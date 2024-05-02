@@ -1,5 +1,7 @@
 package com.truckstopservices.processing.entity;
 
+
+
 public class ConvenienceStoreSale {
     private int coffee;
     private int sodas;

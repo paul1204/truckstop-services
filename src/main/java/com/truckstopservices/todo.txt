@@ -1,0 +1,1 @@
+Add Qty to all product models/entites

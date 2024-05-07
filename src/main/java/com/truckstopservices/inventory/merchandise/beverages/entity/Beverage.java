@@ -9,13 +9,15 @@ public class Beverage<T> {
     public double price;
 
     public Brands brand;
+    int qty;
 
-    public Beverage(String skuCode, String name, String size, double price, Brands brand) {
+    public Beverage(String skuCode, String name, String size, double price, Brands brand, int qty) {
         this.skuCode = skuCode;
         this.name = name;
         this.size = size;
         this.price = price;
         this.brand = brand;
+        this.qty = qty;
     }
 
     public String getSkuCode() {
@@ -48,5 +50,21 @@ public class Beverage<T> {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public Brands getBrand() {
+        return brand;
+    }
+
+    public void setBrand(Brands brand) {
+        this.brand = brand;
+    }
+
+    public int getQty() {
+        return qty;
+    }
+
+    public void setQty(int qty) {
+        this.qty = qty;
     }
 }

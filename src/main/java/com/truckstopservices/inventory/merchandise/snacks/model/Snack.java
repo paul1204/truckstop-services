@@ -9,11 +9,15 @@ public abstract class Snack {
 
     public Brands brand;
 
-    public Snack(String skuCode, String name, double price, Brands brand) {
+    int qty;
+
+
+    public Snack(String skuCode, String name, double price, Brands brand, int qty) {
         this.skuCode = skuCode;
         this.name = name;
         this.price = price;
         this.brand = brand;
+        this.qty = qty;
     }
 
     public String getSkuCode() {
@@ -47,4 +51,12 @@ public abstract class Snack {
     public void setBrand(Brands brand) {
         this.brand = brand;
     }
+    public int getQty() {
+        return qty;
+    }
+
+    public void setQty(int qty) {
+        this.qty = qty;
+    }
+
 }

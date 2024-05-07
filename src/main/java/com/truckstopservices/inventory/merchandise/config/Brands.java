@@ -1,4 +1,4 @@
-package com.truckstopservices.inventory.merchandise;
+package com.truckstopservices.inventory.merchandise.config;
 
 public enum Brands {
     PEPSI,

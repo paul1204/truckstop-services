@@ -1,7 +1,7 @@
 package com.truckstopservices.inventory.manager.config;
 
-import com.truckstopservices.inventory.manager.entity.StockBalance;
-import com.truckstopservices.inventory.merchandise.Brands;
+import com.truckstopservices.inventory.manager.entity.InitialInventory;
+import com.truckstopservices.inventory.merchandise.config.Brands;
 import com.truckstopservices.inventory.merchandise.beverages.entity.Beverage;
 import com.truckstopservices.inventory.merchandise.snacks.entity.Chips;
 import com.truckstopservices.inventory.merchandise.snacks.model.Snack;
@@ -15,7 +15,7 @@ import java.util.List;
 public class InventoryConfig {
 
     @Bean
-    public StockBalance initalInventory(){
+    public InitialInventory initalInventory(){
         List<Snack> initalSnacks = Arrays.asList(
                 new Chips("123", "Plain", 1.49, Brands.LAYS),
                 new Chips("456", "Spicy", 1.49, Brands.LAYS),
@@ -29,6 +29,6 @@ public class InventoryConfig {
         new Beverage("B123", "Sprite Zero", "12oz", 1.49, Brands.COCACOLA)
                 // Add more predefined snacks as needed
         );
-        return new StockBalance(initalSnacks, initalDrinks);
+        return new InitialInventory(initalSnacks, initalDrinks);
     }
 }

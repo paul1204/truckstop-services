@@ -1,8 +1,8 @@
 package com.truckstopservices.inventory.merchandise.beverages.entity;
 
-import com.truckstopservices.inventory.merchandise.Brands;
+import com.truckstopservices.inventory.merchandise.config.Brands;
 
-public class Beverage {
+public class Beverage<T> {
     public String skuCode;
     public String name;
     public String size;

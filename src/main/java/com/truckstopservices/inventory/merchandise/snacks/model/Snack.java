@@ -1,6 +1,6 @@
 package com.truckstopservices.inventory.merchandise.snacks.model;
 
-import com.truckstopservices.inventory.merchandise.Brands;
+import com.truckstopservices.inventory.merchandise.config.Brands;
 
 public abstract class Snack {
     public String skuCode;

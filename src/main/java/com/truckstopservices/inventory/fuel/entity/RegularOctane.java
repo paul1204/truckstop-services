@@ -1,14 +1,15 @@
 package com.truckstopservices.inventory.fuel.entity;
 
+import com.truckstopservices.inventory.fuel.model.CalculateFuelPrice;
 import com.truckstopservices.inventory.fuel.model.FuelModel;
 
-public class RegularOctane extends FuelModel {
+public class RegularOctane extends FuelModel implements CalculateFuelPrice {
     public RegularOctane(int octane, double pricePerGallon) {
         super(octane, pricePerGallon);
     }
 
     @Override
-    public double calculateTotalPrice(double quantity) {
-        return 0;
+    public double calculateGallonsToDispense(double amount) {
+        return amount / getPricePerGallon();
     }
 }

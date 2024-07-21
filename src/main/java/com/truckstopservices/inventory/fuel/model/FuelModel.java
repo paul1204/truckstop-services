@@ -25,6 +25,8 @@ public abstract class FuelModel {
         this.pricePerGallon = pricePerGallon;
     }
 
-    public abstract double calculateTotalPrice(double quantity);
+    public double calculateTotalPrice(double quantity){
+        return getPricePerGallon() * quantity;
+    };
 
 }

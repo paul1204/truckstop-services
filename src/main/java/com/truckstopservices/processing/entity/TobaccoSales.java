@@ -13,6 +13,8 @@ public class TobaccoSales {
     private Long tobaccoSalesId;
     private double totalSales;
 
+    @ManyToOne
+    private ShiftReport shiftReport;
 
 //    private int cigarettes;
 

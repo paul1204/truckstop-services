@@ -16,6 +16,9 @@ public class MerchandiseSales {
 
     private double totalConvenienceStoreSales;
 
+    @ManyToOne
+    private ShiftReport shiftReport;
+
     //Break Down Convenience Store Items later...
 //    private int coffee;
 //    private int sodas;

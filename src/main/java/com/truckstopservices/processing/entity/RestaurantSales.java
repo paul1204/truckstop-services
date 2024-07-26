@@ -1,11 +1,8 @@
 package com.truckstopservices.processing.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+
 @Entity
 public class RestaurantSales {
 
@@ -14,7 +11,7 @@ public class RestaurantSales {
     private Long restaurantSalesId;
     private double totalSales;
 
-    @ManyToOne
+    @OneToOne
     private ShiftReport shiftReport;
 
 //    private int breakfastMeals;

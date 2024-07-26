@@ -1,29 +1,33 @@
 package com.truckstopservices.processing.service;
 
-import com.truckstopservices.posdataingest.model.ShiftReport;
+import com.truckstopservices.processing.entity.FuelSales;
+import com.truckstopservices.processing.entity.ShiftReport;
 import com.truckstopservices.processing.dto.ShiftReportDto;
+import com.truckstopservices.processing.repository.ShiftReportRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ProcessingService {
-    public ProcessingService(){
+    @Autowired
+    private ShiftReportRepository shiftReportRepository;
 
-    }
-    public ShiftReportDto parseData(ShiftReport posReport){
-        ShiftReportDto shiftReportDto = new ShiftReportDto();
-        shiftReportDto.setDate(posReport.getDate());
-        shiftReportDto.setShiftNumber(posReport.getShiftNumber());
-        shiftReportDto.setEmployeeID(posReport.getEmployeeID());
-        shiftReportDto.setManagerID(posReport.getManagerID());
-        shiftReportDto.setPosCashTil1(posReport.getPosCashTil1());
-        shiftReportDto.setPosCashTil2(posReport.getPosCashTil2());
+    @Transactional
+    public ShiftReportDto parseData(ShiftReportDto shiftReportDto){
+        ShiftReport shiftReport = shiftReportRepository.findByShiftNumber(shiftReportDto.shiftNumber())
+                .orElse(new ShiftReport());
+        shiftReport.setDate(shiftReportDto.date());
+        shiftReport.setShiftNumber(shiftReportDto.shiftNumber());
+        shiftReport.setEmployeeID(shiftReportDto.employeeID());
+        shiftReport.setManagerID(shiftReportDto.managerID());
+        shiftReport.setPosCashTil1(shiftReportDto.posCashTil1());
+        shiftReport.setPosCashTil2(shiftReportDto.posCashTil2());
 
-        shiftReportDto.setFuelSaleRegular(posReport.getFuelSaleRegular());
-        shiftReportDto.setFuelSalesMidGrade(posReport.getFuelSalesMidGrade());
-        shiftReportDto.setFuelSalesPremium(posReport.getFuelSalesPremium());
-        shiftReportDto.setFuelSalesDiesel(posReport.getFuelSalesDiesel());
-        shiftReportDto.setConvenienceStoreSales(posReport.getConvenienceStoreSales());
-        shiftReportDto.setRestaurantSales(posReport.getRestaurantSales());
-        shiftReportDto.setTobaccoSales(posReport.getTobaccoSales());
-
+        Set<FuelSales> fuelSalesSet = new HashSet<>();
+        FuelSales fuelSale = new FuelSales();
+        //fuelSale.setRegularGasolineTransactions(shiftReportDto.fuelSaleRegular());
         return shiftReportDto;
     }
 

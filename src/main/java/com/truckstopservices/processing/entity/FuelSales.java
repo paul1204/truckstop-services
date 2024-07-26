@@ -12,7 +12,7 @@ import jakarta.persistence.ManyToOne;
 public class FuelSales {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long fuelId;
+    private Long fuelSalesId;
     private int dieselTransactions;
     private int regularGasolineTransactions;
     private int midGradeGasolineTransactions;

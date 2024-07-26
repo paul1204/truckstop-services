@@ -10,7 +10,7 @@ public class TobaccoSales {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long tobaccoId;
+    private Long tobaccoSalesId;
     private double totalSales;
 
 

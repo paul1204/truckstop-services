@@ -12,9 +12,9 @@ import java.util.Optional;
 public interface ShiftReportRepository extends JpaRepository<ShiftReport, Long> {
 
     Optional<ShiftReport> findByShiftNumber(String shiftNumber);
-    List<FuelSales> findFuelSalesByShiftId(Long id);
-    List<MerchandiseSales> findMerchandiseSalesByShiftId(Long id);
-    List<RestaurantSales> findRestaurantSalesByShiftId(Long id);
-    List<TobaccoSales> findTobaccoSalesByShiftId(Long id);
+    List<FuelSales> findFuelSalesIdByShiftId(Long id);
+    List<MerchandiseSales> findMerchandiseSalesIdByShiftId(Long id);
+    List<RestaurantSales> findRestaurantSalesIdByShiftId(Long id);
+    List<TobaccoSales> findTobaccoSalesIdByShiftId(Long id);
 
 }

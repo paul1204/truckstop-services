@@ -11,7 +11,7 @@ public class RestaurantSales {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long restaurantId;
+    private Long restaurantSalesId;
     private double totalSales;
 
     @ManyToOne

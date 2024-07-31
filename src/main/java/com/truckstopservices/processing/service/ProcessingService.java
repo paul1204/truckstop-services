@@ -18,7 +18,7 @@ public class ProcessingService {
     private ShiftReportRepository shiftReportRepository;
 
     @Transactional
-    public ShiftReport parseShiftData(ShiftReportDto shiftReportDto){
+    public void parseShiftData(ShiftReportDto shiftReportDto){
         ShiftReport shiftReport = shiftReportRepository.findByShiftNumber(shiftReportDto.shiftNumber())
                 .orElse(new ShiftReport());
         shiftReport.setDate(shiftReportDto.date());
@@ -48,8 +48,8 @@ public class ProcessingService {
         merchandiseSales.setShiftReport(shiftReport);
         restaurantSales.setShiftReport(shiftReport);
         tobaccoSales.setShiftReport(shiftReport);
-        
-        return shiftReport;
+
+        saveToRepository(shiftReport);
     }
 
     public void saveToRepository(ShiftReport shiftReport){

@@ -23,9 +23,11 @@ public abstract class FuelModel {
     }
 
 
-    public FuelModel(int octane, double pricePerGallon, double totalGallons){
+    public FuelModel(int octane, double pricePerGallon, double initalFuel){
         this.octane = octane;
         this.pricePerGallon = pricePerGallon;
+        this.totalGallons = initalFuel;
+        this.availableGallons = initalFuel;
     }
 
     public int getOctane() {

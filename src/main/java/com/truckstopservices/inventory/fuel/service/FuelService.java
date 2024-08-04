@@ -55,11 +55,6 @@ public class FuelService {
                 .map(premiumOctane -> new FuelInventoryResponse("93",premiumOctane.getTotalGallons()))
                 .toList());
 
-
-//        fuelInventoryList.addAll(regularFuelRepository.findAll());
-//        fuelInventoryList.addAll(midGradeFuelRepository.findAll());
-//        fuelInventoryList.addAll(premimumFuelRepository.findAll());
-
         return fuelInventoryList;
     }
 

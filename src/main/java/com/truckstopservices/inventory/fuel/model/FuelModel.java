@@ -4,9 +4,9 @@ package com.truckstopservices.inventory.fuel.model;
 import com.truckstopservices.processing.entity.FuelSales;
 import jakarta.persistence.*;
 
-//@MappedSuperclass
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@MappedSuperclass
+//@Entity
+//@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class FuelModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

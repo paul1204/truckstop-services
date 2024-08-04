@@ -5,8 +5,6 @@ import com.truckstopservices.processing.entity.FuelSales;
 import jakarta.persistence.*;
 
 @MappedSuperclass
-//@Entity
-//@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class FuelModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,9 +17,7 @@ public abstract class FuelModel {
     private double availableGallons;
 
     public FuelModel(){
-
     }
-
 
     public FuelModel(int octane, double pricePerGallon, double initalFuel){
         this.octane = octane;
@@ -63,10 +59,6 @@ public abstract class FuelModel {
 
     public void setAvailableGallons(int availableGallons) {
         this.availableGallons = availableGallons;
-    }
-
-    public void initalizeTotalGallon(){
-
     }
 
 }

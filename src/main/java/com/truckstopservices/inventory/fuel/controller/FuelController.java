@@ -26,7 +26,7 @@ public class FuelController {
     @GetMapping("/viewInventory")
     public ResponseEntity<List<?>> viewInventory() {
         List<?> response = fuelService.getAllFuelInventory();
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

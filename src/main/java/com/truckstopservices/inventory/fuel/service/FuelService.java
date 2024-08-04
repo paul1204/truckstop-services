@@ -1,5 +1,6 @@
 package com.truckstopservices.inventory.fuel.service;
 
+import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.model.FuelModel;
 import com.truckstopservices.inventory.fuel.repository.DieselRepository;
 //import com.truckstopservices.inventory.fuel.repository.FuelRepository;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FuelService {
@@ -35,11 +37,28 @@ public class FuelService {
     }
 
     public List<?> getAllFuelInventory(){
-        List<FuelModel> fuelInventoryList = new ArrayList<>();
-        fuelInventoryList.addAll(dieselRepository.findAll());
-        fuelInventoryList.addAll(regularFuelRepository.findAll());
-        fuelInventoryList.addAll(midGradeFuelRepository.findAll());
-        fuelInventoryList.addAll(premimumFuelRepository.findAll());
+        List<FuelInventoryResponse> fuelInventoryList = new ArrayList<>();
+        fuelInventoryList.addAll(
+                dieselRepository.findAll().stream()
+                .map(diesel -> new FuelInventoryResponse("Diesel",diesel.getTotalGallons()))
+                .toList());
+        fuelInventoryList.addAll(
+                regularFuelRepository.findAll().stream()
+                .map(regularOctane -> new FuelInventoryResponse("87",regularOctane.getTotalGallons()))
+                .toList());
+        fuelInventoryList.addAll(
+                midGradeFuelRepository.findAll().stream()
+                .map(midGradeOctane -> new FuelInventoryResponse("89",midGradeOctane.getTotalGallons()))
+                .toList());
+        fuelInventoryList.addAll(
+                premimumFuelRepository.findAll().stream()
+                .map(premiumOctane -> new FuelInventoryResponse("93",premiumOctane.getTotalGallons()))
+                .toList());
+
+
+//        fuelInventoryList.addAll(regularFuelRepository.findAll());
+//        fuelInventoryList.addAll(midGradeFuelRepository.findAll());
+//        fuelInventoryList.addAll(premimumFuelRepository.findAll());
 
         return fuelInventoryList;
     }

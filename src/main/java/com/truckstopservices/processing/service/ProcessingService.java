@@ -8,15 +8,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ProcessingService {
     @Autowired
     private ShiftReportRepository shiftReportRepository;
 
+
+
+    public ShiftReportDto parsePOSFile(String rawDtoString){
+        String[] lines = rawDtoString.split("\n");
+
+        System.out.println(rawDtoString);
+
+
+        Map<String, String> dtopMap = new HashMap<>();
+
+        for(String line : lines){
+            String[] data = line.split(":",2);
+            if(data.length == 2){
+                dtopMap.put(data[0].trim(), data[1].trim());
+            }
+        }
+        String date = dtopMap.get("DATE");
+        String shiftNumber = dtopMap.get("SHIFT_NUMBER");
+        String employeeID = dtopMap.get("EMPLOYEE_ID");
+        String managerID = dtopMap.get("MANAGER_ID");
+
+        double posCashTil1 = Double.parseDouble(dtopMap.get("STARTING_DRAWER_POS1").replaceAll("[$,]", ""));
+        double posCashTil2 = Double.parseDouble(dtopMap.get("STARTING_DRAWER_POS2").replaceAll("[$,]", ""));
+
+        double fuelSaleRegular = Double.parseDouble(dtopMap.get("REGULAR_GASOLINE_TRANSACTIONS").replaceAll("[$,]", ""));
+        double fuelSalesMidGrade = Double.parseDouble(dtopMap.get("MID_GRADE_GASOLINE_TRANSACTIONS").replaceAll("[$,]", ""));
+        double fuelSalesPremium = Double.parseDouble(dtopMap.get("PREMIUM_GASOLINE_TRANSACTIONS").replaceAll("[$,]", ""));
+        double fuelSalesDiesel = Double.parseDouble(dtopMap.get("DIESEL_TRANSACTIONS").replaceAll("[$,]", ""));
+
+        double merchandiseSales = Double.parseDouble(dtopMap.get("TOTAL_CONVENIENCE_STORE_SALES").replaceAll("[$,]", ""));
+        double restaurantSales = Double.parseDouble(dtopMap.get("TOTAL_RESTAURANT_SALES").replaceAll("[$,]", ""));
+        double tobaccoSales = Double.parseDouble(dtopMap.get("TOTAL_TOBACCO_SALES").replaceAll("[$,]", ""));
+        return new ShiftReportDto(date, shiftNumber, employeeID, managerID, posCashTil1, posCashTil2,
+                fuelSaleRegular, fuelSalesMidGrade, fuelSalesPremium, fuelSalesDiesel,
+                merchandiseSales, restaurantSales, tobaccoSales);
+    }
     @Transactional
     public void parseShiftData(ShiftReportDto shiftReportDto){
         ShiftReport shiftReport = shiftReportRepository.findByShiftNumber(shiftReportDto.shiftNumber())

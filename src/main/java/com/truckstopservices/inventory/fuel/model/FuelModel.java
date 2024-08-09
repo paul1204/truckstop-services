@@ -61,4 +61,7 @@ public abstract class FuelModel {
         this.availableGallons = availableGallons;
     }
 
+    public void updateGallonsReduceInventory(double gallonsSold){
+        this.availableGallons -= gallonsSold;
+    }
 }

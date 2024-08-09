@@ -1,12 +1,19 @@
 package com.truckstopservices.inventory.fuel.service;
 
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
+import com.truckstopservices.inventory.fuel.entity.Diesel;
+import com.truckstopservices.inventory.fuel.entity.MidGradeOctane;
+import com.truckstopservices.inventory.fuel.entity.PremiumOctane;
+import com.truckstopservices.inventory.fuel.entity.RegularOctane;
 import com.truckstopservices.inventory.fuel.model.FuelModel;
 import com.truckstopservices.inventory.fuel.repository.DieselRepository;
 //import com.truckstopservices.inventory.fuel.repository.FuelRepository;
 import com.truckstopservices.inventory.fuel.repository.MidGradeFuelRepository;
 import com.truckstopservices.inventory.fuel.repository.PremimumFuelRepository;
 import com.truckstopservices.inventory.fuel.repository.RegularFuelRepository;
+import com.truckstopservices.processing.dto.ShiftReportDto;
+import com.truckstopservices.processing.entity.ShiftReport;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,4 +68,28 @@ public class FuelService {
     //Add Fuel To Inventory
 
     //Update Fuel Inventory
+    public void updateFuelInventoryDeductAvailableGallons(ShiftReportDto shiftReportDto){
+        RegularOctane regularOctane = regularFuelRepository.findByOctane(87)
+                .orElseThrow(()-> new EntityNotFoundException("Regular Not Found"));
+        regularOctane.updateGallonsReduceInventory(shiftReportDto.fuelSaleRegular());
+
+        MidGradeOctane midGrade = midGradeFuelRepository.findByOctane(89)
+                .orElseThrow(()-> new EntityNotFoundException("Mid Grade Not Found"));
+        midGrade.updateGallonsReduceInventory(shiftReportDto.fuelSalesMidGrade());
+
+        PremiumOctane premiumOctane = premimumFuelRepository.findByOctane(91)
+                .orElseThrow(()-> new EntityNotFoundException("Premium Grade Not Found"));
+        premiumOctane.updateGallonsReduceInventory(shiftReportDto.fuelSalesPremium());
+
+        Diesel diesel = dieselRepository.findByOctane(40)
+                .orElseThrow(()-> new EntityNotFoundException("Diesel Not Found"));
+        diesel.updateGallonsReduceInventory(shiftReportDto.fuelSalesDiesel());
+    }
+
+    public void updateRegularFuelInventory(double regularOctane){
+
+        //regularFuelRepository.save(sRDto.fuelSaleRegular());
+        //regularFuelRepository.save()
+    }
+
 }

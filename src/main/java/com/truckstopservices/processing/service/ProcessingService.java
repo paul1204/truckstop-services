@@ -1,5 +1,7 @@
 package com.truckstopservices.processing.service;
 
+import com.truckstopservices.inventory.fuel.model.FuelModel;
+import com.truckstopservices.inventory.fuel.service.FuelService;
 import com.truckstopservices.processing.dto.DailySalesDto;
 import com.truckstopservices.processing.entity.*;
 import com.truckstopservices.processing.dto.ShiftReportDto;
@@ -15,6 +17,9 @@ import java.util.*;
 public class ProcessingService {
     @Autowired
     private ShiftReportRepository shiftReportRepository;
+
+    @Autowired
+    private FuelService fuelService;
 
     public ShiftReportDto parsePOSFile(String rawDtoString){
         String[] lines = rawDtoString.split("\n");
@@ -51,9 +56,10 @@ public class ProcessingService {
     public void parseShiftData(ShiftReportDto shiftReportDto){
         ShiftReport s = createShiftReport(shiftReportDto);
         saveToRepository(s);
+
+        //update inventory
+        fuelService.updateFuelInventoryDeductAvailableGallons(shiftReportDto);
     }
-
-
 
     private ShiftReport createShiftReport(ShiftReportDto shiftReportDto){
         ShiftReport shiftReport = shiftReportRepository.findByShiftNumber(shiftReportDto.shiftNumber())
@@ -93,7 +99,6 @@ public class ProcessingService {
         shiftReport.setTobaccoSales(tobaccoSales);
 
         return shiftReport;
-
     }
     public void saveToRepository(ShiftReport shiftReport){
         shiftReportRepository.save(shiftReport);

@@ -1,14 +1,5 @@
 package com.truckstopservices.processing.entity;
-
-//import javax.persistence.Entity;
-//import javax.persistence.Id;
-//import javax.persistence.GeneratedValue;
-//import javax.persistence.GenerationType;
-//import javax.persistence.OneToMany;
-//import javax.persistence.CascadeType;
 import jakarta.persistence.*;
-
-import java.util.Set;
 
 @Entity
 public class ShiftReport {
@@ -25,7 +16,6 @@ public class ShiftReport {
     private double posCashTil1;
     private double posCashTil2;
     public ShiftReport(){
-
     }
 
     @OneToOne(mappedBy = "shiftReport", cascade = CascadeType.ALL, orphanRemoval = true)

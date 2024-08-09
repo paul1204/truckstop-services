@@ -10,23 +10,20 @@ public class FuelSales {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long fuelSalesId;
     private double dieselTransactions;
-    private double regularGasolineTransactions;
+    public double regularGasolineTransactions;
     private double midGradeGasolineTransactions;
     private double premiumGasolineTransactions;
     private double totalGasolineSales;
 
 
     @OneToOne
-    //@JoinColumn(name = "shift_id")
     @JoinColumn(name = "shift_number", referencedColumnName = "shiftNumber")
     private ShiftReport shiftReport;
 
     public FuelSales(){
-
     }
     public FuelSales(double totalFuelSales){
         this.totalGasolineSales = totalFuelSales;
-
     }
 
     public double getDieselTransactions() {

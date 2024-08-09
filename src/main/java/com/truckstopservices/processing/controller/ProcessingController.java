@@ -35,13 +35,12 @@ public class ProcessingController {
     public ResponseEntity<ShiftReportDto> processShift(@RequestParam("file") MultipartFile rawShiftReport) {
         ShiftReportDto shiftReportDto;
         try {
-
             if (rawShiftReport.isEmpty()) {
                 return new ResponseEntity<ShiftReportDto>((ShiftReportDto) null, HttpStatus.BAD_REQUEST);
             }
-
             String rawShiftString = new String(rawShiftReport.getBytes(), StandardCharsets.UTF_8);
             shiftReportDto = processingService.parsePOSFile(rawShiftString);
+            processingService.parseShiftData(shiftReportDto);
 
         } catch (Exception e) {
             return new ResponseEntity<ShiftReportDto>((ShiftReportDto) null, HttpStatus.CREATED);

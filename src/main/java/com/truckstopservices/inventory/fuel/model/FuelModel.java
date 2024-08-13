@@ -57,7 +57,7 @@ public abstract class FuelModel {
         return availableGallons;
     }
 
-    public void setAvailableGallons(int availableGallons) {
+    public void setAvailableGallons(double availableGallons) {
         this.availableGallons = availableGallons;
     }
 

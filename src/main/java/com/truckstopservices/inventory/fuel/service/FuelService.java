@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,12 +85,27 @@ public class FuelService {
         Diesel diesel = dieselRepository.findByOctane(40)
                 .orElseThrow(()-> new EntityNotFoundException("Diesel Not Found"));
         diesel.updateGallonsReduceInventory(shiftReportDto.fuelSalesDiesel());
+
+        //dieselRepository.
     }
 
     public void updateRegularFuelInventory(double regularOctane){
 
         //regularFuelRepository.save(sRDto.fuelSaleRegular());
         //regularFuelRepository.save()
+    }
+
+    public String recieveFuelDelivery(int octane, int purchasedGallons){
+        Optional<Diesel> availableDiesel = dieselRepository.findByOctane(40);
+        if(availableDiesel.isPresent()){
+            Diesel diesel = availableDiesel.get();
+            diesel.setAvailableGallons(diesel.getAvailableGallons() + purchasedGallons);
+            dieselRepository.save(diesel);
+            return "Return Better Response";
+        }
+        else{
+            return "Throw Better Execption";
+        }
     }
 
 }

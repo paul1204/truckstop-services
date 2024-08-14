@@ -1,8 +1,12 @@
 package com.truckstopservices.inventory.fuel.controller;
 
 
+import com.truckstopservices.inventory.fuel.entity.Diesel;
+import com.truckstopservices.inventory.fuel.entity.PremiumOctane;
+import com.truckstopservices.inventory.fuel.entity.RegularOctane;
 import com.truckstopservices.inventory.fuel.model.FuelModel;
 import com.truckstopservices.inventory.fuel.service.FuelService;
+import com.truckstopservices.processing.dto.FuelDeliveryResponse;
 import com.truckstopservices.processing.dto.ShiftReportDto;
 import com.truckstopservices.processing.entity.ShiftReport;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +36,40 @@ public class FuelController {
 
     @PostMapping("/update/FuelInventory/reduceGallons")
     public ResponseEntity<List<?>> updateFuelInventoryReduceGallons(@RequestBody ShiftReportDto shiftReportDto){
-        //shiftReport.getFuelSales().getRegularGasolineTransactions();
         fuelService.updateFuelInventoryDeductAvailableGallons(shiftReportDto);
         return ResponseEntity.ok().build();
-
+    }
+    @PutMapping("/update/FuelInventory/dieselDelivery")
+    public ResponseEntity<FuelDeliveryResponse<Diesel>> dieselDeliveryUpdateInventory(@RequestParam double dieselDeliveryGallons){
+    try{
+        Diesel updatedDiesel = fuelService.recieveDieselFuelDelivery(dieselDeliveryGallons);
+        return new ResponseEntity<>(new FuelDeliveryResponse<Diesel>(true, "Diesel Delivery Successful", updatedDiesel), HttpStatus.OK);
+    }
+    catch (Exception e){
+        return new ResponseEntity<>(new FuelDeliveryResponse<Diesel>(false, e.getMessage(), null), HttpStatus.BAD_REQUEST);
+    }
+    }
+    @PutMapping("/update/FuelInventory/RegularOctaneDelivery")
+    public ResponseEntity<FuelDeliveryResponse<RegularOctane>> recieveRegularOctaneFuelDelivery(@RequestParam double regularOctaneDeliveryGallons){
+        try{
+            RegularOctane updatedRegular = fuelService.recieveRegularOctaneFuelDelivery(regularOctaneDeliveryGallons);
+            return new ResponseEntity<>(new FuelDeliveryResponse<RegularOctane>(true, "Regular Delivery Successful", updatedRegular), HttpStatus.OK);
+        }
+        //Throw Better Exception!
+        catch(Exception e){
+            return new ResponseEntity<>(new FuelDeliveryResponse<RegularOctane>(false, e.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PutMapping("/update/FuelInventory/PremiumOctaneDelivery")
+    public ResponseEntity<FuelDeliveryResponse<PremiumOctane>> recievePremiumOctaneFuelDelivery(@RequestParam double premiumOctaneDeliverGallons){
+        try{
+            PremiumOctane updatedPremium = fuelService.recievePremiumOctaneFuelDelivery(premiumOctaneDeliverGallons);
+            return new ResponseEntity<>(new FuelDeliveryResponse<PremiumOctane>(true, "Delivery Successful", updatedPremium), HttpStatus.OK);
+        }
+        //Throw Better Exception!
+        catch(Exception e){
+            return new ResponseEntity<>(new FuelDeliveryResponse<PremiumOctane>(false,e.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

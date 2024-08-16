@@ -64,7 +64,7 @@ public class FuelController {
     public ResponseEntity<FuelDeliveryResponse<PremiumOctane>> recievePremiumOctaneFuelDelivery(@RequestParam double premiumOctaneDeliverGallons){
         try{
             PremiumOctane updatedPremium = fuelService.recievePremiumOctaneFuelDelivery(premiumOctaneDeliverGallons);
-            return new ResponseEntity<>(new FuelDeliveryResponse<PremiumOctane>(true, "Delivery Successful", updatedPremium), HttpStatus.OK);
+            return new ResponseEntity<>(new FuelDeliveryResponse<PremiumOctane>(true, "Premium Delivery Successful", updatedPremium), HttpStatus.OK);
         }
         //Throw Better Exception!
         catch(Exception e){

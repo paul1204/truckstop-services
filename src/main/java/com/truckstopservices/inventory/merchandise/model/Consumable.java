@@ -1,20 +1,30 @@
-package com.truckstopservices.inventory.merchandise.beverages.entity;
+package com.truckstopservices.inventory.merchandise.model;
 
-import com.truckstopservices.inventory.merchandise.config.Brands;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
-public class Beverage<T> {
-    public String skuCode;
-    public String name;
-    public String size;
-    public double price;
+@MappedSuperclass
+public abstract class Consumable {
 
-    public Brands brand;
-    int qty;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-    public Beverage(String skuCode, String name, String size, double price, Brands brand, int qty) {
+    private String skuCode;
+
+    private String name;
+
+    private double price;
+
+    private String brand;
+
+    private int qty;
+
+    public Consumable(String skuCode, String name, double price, String brand, int qty) {
         this.skuCode = skuCode;
         this.name = name;
-        this.size = size;
         this.price = price;
         this.brand = brand;
         this.qty = qty;
@@ -36,14 +46,6 @@ public class Beverage<T> {
         this.name = name;
     }
 
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
-    }
-
     public double getPrice() {
         return price;
     }
@@ -52,11 +54,11 @@ public class Beverage<T> {
         this.price = price;
     }
 
-    public Brands getBrand() {
+    public String getBrand() {
         return brand;
     }
 
-    public void setBrand(Brands brand) {
+    public void setBrand(String brand) {
         this.brand = brand;
     }
 

@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface DieselRepository extends JpaRepository<Diesel, Integer> {
+public interface DieselRepository extends JpaRepository<Diesel, Long> {
     Optional<Diesel> findByOctane(int octane);
 }

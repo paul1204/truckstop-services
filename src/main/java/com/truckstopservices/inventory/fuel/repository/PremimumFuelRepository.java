@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface PremimumFuelRepository extends JpaRepository<PremiumOctane, Integer> {
+public interface PremimumFuelRepository extends JpaRepository<PremiumOctane, Long> {
     Optional<PremiumOctane> findByOctane(int octane);
 }
 

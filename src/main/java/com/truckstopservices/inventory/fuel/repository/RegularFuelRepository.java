@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface RegularFuelRepository extends JpaRepository<RegularOctane, Double> {
+public interface RegularFuelRepository extends JpaRepository<RegularOctane, Long> {
     Optional<RegularOctane> findByOctane(int octane);
 }
 

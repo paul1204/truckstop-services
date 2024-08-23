@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface MidGradeFuelRepository extends JpaRepository<MidGradeOctane, Integer> {
+public interface MidGradeFuelRepository extends JpaRepository<MidGradeOctane, Long> {
     Optional<MidGradeOctane> findByOctane(int octane);
 }

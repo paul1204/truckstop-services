@@ -13,5 +13,7 @@ public record ShiftReportDto(
         double fuelSalesDiesel,
         double merchandiseSales,
         double restaurantSales,
-        double tobaccoSales
+        double tobaccoSales,
+        double nonRestaurantSales,
+        double bottledBeverageSales
 ) {}

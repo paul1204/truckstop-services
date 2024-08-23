@@ -46,11 +46,13 @@ public class ProcessingService {
         double fuelSalesDiesel = Double.parseDouble(dtopMap.get("DIESEL_TRANSACTIONS").replaceAll("[$,]", ""));
 
         double merchandiseSales = Double.parseDouble(dtopMap.get("TOTAL_CONVENIENCE_STORE_SALES").replaceAll("[$,]", ""));
+        double nonRestaurantSales = Double.parseDouble(dtopMap.get("NON_RESTAURANT_FOOD").replaceAll("[$,]]", ""));
+        double bottledBeverage = Double.parseDouble(dtopMap.get("BOTTLED_BEVERAGES").replaceAll("[$,]]", ""));
         double restaurantSales = Double.parseDouble(dtopMap.get("TOTAL_RESTAURANT_SALES").replaceAll("[$,]", ""));
         double tobaccoSale = Double.parseDouble(dtopMap.get("TOTAL_TOBACCO_SALES").replaceAll("[$,]", ""));
         return new ShiftReportDto(date, shiftNumber, employeeID, managerID, posCashTil1, posCashTil2,
                 fuelSaleRegular, fuelSalesMidGrade, fuelSalesPremium, fuelSalesDiesel,
-                merchandiseSales, restaurantSales, tobaccoSale);
+                merchandiseSales, restaurantSales, tobaccoSale, nonRestaurantSales, bottledBeverage);
     }
     @Transactional
     public void parseShiftData(ShiftReportDto shiftReportDto){
@@ -71,7 +73,6 @@ public class ProcessingService {
         shiftReport.setPosCashTil1(shiftReportDto.posCashTil1());
         shiftReport.setPosCashTil2(shiftReportDto.posCashTil2());
 
-        //Set<FuelSales> fuelSalesSet = new HashSet<>();
         FuelSales fuelSale = new FuelSales();
         fuelSale.setRegularGasolineTransactions(shiftReportDto.fuelSaleRegular());
         fuelSale.setMidGradeGasolineTransactions(shiftReportDto.fuelSalesMidGrade());
@@ -80,6 +81,8 @@ public class ProcessingService {
 
         MerchandiseSales merchandiseSales = new MerchandiseSales();
         merchandiseSales.setMerchandiseSales(shiftReportDto.merchandiseSales());
+        merchandiseSales.setNonRestaurantSales(shiftReportDto.nonRestaurantSales());
+        merchandiseSales.setBottledBeverageSales(shiftReportDto.bottledBeverageSales());
 
         RestaurantSales restaurantSales = new RestaurantSales();
         restaurantSales.setTotalRestaurantSalesSales(shiftReportDto.restaurantSales());

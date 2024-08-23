@@ -11,9 +11,10 @@ public class MerchandiseSales {
     private Long merchandiseSalesId;
 
     private double merchandiseSales;
+    private double nonRestaurantSales;
+    private double bottledBeverageSales;
 
     @OneToOne
-    //@JoinColumn(name = "shift_id", referencedColumnName = "shiftId")
     @JoinColumn(name = "shift_number", referencedColumnName = "shiftNumber")
     private ShiftReport shiftReport;
 
@@ -31,14 +32,24 @@ public class MerchandiseSales {
         this.merchandiseSales = merchandiseSales;
     }
 
-
     public void setShiftReport(ShiftReport shiftReport) {
         this.shiftReport = shiftReport;
     }
     //Break Down Convenience Store Items later...
-//    private int coffee;
-//    private int sodas;
-//    private int waterBottles;
-//    private int beer;
-//    private int medication;
+
+    public double getNonRestaurantSales() {
+        return nonRestaurantSales;
+    }
+
+    public void setNonRestaurantSales(double nonRestaurantSales) {
+        this.nonRestaurantSales = nonRestaurantSales;
+    }
+
+    public double getBottledBeverageSales() {
+        return bottledBeverageSales;
+    }
+
+    public void setBottledBeverageSales(double bottledBeverageSales) {
+        this.bottledBeverageSales = bottledBeverageSales;
+    }
 }

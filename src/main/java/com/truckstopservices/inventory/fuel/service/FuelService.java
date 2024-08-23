@@ -1,27 +1,17 @@
 package com.truckstopservices.inventory.fuel.service;
 
+import com.truckstopservices.inventory.fuel.dto.FuelDeliveryDto;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
-import com.truckstopservices.inventory.fuel.entity.Diesel;
-import com.truckstopservices.inventory.fuel.entity.MidGradeOctane;
-import com.truckstopservices.inventory.fuel.entity.PremiumOctane;
-import com.truckstopservices.inventory.fuel.entity.RegularOctane;
-import com.truckstopservices.inventory.fuel.model.FuelModel;
-import com.truckstopservices.inventory.fuel.repository.DieselRepository;
+import com.truckstopservices.inventory.fuel.entity.*;
+import com.truckstopservices.inventory.fuel.repository.*;
 //import com.truckstopservices.inventory.fuel.repository.FuelRepository;
-import com.truckstopservices.inventory.fuel.repository.MidGradeFuelRepository;
-import com.truckstopservices.inventory.fuel.repository.PremimumFuelRepository;
-import com.truckstopservices.inventory.fuel.repository.RegularFuelRepository;
-import com.truckstopservices.processing.dto.FuelDeliveryResponse;
 import com.truckstopservices.processing.dto.ShiftReportDto;
-import com.truckstopservices.processing.entity.ShiftReport;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class FuelService {
@@ -38,6 +28,9 @@ public class FuelService {
     @Autowired
     private PremimumFuelRepository premimumFuelRepository;
 
+    @Autowired
+    private FuelDeliveryRepository fuelDeliveryRepository;
+
     public FuelService(DieselRepository dieselRepository, RegularFuelRepository regularFuelRepository, MidGradeFuelRepository midGradeFuelRepository, PremimumFuelRepository premimumFuelRepository) {
         this.dieselRepository = dieselRepository;
         this.regularFuelRepository = regularFuelRepository;
@@ -45,7 +38,7 @@ public class FuelService {
         this.premimumFuelRepository = premimumFuelRepository;
     }
 
-    public List<?> getAllFuelInventory(){
+    public List<FuelInventoryResponse> getAllFuelInventory(){
         List<FuelInventoryResponse> fuelInventoryList = new ArrayList<>();
         fuelInventoryList.addAll(
                 dieselRepository.findAll().stream()
@@ -67,7 +60,7 @@ public class FuelService {
         return fuelInventoryList;
     }
 
-    public void updateFuelInventoryDeductAvailableGallons(ShiftReportDto shiftReportDto){
+    public void updateFuelInventoryDeductAvailableGallonsFromSales(ShiftReportDto shiftReportDto){
         RegularOctane regularOctane = regularFuelRepository.findByOctane(87)
                 .orElseThrow(()-> new EntityNotFoundException("Regular Not Found"));
         regularOctane.updateGallonsReduceInventory(shiftReportDto.fuelSaleRegular());
@@ -86,7 +79,17 @@ public class FuelService {
 
     }
 
-    public Diesel recieveDieselFuelDelivery(double purchasedGallons) throws Exception{
+    //RETURN RESPONSE!
+    public void updateFuelDeliveryRepo(FuelDelivery fuelDelivery) throws Exception {
+        fuelDeliveryRepository.save(fuelDelivery);
+        updateFuelInventoryFromDelivery(fuelDelivery);
+    }
+    private void updateFuelInventoryFromDelivery(FuelDelivery fuelDelivery) throws Exception {
+        updateDieselFuelDelivery(fuelDelivery.getDieselQtyOrdered());
+        updateRegularOctaneFuelDelivery(fuelDelivery.getRegularOctaneQtyOrdered());
+        updatePremiumOctaneFuelDelivery(fuelDelivery.getPremiumOctanePricePerGallon());
+    }
+    public Diesel updateDieselFuelDelivery(double purchasedGallons) throws Exception{
         return dieselRepository.findByOctane(40)
                 .map(diesel -> {
                     diesel.setAvailableGallons(diesel.getAvailableGallons()+ purchasedGallons);
@@ -96,7 +99,7 @@ public class FuelService {
                 .orElseThrow(()-> new Exception("Error, could not accept Fuel Delivery "));
     }
 
-    public RegularOctane recieveRegularOctaneFuelDelivery(double purchasedGallons) throws Exception{
+    public RegularOctane updateRegularOctaneFuelDelivery(double purchasedGallons) throws Exception{
         return regularFuelRepository.findByOctane(87)
                 .map(regularOctane -> {
                     regularOctane.setAvailableGallons(regularOctane.getAvailableGallons()+ purchasedGallons);
@@ -106,7 +109,7 @@ public class FuelService {
                 .orElseThrow(()-> new Exception("Error, could not accept Fuel Delivery "));
     }
 
-    public PremiumOctane recievePremiumOctaneFuelDelivery(double purchasedGallons) throws Exception {
+    public PremiumOctane updatePremiumOctaneFuelDelivery(double purchasedGallons) throws Exception {
         return premimumFuelRepository.findByOctane(91)
                 .map(premiumOctane -> {
                     premiumOctane.setAvailableGallons(premiumOctane.getAvailableGallons()+ purchasedGallons);

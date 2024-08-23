@@ -60,7 +60,7 @@ public class ProcessingService {
         saveToRepository(s);
 
         //update inventory
-        fuelService.updateFuelInventoryDeductAvailableGallons(shiftReportDto);
+        fuelService.updateFuelInventoryDeductAvailableGallonsFromSales(shiftReportDto);
     }
 
     private ShiftReport createShiftReport(ShiftReportDto shiftReportDto){

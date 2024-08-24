@@ -1,12 +1,12 @@
 package com.truckstopservices.inventory.fuel.entity;
 
 import com.truckstopservices.inventory.fuel.model.CalculateFuelPrice;
-import com.truckstopservices.inventory.fuel.model.FuelModel;
+import com.truckstopservices.inventory.fuel.model.Fuel;
 import jakarta.persistence.Entity;
 
 
 @Entity
-public class PremiumOctane extends FuelModel implements CalculateFuelPrice {
+public class PremiumOctane extends Fuel implements CalculateFuelPrice {
 
     public PremiumOctane(){
         super();

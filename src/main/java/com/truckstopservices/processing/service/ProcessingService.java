@@ -1,6 +1,6 @@
 package com.truckstopservices.processing.service;
 
-import com.truckstopservices.inventory.fuel.model.FuelModel;
+import com.truckstopservices.inventory.fuel.model.Fuel;
 import com.truckstopservices.inventory.fuel.service.FuelService;
 import com.truckstopservices.processing.dto.DailySalesDto;
 import com.truckstopservices.processing.entity.*;
@@ -133,5 +133,4 @@ public class ProcessingService {
                 .sum();
         return new DailySalesDto(date, totalFuelSales, totalMerchandiseSales, totalRestaurantSales, totalTobaccoSales);
     }
-
 }

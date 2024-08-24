@@ -22,12 +22,15 @@ public abstract class Consumable {
 
     private int qty;
 
-    public Consumable(String skuCode, String name, double price, String brand, int qty) {
+    private String size;
+
+    public Consumable(String skuCode, String name, double price, String brand, int qty, String size) {
         this.skuCode = skuCode;
         this.name = name;
         this.price = price;
         this.brand = brand;
         this.qty = qty;
+        this.size = size;
     }
 
     public String getSkuCode() {
@@ -69,4 +72,8 @@ public abstract class Consumable {
     public void setQty(int qty) {
         this.qty = qty;
     }
+
+    public String getSize() {return size;}
+
+    public void setSize(String size) {this.size = size;}
 }

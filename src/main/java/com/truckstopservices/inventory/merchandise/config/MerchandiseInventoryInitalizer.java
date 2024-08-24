@@ -21,11 +21,11 @@ public class MerchandiseInventoryInitalizer {
     @Bean
     public CommandLineRunner loadMerchandiseInventoryData() {
         return args -> {
-        beverageRepository.save(new ColdBeverage("100", "Coke", 1.99, "Coca-Cola", 20));
-        beverageRepository.save(new ColdBeverage("101", "Diet Coke", 1.99, "Coca-Cola", 20));
+        beverageRepository.save(new ColdBeverage("100", "Coke", 1.99, "Coca-Cola", 20, "20oz"));
+        beverageRepository.save(new ColdBeverage("101", "Diet Coke", 1.99, "Coca-Cola", 20, "20oz"));
 
-        nonRestaurantRepository.save(new NonRestaurantFood("500", "Chips", 1.00, "Lays", 20));
-        nonRestaurantRepository.save(new NonRestaurantFood("501", "Spicy Chips", 1.00, "Lays", 20));
+        nonRestaurantRepository.save(new NonRestaurantFood("500", "Chips", 1.00, "Lays", 20, "M"));
+        nonRestaurantRepository.save(new NonRestaurantFood("501", "Spicy Chips", 1.00, "Lays", 20, "M"));
         };
     }
 }

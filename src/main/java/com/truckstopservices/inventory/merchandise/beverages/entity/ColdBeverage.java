@@ -7,7 +7,8 @@ import jakarta.persistence.Entity;
 @Entity
 public class ColdBeverage extends Consumable {
 
-    public ColdBeverage(String skuCode, String name, double price, String brand, int qty) {
-        super(skuCode, name, price, brand, qty);
+    public ColdBeverage(String skuCode, String name, double price, String brand, int qty, String size) {
+        super(skuCode, name, price, brand, qty, size);
     }
+
 }

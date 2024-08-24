@@ -1,6 +1,4 @@
 package com.truckstopservices.inventory.fuel.service;
-
-import com.truckstopservices.inventory.fuel.dto.FuelDeliveryDto;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.entity.*;
 import com.truckstopservices.inventory.fuel.repository.*;
@@ -9,6 +7,7 @@ import com.truckstopservices.processing.dto.ShiftReportDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.truckstopservices.inventory.fuel.model.Fuel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,56 +62,57 @@ public class FuelService {
     public void updateFuelInventoryDeductAvailableGallonsFromSales(ShiftReportDto shiftReportDto){
         RegularOctane regularOctane = regularFuelRepository.findByOctane(87)
                 .orElseThrow(()-> new EntityNotFoundException("Regular Not Found"));
-        regularOctane.updateGallonsReduceInventory(shiftReportDto.fuelSaleRegular());
+        regularOctane.updateGallonsReduceInventorySales(shiftReportDto.fuelSaleRegular());
 
         MidGradeOctane midGrade = midGradeFuelRepository.findByOctane(89)
                 .orElseThrow(()-> new EntityNotFoundException("Mid Grade Not Found"));
-        midGrade.updateGallonsReduceInventory(shiftReportDto.fuelSalesMidGrade());
+        midGrade.updateGallonsReduceInventorySales(shiftReportDto.fuelSalesMidGrade());
 
         PremiumOctane premiumOctane = premimumFuelRepository.findByOctane(91)
                 .orElseThrow(()-> new EntityNotFoundException("Premium Grade Not Found"));
-        premiumOctane.updateGallonsReduceInventory(shiftReportDto.fuelSalesPremium());
+        premiumOctane.updateGallonsReduceInventorySales(shiftReportDto.fuelSalesPremium());
 
         Diesel diesel = dieselRepository.findByOctane(40)
                 .orElseThrow(()-> new EntityNotFoundException("Diesel Not Found"));
-        diesel.updateGallonsReduceInventory(shiftReportDto.fuelSalesDiesel());
-
+        diesel.updateGallonsReduceInventorySales(shiftReportDto.fuelSalesDiesel());
+        //return new Fuel[]{regularOctane,premiumOctane,diesel};
     }
 
     //RETURN RESPONSE!
-    public void updateFuelDeliveryRepo(FuelDelivery fuelDelivery) throws Exception {
+    public Fuel[] updateFuelDeliveryRepo(FuelDelivery fuelDelivery) throws Exception {
         fuelDeliveryRepository.save(fuelDelivery);
-        updateFuelInventoryFromDelivery(fuelDelivery);
+        return updateFuelInventoryFromDelivery(fuelDelivery);
     }
-    private void updateFuelInventoryFromDelivery(FuelDelivery fuelDelivery) throws Exception {
-        updateDieselFuelDelivery(fuelDelivery.getDieselQtyOrdered());
-        updateRegularOctaneFuelDelivery(fuelDelivery.getRegularOctaneQtyOrdered());
-        updatePremiumOctaneFuelDelivery(fuelDelivery.getPremiumOctanePricePerGallon());
+    private Fuel[] updateFuelInventoryFromDelivery(FuelDelivery fuelDelivery) throws Exception {
+        return new Fuel[]{updateDieselFuelDelivery(fuelDelivery.getDieselQtyOrdered()),
+        updateRegularOctaneFuelDelivery(fuelDelivery.getRegularOctaneQtyOrdered()),
+        updatePremiumOctaneFuelDelivery(fuelDelivery.getPremiumOctanePricePerGallon())};
     }
-    public Diesel updateDieselFuelDelivery(double purchasedGallons) throws Exception{
+    public Diesel updateDieselFuelDelivery(double gallonsDelivered) throws Exception{
         return dieselRepository.findByOctane(40)
                 .map(diesel -> {
-                    diesel.setAvailableGallons(diesel.getAvailableGallons()+ purchasedGallons);
+                    diesel.updateGallonsAddInventory(gallonsDelivered);
+                    //diesel.setAvailableGallons(diesel.getAvailableGallons()+ purchasedGallons);
                     return dieselRepository.save(diesel);
                 })
                 //Throw Better Error!!
                 .orElseThrow(()-> new Exception("Error, could not accept Fuel Delivery "));
     }
 
-    public RegularOctane updateRegularOctaneFuelDelivery(double purchasedGallons) throws Exception{
+    public RegularOctane updateRegularOctaneFuelDelivery(double gallonsDelivered) throws Exception{
         return regularFuelRepository.findByOctane(87)
                 .map(regularOctane -> {
-                    regularOctane.setAvailableGallons(regularOctane.getAvailableGallons()+ purchasedGallons);
+                    regularOctane.updateGallonsAddInventory(gallonsDelivered);
                     return regularFuelRepository.save(regularOctane);
                 })
                 //Throw Better Error!!
                 .orElseThrow(()-> new Exception("Error, could not accept Fuel Delivery "));
     }
 
-    public PremiumOctane updatePremiumOctaneFuelDelivery(double purchasedGallons) throws Exception {
+    public PremiumOctane updatePremiumOctaneFuelDelivery(double gallonsDelivered) throws Exception {
         return premimumFuelRepository.findByOctane(91)
                 .map(premiumOctane -> {
-                    premiumOctane.setAvailableGallons(premiumOctane.getAvailableGallons()+ purchasedGallons);
+                    premiumOctane.updateGallonsAddInventory(gallonsDelivered);
                     return premimumFuelRepository.save(premiumOctane);
                 })
                 //Throw Better Error!!

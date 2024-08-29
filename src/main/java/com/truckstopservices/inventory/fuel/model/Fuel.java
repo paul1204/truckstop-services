@@ -4,6 +4,9 @@ package com.truckstopservices.inventory.fuel.model;
 import com.truckstopservices.processing.entity.FuelSales;
 import jakarta.persistence.*;
 
+import java.util.List;
+import java.util.Queue;
+
 @MappedSuperclass
 public abstract class Fuel {
     @Id
@@ -16,14 +19,22 @@ public abstract class Fuel {
 
     private double availableGallons;
 
+    private List<Double> fifoPrice;
+    private List<Double> fifoGallons;
+
+    private double averagePrice;
+
     public Fuel(){
     }
 
-    public Fuel(int octane, double pricePerGallon, double initalFuel){
+    public Fuel(int octane, double pricePerGallon, double initalFuelGallons, List<Double> fifoPrice, List<Double> fifoGallons){
         this.octane = octane;
         this.pricePerGallon = pricePerGallon;
-        this.totalGallons = initalFuel;
-        this.availableGallons = initalFuel;
+        this.totalGallons = initalFuelGallons;
+        this.availableGallons = initalFuelGallons;
+        this.fifoPrice = fifoPrice;
+        this.fifoGallons = fifoGallons;
+        this.averagePrice = pricePerGallon;
     }
 
     public int getOctane() {
@@ -66,4 +77,28 @@ public abstract class Fuel {
     }
 
     public void updateGallonsAddInventory(double gallonsDelivered){this.availableGallons += gallonsDelivered;}
+
+    public List<Double> getFifoPrice() {
+        return fifoPrice;
+    }
+
+    public void setFifoPrice(List<Double> fifoPrice) {
+        this.fifoPrice = fifoPrice;
+    }
+
+    public List<Double> getFifoGallons() {
+        return fifoGallons;
+    }
+
+    public void setFifoGallons(List<Double> fifoGallons) {
+        this.fifoGallons = fifoGallons;
+    }
+
+    public double getAveragePrice() {
+        return averagePrice;
+    }
+
+    public void setAveragePrice(double averagePrice) {
+        this.averagePrice = averagePrice;
+    }
 }

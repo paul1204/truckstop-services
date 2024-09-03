@@ -1,16 +1,21 @@
 package com.truckstopservices.processing.service;
 
-import com.truckstopservices.inventory.fuel.model.Fuel;
 import com.truckstopservices.inventory.fuel.service.FuelService;
+import com.truckstopservices.inventory.merchandise.beverages.entity.ColdBeverage;
+import com.truckstopservices.inventory.merchandise.repository.BeverageRepository;
+import com.truckstopservices.inventory.merchandise.service.MerchandiseService;
 import com.truckstopservices.processing.dto.DailySalesDto;
+import com.truckstopservices.processing.dto.InventoryDto;
 import com.truckstopservices.processing.entity.*;
 import com.truckstopservices.processing.dto.ShiftReportDto;
 import com.truckstopservices.processing.repository.ShiftReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
@@ -21,7 +26,17 @@ public class ProcessingService {
     @Autowired
     private FuelService fuelService;
 
-    public ShiftReportDto parsePOSFile(String rawDtoString){
+    @Autowired
+    private MerchandiseService merchandiseService;
+
+    @Autowired
+    private BeverageRepository beverageRepository;
+
+    public ProcessingService(BeverageRepository beverageRepository) {
+        this.beverageRepository = beverageRepository;
+    }
+
+    public ShiftReportDto parsePOSShiftFile(String rawDtoString){
         String[] lines = rawDtoString.split("\n");
         System.out.println(rawDtoString);
         Map<String, String> dtopMap = new HashMap<>();
@@ -46,16 +61,17 @@ public class ProcessingService {
         double fuelSalesDiesel = Double.parseDouble(dtopMap.get("DIESEL_TRANSACTIONS").replaceAll("[$,]", ""));
 
         double merchandiseSales = Double.parseDouble(dtopMap.get("TOTAL_CONVENIENCE_STORE_SALES").replaceAll("[$,]", ""));
-        double nonRestaurantSales = Double.parseDouble(dtopMap.get("NON_RESTAURANT_FOOD").replaceAll("[$,]]", ""));
-        double bottledBeverage = Double.parseDouble(dtopMap.get("BOTTLED_BEVERAGES").replaceAll("[$,]]", ""));
+        double nonRestaurantSales = Double.parseDouble(dtopMap.get("NON_RESTAURANT_FOOD").replaceAll("[$,]", ""));
+        double bottledBeverage = Double.parseDouble(dtopMap.get("BOTTLED_BEVERAGES").replaceAll("[$,]", ""));
         double restaurantSales = Double.parseDouble(dtopMap.get("TOTAL_RESTAURANT_SALES").replaceAll("[$,]", ""));
         double tobaccoSale = Double.parseDouble(dtopMap.get("TOTAL_TOBACCO_SALES").replaceAll("[$,]", ""));
+
         return new ShiftReportDto(date, shiftNumber, employeeID, managerID, posCashTil1, posCashTil2,
                 fuelSaleRegular, fuelSalesMidGrade, fuelSalesPremium, fuelSalesDiesel,
                 merchandiseSales, restaurantSales, tobaccoSale, nonRestaurantSales, bottledBeverage);
     }
     @Transactional
-    public void parseShiftData(ShiftReportDto shiftReportDto){
+    public void parseShiftDataAndSaveToRepo(ShiftReportDto shiftReportDto){
         ShiftReport s = createShiftReport(shiftReportDto);
         saveToRepository(s);
 
@@ -105,6 +121,58 @@ public class ProcessingService {
     }
     public void saveToRepository(ShiftReport shiftReport){
         shiftReportRepository.save(shiftReport);
+    }
+
+
+    public List<List<InventoryDto>> parsePOSInventoryFile(MultipartFile inventoryReport) throws IOException {
+        List<InventoryDto> bottledDrinkInventory = new ArrayList<>();
+        List<InventoryDto> nonRestaurantInventory = new ArrayList<>();
+       try{
+        BufferedReader br = new BufferedReader(new InputStreamReader(inventoryReport.getInputStream(), StandardCharsets.UTF_8));
+        String line;
+        boolean isBottled = false;
+        boolean isNonRestaurant = false;
+        while((line = br.readLine()) != null){
+            line = line.trim();
+
+            if (line.startsWith("BOTTLED_DRINKS_DETAILS")){
+                isBottled = true;
+                isNonRestaurant = false;
+                continue;
+            }
+
+            if (line.startsWith("NON_RESTAURANT_DETAILS")){
+                isBottled = false;
+                isNonRestaurant = true;
+                continue;
+            }
+            if(isBottled && line.startsWith("SKU_CODE")){
+                String[] parts = line.split(",");
+                String skuCode = parts[0].split(":")[1].trim();
+                //int code = Integer.parseInt(skuCode);
+                int qty = Integer.parseInt(parts[1].split(":")[1].trim());
+                bottledDrinkInventory.add(new InventoryDto("BOTTLED_DRINK", skuCode, qty));
+            }
+
+            if(isNonRestaurant && line.startsWith("SKU_CODE")){
+                String[] parts = line.split(",");
+                String skuCode = parts[0].split(":")[1].trim();
+                //int code = Integer.parseInt(skuCode);
+                int qty = Integer.parseInt(parts[1].split(":")[1].trim());
+                nonRestaurantInventory.add(new InventoryDto("NON_RESTAURANT",skuCode, qty));
+            }
+        }
+       }
+       catch(Exception e){
+           //Change this!!!
+           e.printStackTrace();
+       }
+        return List.of(bottledDrinkInventory, nonRestaurantInventory);
+    }
+
+    @Transactional
+    public void updateInventory(List<List<InventoryDto>> inventoryList){
+        merchandiseService.reduceInventory(inventoryList);
     }
 
     public void pushToAccountingService(ShiftReport posReport){

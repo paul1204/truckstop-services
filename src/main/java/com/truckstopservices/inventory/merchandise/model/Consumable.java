@@ -1,9 +1,6 @@
 package com.truckstopservices.inventory.merchandise.model;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 
 @MappedSuperclass
 public abstract class Consumable {
@@ -24,6 +21,7 @@ public abstract class Consumable {
 
     private String size;
 
+    public Consumable(){}
     public Consumable(String skuCode, String name, double price, String brand, int qty, String size) {
         this.skuCode = skuCode;
         this.name = name;
@@ -37,9 +35,7 @@ public abstract class Consumable {
         return skuCode;
     }
 
-    public void setSkuCode(String skuCode) {
-        this.skuCode = skuCode;
-    }
+    public void setSkuCode(String skuCode) {this.skuCode = skuCode;}
 
     public String getName() {
         return name;
@@ -76,4 +72,8 @@ public abstract class Consumable {
     public String getSize() {return size;}
 
     public void setSize(String size) {this.size = size;}
+
+    public void reduceInventory(int qty){
+        setQty(this.qty -= qty);
+    }
 }

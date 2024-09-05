@@ -1,0 +1,13 @@
+version: '3'
+services:
+  spring-app:
+    image: openjdk:20-jdk-slim
+    container_name: spring-app
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./target/truckstop-services-0.0.1-SNAPSHOT.jar:/app/truck-stop-services.jar
+    working_dir: /app
+    command: ["java", "-jar", "truck-stop-services.jar"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev

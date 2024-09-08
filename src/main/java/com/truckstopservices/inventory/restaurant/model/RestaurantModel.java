@@ -13,20 +13,20 @@ public class RestaurantModel {
     private Long id;
     private String skuCode;
     private String name;
-    private String qty;
+    private int qty;
     private String size;
     private double price;
-    private double taxRate;
+
 
     public RestaurantModel(){}
 
-    public RestaurantModel(String skuCode, String name, String qty, String size, double price, double taxRate) {
+    public RestaurantModel(String skuCode, String name, int qty, String size, double price) {
         this.skuCode = skuCode;
         this.name = name;
         this.qty = qty;
         this.size = size;
         this.price = price;
-        this.taxRate = taxRate;
+
     }
 
     public String getSkuCode() {
@@ -45,11 +45,11 @@ public class RestaurantModel {
         this.name = name;
     }
 
-    public String getQty() {
+    public int getQty() {
         return qty;
     }
 
-    public void setQty(String qty) {
+    public void setQty(int qty) {
         this.qty = qty;
     }
 
@@ -69,11 +69,4 @@ public class RestaurantModel {
         this.price = price;
     }
 
-    public double getTaxRate() {
-        return taxRate;
-    }
-
-    public void setTaxRate(double taxRate) {
-        this.taxRate = taxRate;
-    }
 }

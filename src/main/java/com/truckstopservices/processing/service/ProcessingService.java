@@ -1,9 +1,9 @@
 package com.truckstopservices.processing.service;
 
 import com.truckstopservices.inventory.fuel.service.FuelService;
-import com.truckstopservices.inventory.merchandise.beverages.entity.ColdBeverage;
 import com.truckstopservices.inventory.merchandise.repository.BeverageRepository;
 import com.truckstopservices.inventory.merchandise.service.MerchandiseService;
+import com.truckstopservices.processing.client.MerchandiseManager;
 import com.truckstopservices.processing.dto.DailySalesDto;
 import com.truckstopservices.processing.dto.InventoryDto;
 import com.truckstopservices.processing.entity.*;
@@ -32,8 +32,13 @@ public class ProcessingService {
     @Autowired
     private BeverageRepository beverageRepository;
 
-    public ProcessingService(BeverageRepository beverageRepository) {
+    private final MerchandiseManager merchandiseManagerClient;
+
+    public ProcessingService(BeverageRepository beverageRepository
+            , MerchandiseManager merchandiseManagerClient
+    ) {
         this.beverageRepository = beverageRepository;
+        this.merchandiseManagerClient = merchandiseManagerClient;
     }
 
     public ShiftReportDto parsePOSShiftFile(String rawDtoString){
@@ -123,33 +128,43 @@ public class ProcessingService {
         shiftReportRepository.save(shiftReport);
     }
 
-
     public List<List<InventoryDto>> parsePOSInventoryFile(MultipartFile inventoryReport) throws IOException {
         List<InventoryDto> bottledDrinkInventory = new ArrayList<>();
         List<InventoryDto> nonRestaurantInventory = new ArrayList<>();
+        List<InventoryDto> restaurantInventory = new ArrayList<>();
        try{
         BufferedReader br = new BufferedReader(new InputStreamReader(inventoryReport.getInputStream(), StandardCharsets.UTF_8));
         String line;
         boolean isBottled = false;
         boolean isNonRestaurant = false;
+        boolean isRestaurant = false;
         while((line = br.readLine()) != null){
             line = line.trim();
 
             if (line.startsWith("BOTTLED_DRINKS_DETAILS")){
                 isBottled = true;
                 isNonRestaurant = false;
+                isRestaurant = false;
                 continue;
             }
 
             if (line.startsWith("NON_RESTAURANT_DETAILS")){
                 isBottled = false;
                 isNonRestaurant = true;
+                isRestaurant = true;
                 continue;
             }
+            if (line.startsWith("RESTAURANT_DETAILS")){
+                isBottled = false;
+                isNonRestaurant = false;
+                isRestaurant = true;
+                continue;
+            }
+
+
             if(isBottled && line.startsWith("SKU_CODE")){
                 String[] parts = line.split(",");
                 String skuCode = parts[0].split(":")[1].trim();
-                //int code = Integer.parseInt(skuCode);
                 int qty = Integer.parseInt(parts[1].split(":")[1].trim());
                 bottledDrinkInventory.add(new InventoryDto("BOTTLED_DRINK", skuCode, qty));
             }
@@ -157,22 +172,28 @@ public class ProcessingService {
             if(isNonRestaurant && line.startsWith("SKU_CODE")){
                 String[] parts = line.split(",");
                 String skuCode = parts[0].split(":")[1].trim();
-                //int code = Integer.parseInt(skuCode);
                 int qty = Integer.parseInt(parts[1].split(":")[1].trim());
                 nonRestaurantInventory.add(new InventoryDto("NON_RESTAURANT",skuCode, qty));
             }
+            if(isRestaurant && line.startsWith("SKU_CODE")){
+                String[] parts = line.split(",");
+                String skuCode = parts[0].split(":")[1].trim();
+                int qty = Integer.parseInt(parts[1].split(":")[1].trim());
+                restaurantInventory.add(new InventoryDto("RESTAURANT",skuCode, qty));
+            }
+
         }
        }
        catch(Exception e){
            //Change this!!!
            e.printStackTrace();
        }
-        return List.of(bottledDrinkInventory, nonRestaurantInventory);
+        return List.of(bottledDrinkInventory, nonRestaurantInventory,restaurantInventory);
     }
 
     @Transactional
     public void updateInventory(List<List<InventoryDto>> inventoryList){
-        merchandiseService.reduceInventory(inventoryList);
+        merchandiseManagerClient.updateMerchandiseInventoryFromSales(inventoryList);
     }
 
     public void pushToAccountingService(ShiftReport posReport){

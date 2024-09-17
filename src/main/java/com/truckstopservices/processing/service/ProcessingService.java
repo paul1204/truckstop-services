@@ -34,9 +34,7 @@ public class ProcessingService {
 
     private final MerchandiseManager merchandiseManagerClient;
 
-    public ProcessingService(BeverageRepository beverageRepository
-            , MerchandiseManager merchandiseManagerClient
-    ) {
+    public ProcessingService(BeverageRepository beverageRepository, MerchandiseManager merchandiseManagerClient) {
         this.beverageRepository = beverageRepository;
         this.merchandiseManagerClient = merchandiseManagerClient;
     }
@@ -151,7 +149,7 @@ public class ProcessingService {
             if (line.startsWith("NON_RESTAURANT_DETAILS")){
                 isBottled = false;
                 isNonRestaurant = true;
-                isRestaurant = true;
+                isRestaurant = false;
                 continue;
             }
             if (line.startsWith("RESTAURANT_DETAILS")){
@@ -179,7 +177,7 @@ public class ProcessingService {
                 String[] parts = line.split(",");
                 String skuCode = parts[0].split(":")[1].trim();
                 int qty = Integer.parseInt(parts[1].split(":")[1].trim());
-                restaurantInventory.add(new InventoryDto("RESTAURANT",skuCode, qty));
+                restaurantInventory.add(new InventoryDto("HOT_FOOD",skuCode, qty));
             }
 
         }
@@ -188,12 +186,12 @@ public class ProcessingService {
            //Change this!!!
            e.printStackTrace();
        }
-        return List.of(bottledDrinkInventory, nonRestaurantInventory,restaurantInventory);
+        return List.of(bottledDrinkInventory, nonRestaurantInventory, restaurantInventory);
     }
 
-    @Transactional
+    //@Transactional
     public void updateInventory(List<List<InventoryDto>> inventoryList){
-        merchandiseManagerClient.updateMerchandiseInventoryFromSales(inventoryList);
+       merchandiseManagerClient.updateMerchandiseInventoryFromSales(inventoryList);
     }
 
     public void pushToAccountingService(ShiftReport posReport){

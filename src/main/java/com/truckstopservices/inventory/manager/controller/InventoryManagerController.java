@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/inventory")
@@ -28,7 +29,7 @@ public class InventoryManagerController {
     }
 
     @PutMapping
-    public ResponseEntity<?> updateMerchandiseInventoryFromSales(@RequestBody List<List<InventoryDto>> inventoryList){
+    public ResponseEntity<String> updateMerchandiseInventoryFromSales(@RequestBody List<List<InventoryDto>> inventoryList){
         merchandiseService.reduceInventory(inventoryList);
         return new ResponseEntity<>("Inventory Updated", HttpStatus.OK);
     }

@@ -32,6 +32,7 @@ public class ProcessingService {
     @Autowired
     private BeverageRepository beverageRepository;
 
+    @Autowired
     private final MerchandiseManager merchandiseManagerClient;
 
     public ProcessingService(BeverageRepository beverageRepository, MerchandiseManager merchandiseManagerClient) {

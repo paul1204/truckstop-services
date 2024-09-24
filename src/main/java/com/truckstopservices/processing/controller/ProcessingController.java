@@ -13,8 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/shiftProcessing")
@@ -34,20 +37,49 @@ public class ProcessingController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/postShift")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<ShiftReportDto> processShift(@RequestParam("shift_report") MultipartFile rawShiftReport, @RequestParam("inventory_report") MultipartFile rawInventoryReport) {
-        ShiftReportDto shiftReportDto;
+    public ResponseEntity<Map<String, Object>> processShift(@RequestParam("shift_report") MultipartFile rawShiftReport, @RequestParam("inventory_report") MultipartFile rawInventoryReport) {
+        long startTime = System.currentTimeMillis();
         try {
             if (rawShiftReport.isEmpty()) {
-                return new ResponseEntity<ShiftReportDto>((ShiftReportDto) null, HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             }
-            String rawShiftString = new String(rawShiftReport.getBytes(), StandardCharsets.UTF_8);
-            shiftReportDto = processingService.parsePOSShiftFile(rawShiftString);
-            processingService.parseShiftDataAndSaveToRepo(shiftReportDto);
-            List<List<InventoryDto>> inventoryList = processingService.parsePOSInventoryFile(rawInventoryReport);
-            processingService.updateInventory(inventoryList);
+
+            final ShiftReportDto[] shiftReportDto = new ShiftReportDto[1];
+            @SuppressWarnings("unchecked")
+            final List<List<InventoryDto>>[] inventoryList = new List[1];
+            Thread parseShiftThread = new Thread(()-> {
+                String rawShiftString = null;
+                try {
+                    rawShiftString = new String(rawShiftReport.getBytes(), StandardCharsets.UTF_8);
+                    shiftReportDto[0] = processingService.parsePOSShiftFile(rawShiftString);
+                    processingService.parseShiftDataAndSaveToRepo(shiftReportDto[0]);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+            });
+            Thread parseInventoryThread = new Thread(()->{
+
+                try {
+                    inventoryList[0] = processingService.parsePOSInventoryFile(rawInventoryReport);
+                    processingService.updateInventory(inventoryList[0]);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+            });
+            parseShiftThread.start();
+            parseInventoryThread.start();
+
+            parseShiftThread.join();
+            parseInventoryThread.join();
+            long endTime = System.currentTimeMillis();
+            System.out.println("Execution Time: " + (endTime - startTime) + " milliseconds!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            return new ResponseEntity<>(Map.of("ShiftReport",shiftReportDto[0], "Inventory Report",inventoryList[0]), HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<ShiftReportDto>((ShiftReportDto) null, HttpStatus.CREATED);
+            Thread.currentThread().interrupt();
+            return new ResponseEntity<>( null, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(shiftReportDto, HttpStatus.CREATED);
+
     }
 }

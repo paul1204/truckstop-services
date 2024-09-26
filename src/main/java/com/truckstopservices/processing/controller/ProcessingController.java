@@ -53,28 +53,27 @@ public class ProcessingController {
                     rawShiftString = new String(rawShiftReport.getBytes(), StandardCharsets.UTF_8);
                     shiftReportDto[0] = processingService.parsePOSShiftFile(rawShiftString);
                     processingService.parseShiftDataAndSaveToRepo(shiftReportDto[0]);
+                    processingService.updateFuelInventory(shiftReportDto[0]);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
             });
             Thread parseInventoryThread = new Thread(()->{
-
                 try {
                     inventoryList[0] = processingService.parsePOSInventoryFile(rawInventoryReport);
                     processingService.updateInventory(inventoryList[0]);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
             });
             parseShiftThread.start();
             parseInventoryThread.start();
 
             parseShiftThread.join();
             parseInventoryThread.join();
+
             long endTime = System.currentTimeMillis();
-            System.out.println("Execution Time: " + (endTime - startTime) + " milliseconds!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            System.out.println("Execution Time: " + (endTime - startTime) + " milliseconds");
             return new ResponseEntity<>(Map.of("ShiftReport",shiftReportDto[0], "Inventory Report",inventoryList[0]), HttpStatus.CREATED);
         } catch (Exception e) {
             Thread.currentThread().interrupt();

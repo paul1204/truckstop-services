@@ -33,9 +33,9 @@ public class FuelController {
     }
 
     @PostMapping("/update/FuelInventory/reduceGallons")
-    public ResponseEntity<List<?>> updateFuelInventoryReduceGallons(@RequestBody ShiftReportDto shiftReportDto){
-        fuelService.updateFuelInventoryDeductAvailableGallonsFromSales(shiftReportDto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> updateFuelInventoryReduceGallons(@RequestBody Double[] fuelSales){
+        fuelService.updateFuelInventoryDeductAvailableGallonsFromSales(fuelSales);
+        return new ResponseEntity<>("Fuel Updated", HttpStatus.OK);
     }
     @PutMapping("/update/FuelInventory/FuelDelivery")
     public ResponseEntity<FuelDeliveryResponse<Fuel>> fuelDeliveryUpdateRepo(@RequestBody FuelDelivery fuelDelivery){

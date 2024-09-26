@@ -71,16 +71,9 @@ public class ProcessingService {
         double tobaccoSale = Double.parseDouble(dtopMap.get("TOTAL_TOBACCO_SALES").replaceAll("[$,]", ""));
 
         return new ShiftReportDto(date, shiftNumber, employeeID, managerID, posCashTil1, posCashTil2,
-                fuelSaleRegular, fuelSalesMidGrade, fuelSalesPremium, fuelSalesDiesel,
+               // fuelSaleRegular, fuelSalesMidGrade, fuelSalesPremium, fuelSalesDiesel,
+                new Double[]{fuelSaleRegular, fuelSalesMidGrade, fuelSalesPremium, fuelSalesDiesel},
                 merchandiseSales, restaurantSales, tobaccoSale, nonRestaurantSales, bottledBeverage);
-    }
-    @Transactional
-    public void parseShiftDataAndSaveToRepo(ShiftReportDto shiftReportDto){
-        ShiftReport s = createShiftReport(shiftReportDto);
-        saveToRepository(s);
-
-        //update inventory
-        fuelService.updateFuelInventoryDeductAvailableGallonsFromSales(shiftReportDto);
     }
 
     private ShiftReport createShiftReport(ShiftReportDto shiftReportDto){
@@ -94,10 +87,10 @@ public class ProcessingService {
         shiftReport.setPosCashTil2(shiftReportDto.posCashTil2());
 
         FuelSales fuelSale = new FuelSales();
-        fuelSale.setRegularGasolineTransactions(shiftReportDto.fuelSaleRegular());
-        fuelSale.setMidGradeGasolineTransactions(shiftReportDto.fuelSalesMidGrade());
-        fuelSale.setPremiumGasolineTransactions(shiftReportDto.fuelSalesPremium());
-        fuelSale.setDieselTransactions(shiftReportDto.fuelSalesDiesel());
+        fuelSale.setRegularGasolineTransactions(shiftReportDto.fuelSales()[0]);
+        fuelSale.setMidGradeGasolineTransactions(shiftReportDto.fuelSales()[1]);
+        fuelSale.setPremiumGasolineTransactions(shiftReportDto.fuelSales()[2]);
+        fuelSale.setDieselTransactions(shiftReportDto.fuelSales()[3]);
 
         MerchandiseSales merchandiseSales = new MerchandiseSales();
         merchandiseSales.setMerchandiseSales(shiftReportDto.merchandiseSales());
@@ -122,9 +115,6 @@ public class ProcessingService {
         shiftReport.setTobaccoSales(tobaccoSales);
 
         return shiftReport;
-    }
-    public void saveToRepository(ShiftReport shiftReport){
-        shiftReportRepository.save(shiftReport);
     }
 
     public List<List<InventoryDto>> parsePOSInventoryFile(MultipartFile inventoryReport) throws IOException {
@@ -188,6 +178,20 @@ public class ProcessingService {
            e.printStackTrace();
        }
         return List.of(bottledDrinkInventory, nonRestaurantInventory, restaurantInventory);
+    }
+
+    //  @Transactional
+    public void parseShiftDataAndSaveToRepo(ShiftReportDto shiftReportDto){
+        ShiftReport s = createShiftReport(shiftReportDto);
+        saveToRepository(s);
+    }
+
+    // @Transactional
+    public void updateFuelInventory(ShiftReportDto shiftReportDto) throws IOException {
+        merchandiseManagerClient.updateFuelInventoryReduceGallons(shiftReportDto.fuelSales());
+    }
+    private void saveToRepository(ShiftReport shiftReport){
+        shiftReportRepository.save(shiftReport);
     }
 
     //@Transactional

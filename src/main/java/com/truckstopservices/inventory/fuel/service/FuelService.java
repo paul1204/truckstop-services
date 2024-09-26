@@ -59,23 +59,25 @@ public class FuelService {
         return fuelInventoryList;
     }
 
-    public void updateFuelInventoryDeductAvailableGallonsFromSales(ShiftReportDto shiftReportDto){
+    public void updateFuelInventoryDeductAvailableGallonsFromSales(Double[] fuelSales){
         RegularOctane regularOctane = regularFuelRepository.findByOctane(87)
                 .orElseThrow(()-> new EntityNotFoundException("Regular Not Found"));
-        regularOctane.updateGallonsReduceInventorySales(shiftReportDto.fuelSaleRegular());
-
+        regularOctane.updateGallonsReduceInventorySales(fuelSales[0]);
+        regularFuelRepository.save(regularOctane);
         MidGradeOctane midGrade = midGradeFuelRepository.findByOctane(89)
                 .orElseThrow(()-> new EntityNotFoundException("Mid Grade Not Found"));
-        midGrade.updateGallonsReduceInventorySales(shiftReportDto.fuelSalesMidGrade());
-
+        midGrade.updateGallonsReduceInventorySales(fuelSales[1]);
+        midGradeFuelRepository.save(midGrade);
         PremiumOctane premiumOctane = premimumFuelRepository.findByOctane(91)
                 .orElseThrow(()-> new EntityNotFoundException("Premium Grade Not Found"));
-        premiumOctane.updateGallonsReduceInventorySales(shiftReportDto.fuelSalesPremium());
-
+        premiumOctane.updateGallonsReduceInventorySales(fuelSales[2]);
+        premimumFuelRepository.save(premiumOctane);
         Diesel diesel = dieselRepository.findByOctane(40)
                 .orElseThrow(()-> new EntityNotFoundException("Diesel Not Found"));
-        diesel.updateGallonsReduceInventorySales(shiftReportDto.fuelSalesDiesel());
+        diesel.updateGallonsReduceInventorySales(fuelSales[3]);
+        dieselRepository.save(diesel);
         //return new Fuel[]{regularOctane,premiumOctane,diesel};
+
     }
 
     //RETURN RESPONSE!
@@ -92,7 +94,6 @@ public class FuelService {
         return dieselRepository.findByOctane(40)
                 .map(diesel -> {
                     diesel.updateGallonsAddInventory(gallonsDelivered);
-                    //diesel.setAvailableGallons(diesel.getAvailableGallons()+ purchasedGallons);
                     return dieselRepository.save(diesel);
                 })
                 //Throw Better Error!!

@@ -21,6 +21,8 @@ public abstract class Consumable {
 
     private String size;
 
+    private String merchandiseType;
+
     public Consumable(){}
     public Consumable(String skuCode, String name, double price, String brand, int qty, String size) {
         this.skuCode = skuCode;
@@ -76,4 +78,6 @@ public abstract class Consumable {
     public void reduceInventory(int qty){
         setQty(this.qty -= qty);
     }
+
+    public void increaseInventory(int qty){this.qty += qty;}
 }

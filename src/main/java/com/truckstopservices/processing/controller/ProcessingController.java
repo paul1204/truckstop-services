@@ -40,7 +40,7 @@ public class ProcessingController {
     public ResponseEntity<Map<String, Object>> processShift(@RequestParam("shift_report") MultipartFile rawShiftReport, @RequestParam("inventory_report") MultipartFile rawInventoryReport) {
         long startTime = System.currentTimeMillis();
         try {
-            if (rawShiftReport.isEmpty()) {
+            if (rawShiftReport.isEmpty() || rawInventoryReport.isEmpty() ) {
                 return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             }
 

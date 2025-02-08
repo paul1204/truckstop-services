@@ -37,10 +37,28 @@ public class InventoryManagerController {
         return new ResponseEntity<>("Inventory Updated", HttpStatus.OK);
     }
 
-    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/delivery")
-    public ResponseEntity<String> orderInventoryReceiveMerchandise(@RequestParam MultipartFile merchandiseInventoryOrder) throws IOException {
-        //merchandiseService.reduceInventory(inventoryList);
-        merchandiseService.acceptDelivery(merchandiseInventoryOrder);
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/delivery/merchandise")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<String> orderInventoryReceiveMerchandiseDelivery(@RequestParam MultipartFile merchandiseInventoryOrder) throws IOException {
+        try {
+            merchandiseService.acceptMerchandiseDelivery(merchandiseInventoryOrder);
+        }
+        //Throw better Exception
+        catch (Exception e){
+            return new ResponseEntity<>( null, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("Delivery Received", HttpStatus.OK);
+    }
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/delivery/restaurant")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<String> orderInventoryReceiveRestaurantDelivery(@RequestParam MultipartFile merchandiseRestaurantOrder) throws IOException {
+        try {
+            restaurantService.acceptRestaurantDelivery(merchandiseRestaurantOrder);
+        }
+        //Throw better Exception
+        catch (Exception e){
+            return new ResponseEntity<>( null, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>("Delivery Received", HttpStatus.OK);
     }
 }

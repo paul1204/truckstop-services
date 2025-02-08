@@ -6,7 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
-public class RestaurantModel {
+public abstract class RestaurantModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -16,7 +16,6 @@ public class RestaurantModel {
     private int qty;
     private String size;
     private double price;
-
 
     public RestaurantModel(){}
 
@@ -69,4 +68,11 @@ public class RestaurantModel {
         this.price = price;
     }
 
+    public void reduceInventory(int qty){
+        setQty(this.qty -= qty);
+    }
+
+    public void increaseInventory(int qty){
+        setQty(this.qty += qty);
+    }
 }

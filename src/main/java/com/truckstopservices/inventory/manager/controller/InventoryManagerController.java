@@ -1,5 +1,6 @@
 package com.truckstopservices.inventory.manager.controller;
 
+import com.truckstopservices.accounting.model.Invoice;
 import com.truckstopservices.inventory.merchandise.service.MerchandiseService;
 import com.truckstopservices.inventory.restaurant.service.RestaurantService;
 import com.truckstopservices.processing.dto.InventoryDto;
@@ -38,27 +39,29 @@ public class InventoryManagerController {
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/delivery/merchandise")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<String> orderInventoryReceiveMerchandiseDelivery(@RequestParam MultipartFile merchandiseInventoryOrder) throws IOException {
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Invoice> orderInventoryReceiveMerchandiseDelivery(@RequestParam MultipartFile merchandiseInventoryOrder) throws IOException {
+        Invoice invoice;
         try {
-            merchandiseService.acceptMerchandiseDelivery(merchandiseInventoryOrder);
+            invoice = merchandiseService.acceptMerchandiseDelivery(merchandiseInventoryOrder);
         }
         //Throw better Exception
-        catch (Exception e){
-            return new ResponseEntity<>( null, HttpStatus.BAD_REQUEST);
+        catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>("Delivery Received", HttpStatus.OK);
+        return new ResponseEntity<>(invoice, HttpStatus.OK);
     }
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/delivery/restaurant")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<String> orderInventoryReceiveRestaurantDelivery(@RequestParam MultipartFile merchandiseRestaurantOrder) throws IOException {
+    @ResponseStatus(HttpStatus.OK )
+    public ResponseEntity<Invoice> orderInventoryReceiveRestaurantDelivery(@RequestParam MultipartFile merchandiseRestaurantOrder) throws IOException {
+        Invoice invoice;
         try {
-            restaurantService.acceptRestaurantDelivery(merchandiseRestaurantOrder);
+            invoice = restaurantService.acceptRestaurantDelivery(merchandiseRestaurantOrder);
         }
         //Throw better Exception
         catch (Exception e){
             return new ResponseEntity<>( null, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>("Delivery Received", HttpStatus.OK);
+        return new ResponseEntity<>(invoice, HttpStatus.OK);
     }
 }

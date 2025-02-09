@@ -11,5 +11,4 @@ import java.util.Optional;
 @Repository
 public interface BeverageRepository extends JpaRepository<ColdBeverage, Long> {
     Optional<ColdBeverage> findBySkuCode(String skuCode);
-
 }

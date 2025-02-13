@@ -1,4 +1,7 @@
 package com.truckstopservices.inventory.fuel.service;
+import com.truckstopservices.accounting.accountsPayable.service.implementation.AccountsPayableImplementation;
+import com.truckstopservices.accounting.model.Invoice;
+import com.truckstopservices.inventory.fuel.dto.FuelDeliveryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.entity.*;
 import com.truckstopservices.inventory.fuel.repository.*;
@@ -30,11 +33,17 @@ public class FuelService {
     @Autowired
     private FuelDeliveryRepository fuelDeliveryRepository;
 
-    public FuelService(DieselRepository dieselRepository, RegularFuelRepository regularFuelRepository, MidGradeFuelRepository midGradeFuelRepository, PremimumFuelRepository premimumFuelRepository) {
+    @Autowired
+    private AccountsPayableImplementation accountsPayableImplementation;
+
+
+    public FuelService(DieselRepository dieselRepository, RegularFuelRepository regularFuelRepository,
+                       MidGradeFuelRepository midGradeFuelRepository, PremimumFuelRepository premimumFuelRepository, AccountsPayableImplementation accountsPayableImplementation) {
         this.dieselRepository = dieselRepository;
         this.regularFuelRepository = regularFuelRepository;
         this.midGradeFuelRepository = midGradeFuelRepository;
         this.premimumFuelRepository = premimumFuelRepository;
+        this.accountsPayableImplementation = accountsPayableImplementation;
     }
 
     public List<FuelInventoryResponse> getAllFuelInventory(){
@@ -80,16 +89,21 @@ public class FuelService {
 
     }
 
-    //RETURN RESPONSE!
-    public Fuel[] updateFuelDeliveryRepo(FuelDelivery fuelDelivery) throws Exception {
+    public FuelDeliveryResponse<Fuel> updateFuelDeliveryRepo(FuelDelivery fuelDelivery) throws Exception {
+        //This keeps track of all fuel delivery received
         fuelDeliveryRepository.save(fuelDelivery);
-        return updateFuelInventoryFromDelivery(fuelDelivery);
+        //This updates actual inventory
+        Fuel[] updatedFuel = updateFuelInventoryFromDelivery(fuelDelivery);
+        Invoice invoice = accountsPayableImplementation.createInvoice(fuelDelivery.getCompanyName(), "02/09/2025", fuelDelivery.returnDeliveryAmount());
+        return new FuelDeliveryResponse<>(true, "Fuel Successfully Delivered!", updatedFuel, invoice);
     }
+
     private Fuel[] updateFuelInventoryFromDelivery(FuelDelivery fuelDelivery) throws Exception {
         return new Fuel[]{updateDieselFuelDelivery(fuelDelivery.getDieselQtyOrdered()),
         updateRegularOctaneFuelDelivery(fuelDelivery.getRegularOctaneQtyOrdered()),
         updatePremiumOctaneFuelDelivery(fuelDelivery.getPremiumOctanePricePerGallon())};
     }
+
     public Diesel updateDieselFuelDelivery(double gallonsDelivered) throws Exception{
         return dieselRepository.findByOctane(40)
                 .map(diesel -> {

@@ -40,11 +40,11 @@ public class FuelController {
     @PutMapping("/update/FuelInventory/FuelDelivery")
     public ResponseEntity<FuelDeliveryResponse<Fuel>> fuelDeliveryUpdateRepo(@RequestBody FuelDelivery fuelDelivery){
     try{
-        Fuel[] fuel = fuelService.updateFuelDeliveryRepo(fuelDelivery);
-        return new ResponseEntity<>(new FuelDeliveryResponse<>(true, "Fuel Successfully Delivered!", fuel), HttpStatus.OK);
+        return new ResponseEntity<>(fuelService.updateFuelDeliveryRepo(fuelDelivery), HttpStatus.OK);
     }
     catch (Exception e){
-        return new ResponseEntity<>(new FuelDeliveryResponse<>(false, e.getMessage(), null), HttpStatus.BAD_REQUEST);
+        //Throw better Exception.
+        return new ResponseEntity<>(new FuelDeliveryResponse<>(false, e.getMessage(), null, null), HttpStatus.BAD_REQUEST);
     }
     }
 }

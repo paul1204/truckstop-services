@@ -1,4 +1,4 @@
-package com.truckstopservices.inventory.fuel.testConfig;
+package com.truckstopservices.inventory.fuel.config;
 
 import com.truckstopservices.inventory.fuel.entity.Diesel;
 import com.truckstopservices.inventory.fuel.entity.MidGradeOctane;

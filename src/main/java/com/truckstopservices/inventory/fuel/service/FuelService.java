@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.truckstopservices.inventory.fuel.model.Fuel;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,6 +90,7 @@ public class FuelService {
 
     }
 
+    @Transactional
     public FuelDeliveryResponse<Fuel> updateFuelDeliveryRepo(FuelDelivery fuelDelivery) throws Exception {
         //This keeps track of all fuel delivery received
         fuelDeliveryRepository.save(fuelDelivery);

@@ -1,5 +1,6 @@
 package com.truckstopservices.inventory.fuel.controller;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
+import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
 import com.truckstopservices.inventory.fuel.entity.Diesel;
 import com.truckstopservices.inventory.fuel.entity.FuelDelivery;
 import com.truckstopservices.inventory.fuel.entity.PremiumOctane;
@@ -38,13 +39,46 @@ public class FuelController {
         return new ResponseEntity<>("Fuel Updated", HttpStatus.OK);
     }
     @PutMapping("/update/FuelInventory/FuelDelivery")
-    public ResponseEntity<FuelDeliveryResponse<Fuel>> fuelDeliveryUpdateRepo(@RequestBody FuelDelivery fuelDelivery){
+    public ResponseEntity<FuelDeliveryResponse<FuelDelivery>> fuelDeliveryUpdateRepo(@RequestBody FuelDelivery fuelDelivery){
     try{
         return new ResponseEntity<>(fuelService.updateFuelDeliveryRepo(fuelDelivery), HttpStatus.OK);
     }
     catch (Exception e){
         //Throw better Exception.
         return new ResponseEntity<>(new FuelDeliveryResponse<>(false, e.getMessage(), null, null), HttpStatus.BAD_REQUEST);
+        }
     }
+
+    @PutMapping("/update/Diesel/FIFO")
+    public ResponseEntity<Diesel> updateDieselFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest){
+        try{
+            return new ResponseEntity<>(fuelService.updateDieselInventoryFIFOSales(fuelSaleRequest.gallonsSold()), HttpStatus.OK);
+        }
+        catch (Exception e){
+            //Throw better Exception
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+
+        }
+    }
+    @PutMapping("/update/RegularFuel/FIFO")
+    public ResponseEntity<RegularOctane> updateRegularFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest){
+        try{
+            return new ResponseEntity<>(fuelService.updateRegularOctaneInventoryFIFOSales(fuelSaleRequest.gallonsSold()), HttpStatus.OK);
+        }
+        catch (Exception e){
+            //Throw better Exception
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+
+        }
+    }
+    @PutMapping("/update/PremiumFuel/FIFO")
+    public ResponseEntity<PremiumOctane> updatePremiumFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest){
+        try{
+            return new ResponseEntity<>(fuelService.updatePremiumOctaneInventoryFIFOSales(fuelSaleRequest.gallonsSold()), HttpStatus.OK);
+        }
+        catch (Exception e){
+            //Throw better Exception
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
     }
 }

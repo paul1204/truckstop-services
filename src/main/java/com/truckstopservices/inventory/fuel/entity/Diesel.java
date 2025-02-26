@@ -13,10 +13,9 @@ public class Diesel extends Fuel implements CalculateFuelPrice {
     public Diesel(){
         super();
     }
-    public Diesel(int octane, double pricePerGallon, double initalGallons) {
-        super(octane, pricePerGallon, initalGallons, new ArrayList<Double>(List.of(pricePerGallon)), new ArrayList<Double>(List.of(initalGallons)));
+    public Diesel(String deliveryDate, int octane, double pricePerGallon, double initalGallons) {
+        super(deliveryDate, octane, pricePerGallon, initalGallons);
     }
-
     @Override
     public double calculateGallonsToDispense(double amount) {
         return amount / getPricePerGallon();

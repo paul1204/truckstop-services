@@ -1,94 +1,40 @@
 package com.truckstopservices.inventory.fuel.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class FuelDelivery {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String fuelDeliveryID;
-    private String date;
-    private double dieselQtyOrdered;
-    private double dieselPricePerGallon;
-    private double regularOctaneQtyOrdered;
-    private double regularOctanePricePerGallon;
-    private double premiumOctaneQtyOrdered;
-    private double premiumOctanePricePerGallon;
-
     private String companyName;
+    private String fuelDelivery_ID;
+    private String deliveryDate;
 
-    //Mid Grade is a mixture of Premium and Regular Octane. No Mid Grade fuel order
+    @OneToOne(cascade = CascadeType.ALL)
+    private Diesel dieselOrder;
+    @OneToOne(cascade = CascadeType.ALL)
+    private RegularOctane regularOctaneOrder;
+    @OneToOne(cascade = CascadeType.ALL)
+    private PremiumOctane premiumOctaneOrder;
 
-    public FuelDelivery(String fuelDeliveryID, double dieselQtyOrdered, double dieselPricePerGallon, double regularOctaneQtyOrdered,
-                        double regularOctanePricePerGallon, double premiumOctaneQtyOrdered, double premiumOctanePricePerGallon, String companyName) {
-        this.fuelDeliveryID = fuelDeliveryID;
-        this.dieselQtyOrdered = dieselQtyOrdered;
-        this.dieselPricePerGallon = dieselPricePerGallon;
-        this.regularOctaneQtyOrdered = regularOctaneQtyOrdered;
-        this.regularOctanePricePerGallon = regularOctanePricePerGallon;
-        this.premiumOctaneQtyOrdered = premiumOctaneQtyOrdered;
-        this.premiumOctanePricePerGallon = premiumOctanePricePerGallon;
+    //Mid Grade is a mixture of Premium and Regular Octane. No Mid Grade fuel order.
+    //Determine Mid Grade calculations later
+
+    public FuelDelivery() {}
+
+    public FuelDelivery(String companyName, String fuelDeliveryID, String deliveryDate, Diesel dieselOrder,
+                        RegularOctane regularOctaneOrder, PremiumOctane premiumOctaneOrder) {
         this.companyName = companyName;
+        this.fuelDelivery_ID = fuelDeliveryID;
+        this.deliveryDate = deliveryDate;
+        this.dieselOrder = dieselOrder;
+        this.regularOctaneOrder = regularOctaneOrder;
+        this.premiumOctaneOrder = premiumOctaneOrder;
     }
 
-    public String getFuelDeliveryID() {
-        return fuelDeliveryID;
-    }
-
-    public void setFuelDeliveryID(String fuelDeliveryID) {
-        this.fuelDeliveryID = fuelDeliveryID;
-    }
-
-    public double getDieselQtyOrdered() {
-        return dieselQtyOrdered;
-    }
-
-    public void setDieselQtyOrdered(double dieselQtyOrdered) {
-        this.dieselQtyOrdered = dieselQtyOrdered;
-    }
-
-    public double getDieselPricePerGallon() {
-        return dieselPricePerGallon;
-    }
-
-    public void setDieselPricePerGallon(double dieselPricePerGallon) {
-        this.dieselPricePerGallon = dieselPricePerGallon;
-    }
-
-    public double getRegularOctaneQtyOrdered() {
-        return regularOctaneQtyOrdered;
-    }
-
-    public void setRegularOctaneQtyOrdered(double regularOctaneQtyOrdered) {
-        this.regularOctaneQtyOrdered = regularOctaneQtyOrdered;
-    }
-
-    public double getRegularOctanePricePerGallon() {
-        return regularOctanePricePerGallon;
-    }
-
-    public void setRegularOctanePricePerGallon(double regularOctanePricePerGallon) {
-        this.regularOctanePricePerGallon = regularOctanePricePerGallon;
-    }
-
-    public double getPremiumOctaneQtyOrdered() {
-        return premiumOctaneQtyOrdered;
-    }
-
-    public void setPremiumOctaneQtyOrdered(double premiumOctaneQtyOrdered) {
-        this.premiumOctaneQtyOrdered = premiumOctaneQtyOrdered;
-    }
-
-    public double getPremiumOctanePricePerGallon() {
-        return premiumOctanePricePerGallon;
-    }
-
-    public void setPremiumOctanePricePerGallon(double premiumOctanePricePerGallon) {
-        this.premiumOctanePricePerGallon = premiumOctanePricePerGallon;
+    public Long getId() {
+        return id;
     }
 
     public String getCompanyName() {
@@ -99,17 +45,43 @@ public class FuelDelivery {
         this.companyName = companyName;
     }
 
-    public double returnDeliveryAmount(){
-        return (this.dieselPricePerGallon + this.dieselQtyOrdered) +
-                (this.regularOctanePricePerGallon + this.regularOctaneQtyOrdered) +
-                (this.premiumOctanePricePerGallon + this.premiumOctaneQtyOrdered);
+    public String getFuelDelivery_ID() {
+        return fuelDelivery_ID;
     }
 
-    public String getDate() {
-        return date;
+    public void setFuelDelivery_ID(String fuelDelivery_ID) {
+        this.fuelDelivery_ID = fuelDelivery_ID;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public String getDeliveryDate() {
+        return deliveryDate;
+    }
+
+    public void setDeliveryDate(String date) {
+        this.deliveryDate = date;
+    }
+
+    public Diesel getDieselOrder() {
+        return dieselOrder;
+    }
+
+    public void setDieselOrder(Diesel dieselOrder) {
+        this.dieselOrder = dieselOrder;
+    }
+
+    public RegularOctane getRegularOctaneOrder() {
+        return regularOctaneOrder;
+    }
+
+    public void setRegularOctaneOrder(RegularOctane regularOctaneOrder) {
+        this.regularOctaneOrder = regularOctaneOrder;
+    }
+
+    public PremiumOctane getPremiumOctaneOrder() {
+        return premiumOctaneOrder;
+    }
+
+    public void setPremiumOctaneOrder(PremiumOctane premiumOctaneOrder) {
+        this.premiumOctaneOrder = premiumOctaneOrder;
     }
 }

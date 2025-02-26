@@ -8,17 +8,15 @@ import jakarta.persistence.Entity;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Entity
 public class RegularOctane extends Fuel implements CalculateFuelPrice {
 
     public RegularOctane(){
         super();
     }
-    public RegularOctane(int octane, double pricePerGallon, double initalGallons) {
-        super(octane, pricePerGallon, initalGallons, new ArrayList<Double>(List.of(pricePerGallon)), new ArrayList<Double>(List.of(initalGallons)));
+    public RegularOctane(String deliveryDate , int octane, double pricePerGallon, double initalGallons) {
+        super(deliveryDate, octane,pricePerGallon, initalGallons);
     }
-
     @Override
     public double calculateGallonsToDispense(double amount) {
         return amount / getPricePerGallon();

@@ -103,7 +103,7 @@ public class FuelService {
             FuelDelivery savedDelivery = fuelDeliveryRepository.save(fuelDelivery);
             //Need to update additional fields past initial save to repo
             updateFuelInventoryFromDelivery(savedDelivery);
-            return new FuelDeliveryResponse<>(true, "Fuel Successfully Delivered!", savedDelivery, null);
+            return new FuelDeliveryResponse<>(true, "Fuel Successfully Delivered!", null, null);
         } catch (DataAccessException e) {
             throw new DataAccessResourceFailureException("Failed to update fuel delivery: " + e.getMessage(), e);
         }

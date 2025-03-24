@@ -203,26 +203,26 @@ public class ProcessingService {
         //make API call to Revenue Management Controller
     }
 
-    public DailySalesDto getDailySales(String date){
-        List<ShiftReport> shiftReports = shiftReportRepository.findByDate(date);
-
-        double totalFuelSales = shiftReports.stream()
-                .mapToDouble(shift -> shift.getFuelSales().getRegularGasolineTransactions() +
-                        shift.getFuelSales().getMidGradeGasolineTransactions() +
-                        shift.getFuelSales().getPremiumGasolineTransactions() +
-                        shift.getFuelSales().getDieselTransactions())
-                .sum();
-
-        double totalMerchandiseSales = shiftReports.stream()
-                .mapToDouble(shift -> shift.getMerchandiseSales().getMerchandiseSales())
-                .sum();
-
-        double totalRestaurantSales = shiftReports.stream()
-                .mapToDouble(s -> s.getRestaurantSales().getRestaurantSalesSales())
-                .sum();
-        double totalTobaccoSales = shiftReports.stream()
-                .mapToDouble(s -> s.getTobaccoSales().getTobaccoSales())
-                .sum();
-        return new DailySalesDto(date, totalFuelSales, totalMerchandiseSales, totalRestaurantSales, totalTobaccoSales);
-    }
+//    public DailySalesDto getDailySales(String date){
+//        List<ShiftReport> shiftReports = shiftReportRepository.findByDate(date);
+//
+//        double totalFuelSales = shiftReports.stream()
+//                .mapToDouble(shift -> shift.getFuelSales().getRegularGasolineTransactions() +
+//                        shift.getFuelSales().getMidGradeGasolineTransactions() +
+//                        shift.getFuelSales().getPremiumGasolineTransactions() +
+//                        shift.getFuelSales().getDieselTransactions())
+//                .sum();
+//
+//        double totalMerchandiseSales = shiftReports.stream()
+//                .mapToDouble(shift -> shift.getMerchandiseSales().getMerchandiseSales())
+//                .sum();
+//
+//        double totalRestaurantSales = shiftReports.stream()
+//                .mapToDouble(s -> s.getRestaurantSales().getRestaurantSalesSales())
+//                .sum();
+//        double totalTobaccoSales = shiftReports.stream()
+//                .mapToDouble(s -> s.getTobaccoSales().getTobaccoSales())
+//                .sum();
+//        return new DailySalesDto(date, totalFuelSales, totalMerchandiseSales, totalRestaurantSales, totalTobaccoSales);
+//    }
 }

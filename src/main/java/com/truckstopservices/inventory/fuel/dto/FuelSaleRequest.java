@@ -1,8 +1,9 @@
 package com.truckstopservices.inventory.fuel.dto;
 
 public record FuelSaleRequest(
-        String octane,
+        int octane,
         double gallonsSold,
-        String totalPrice
+        double totalPrice,
+        String specialMessage
 ) {
 }

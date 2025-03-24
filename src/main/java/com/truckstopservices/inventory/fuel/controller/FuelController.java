@@ -1,15 +1,14 @@
 package com.truckstopservices.inventory.fuel.controller;
+
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
-import com.truckstopservices.inventory.fuel.entity.Diesel;
 import com.truckstopservices.inventory.fuel.entity.FuelDelivery;
-import com.truckstopservices.inventory.fuel.entity.PremiumOctane;
-import com.truckstopservices.inventory.fuel.entity.RegularOctane;
-import com.truckstopservices.inventory.fuel.model.Fuel;
 import com.truckstopservices.inventory.fuel.service.FuelService;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryResponse;
-import com.truckstopservices.processing.dto.ShiftReportDto;
+import com.truckstopservices.inventory.fuel.exception.FuelSaleException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,51 +33,49 @@ public class FuelController {
     }
 
     @PostMapping("/update/FuelInventory/reduceGallons")
-    public ResponseEntity<String> updateFuelInventoryReduceGallons(@RequestBody Double[] fuelSales){
+    public ResponseEntity<String> updateFuelInventoryReduceGallons(@RequestBody Double[] fuelSales) {
         fuelService.updateFuelInventoryDeductAvailableGallonsFromSales(fuelSales);
         return new ResponseEntity<>("Fuel Updated", HttpStatus.OK);
     }
+
     @PutMapping("/update/FuelInventory/FuelDelivery")
-    public ResponseEntity<FuelDeliveryResponse<FuelDelivery>> fuelDeliveryUpdateRepo(@RequestBody FuelDelivery fuelDelivery){
-    try{
-        return new ResponseEntity<>(fuelService.updateFuelDeliveryRepo(fuelDelivery), HttpStatus.OK);
-    }
-    catch (Exception e){
-        //Throw better Exception.
-        return new ResponseEntity<>(new FuelDeliveryResponse<>(false, e.getMessage(), null, null), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<FuelDeliveryResponse<FuelDelivery>> fuelDeliveryUpdateRepo(@RequestBody FuelDelivery fuelDelivery) {
+        try {
+            return new ResponseEntity<>(fuelService.updateFuelDeliveryRepo(fuelDelivery), HttpStatus.OK);
+        } catch (DataAccessException e) {
+            throw new DataAccessResourceFailureException("Failed to update fuel delivery: " + e.getMessage(), e);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new FuelDeliveryResponse<>(false, e.getMessage(), null, null), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/update/Diesel/FIFO")
-    public ResponseEntity<Diesel> updateDieselFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest){
-        try{
-            return new ResponseEntity<>(fuelService.updateDieselInventoryFIFOSales(fuelSaleRequest.gallonsSold()), HttpStatus.OK);
-        }
-        catch (Exception e){
-            //Throw better Exception
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-
+    public ResponseEntity<FuelSaleRequest> updateDieselFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest) {
+        try {
+            FuelSaleRequest fuelSold = fuelService.updateDieselInventoryFIFOSales(fuelSaleRequest.gallonsSold());
+            return new ResponseEntity<>(fuelSold, HttpStatus.OK);
+        } catch (FuelSaleException e) {
+            return new ResponseEntity<>(new FuelSaleRequest(0, 0, 0, e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
+
     @PutMapping("/update/RegularFuel/FIFO")
-    public ResponseEntity<RegularOctane> updateRegularFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest){
-        try{
-            return new ResponseEntity<>(fuelService.updateRegularOctaneInventoryFIFOSales(fuelSaleRequest.gallonsSold()), HttpStatus.OK);
-        }
-        catch (Exception e){
-            //Throw better Exception
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-
+    public ResponseEntity<FuelSaleRequest> updateRegularFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest) {
+        try {
+            FuelSaleRequest fuelSold = fuelService.updateRegularOctaneInventoryFIFOSales(fuelSaleRequest.gallonsSold());
+            return new ResponseEntity<>(fuelSold, HttpStatus.OK);
+        } catch (FuelSaleException e) {
+            return new ResponseEntity<>(new FuelSaleRequest(0, 0, 0, e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
+
     @PutMapping("/update/PremiumFuel/FIFO")
-    public ResponseEntity<PremiumOctane> updatePremiumFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest){
-        try{
-            return new ResponseEntity<>(fuelService.updatePremiumOctaneInventoryFIFOSales(fuelSaleRequest.gallonsSold()), HttpStatus.OK);
-        }
-        catch (Exception e){
-            //Throw better Exception
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<FuelSaleRequest> updatePremiumFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest) {
+        try {
+            FuelSaleRequest fuelSold = fuelService.updatePremiumOctaneInventoryFIFOSales(fuelSaleRequest.gallonsSold());
+            return new ResponseEntity<>(fuelSold, HttpStatus.OK);
+        } catch (FuelSaleException e) {
+            return new ResponseEntity<>(new FuelSaleRequest(0, 0, 0, e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 }

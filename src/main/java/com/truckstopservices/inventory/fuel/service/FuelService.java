@@ -1,18 +1,18 @@
 package com.truckstopservices.inventory.fuel.service;
+
 import com.truckstopservices.accounting.accountsPayable.service.implementation.AccountsPayableImplementation;
-import com.truckstopservices.accounting.model.Invoice;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
 import com.truckstopservices.inventory.fuel.entity.*;
 import com.truckstopservices.inventory.fuel.repository.*;
 //import com.truckstopservices.inventory.fuel.repository.FuelRepository;
-import com.truckstopservices.processing.dto.ShiftReportDto;
+import com.truckstopservices.inventory.fuel.exception.FuelSaleException;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.stereotype.Service;
-import com.truckstopservices.inventory.fuel.model.Fuel;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -55,43 +55,43 @@ public class FuelService {
         this.historicalFuelRepository = historicalFuelRepository;
     }
 
-    public List<FuelInventoryResponse> getAllFuelInventory(){
+    public List<FuelInventoryResponse> getAllFuelInventory() {
         List<FuelInventoryResponse> fuelInventoryList = new ArrayList<>();
         fuelInventoryList.addAll(
                 dieselRepository.findAll().stream()
-                .map(diesel -> new FuelInventoryResponse("Diesel",diesel.getTotalGallons()))
-                .toList());
+                        .map(diesel -> new FuelInventoryResponse("Diesel", diesel.getTotalGallons()))
+                        .toList());
         fuelInventoryList.addAll(
                 regularFuelRepository.findAll().stream()
-                .map(regularOctane -> new FuelInventoryResponse("87",regularOctane.getTotalGallons()))
-                .toList());
+                        .map(regularOctane -> new FuelInventoryResponse("87", regularOctane.getTotalGallons()))
+                        .toList());
         fuelInventoryList.addAll(
                 midGradeFuelRepository.findAll().stream()
-                .map(midGradeOctane -> new FuelInventoryResponse("89",midGradeOctane.getTotalGallons()))
-                .toList());
+                        .map(midGradeOctane -> new FuelInventoryResponse("89", midGradeOctane.getTotalGallons()))
+                        .toList());
         fuelInventoryList.addAll(
                 premimumFuelRepository.findAll().stream()
-                .map(premiumOctane -> new FuelInventoryResponse("93",premiumOctane.getTotalGallons()))
-                .toList());
+                        .map(premiumOctane -> new FuelInventoryResponse("93", premiumOctane.getTotalGallons()))
+                        .toList());
 
         return fuelInventoryList;
     }
 
-    public void updateFuelInventoryDeductAvailableGallonsFromSales(Double[] fuelSales){
+    public void updateFuelInventoryDeductAvailableGallonsFromSales(Double[] fuelSales) {
         RegularOctane regularOctane = regularFuelRepository.findByOctane(87)
-                .orElseThrow(()-> new EntityNotFoundException("Regular Not Found"));
+                .orElseThrow(() -> new EntityNotFoundException("Regular Not Found"));
         regularOctane.updateGallonsReduceInventorySales(fuelSales[0]);
         regularFuelRepository.save(regularOctane);
         MidGradeOctane midGrade = midGradeFuelRepository.findByOctane(89)
-                .orElseThrow(()-> new EntityNotFoundException("Mid Grade Not Found"));
+                .orElseThrow(() -> new EntityNotFoundException("Mid Grade Not Found"));
         midGrade.updateGallonsReduceInventorySales(fuelSales[1]);
         midGradeFuelRepository.save(midGrade);
         PremiumOctane premiumOctane = premimumFuelRepository.findByOctane(91)
-                .orElseThrow(()-> new EntityNotFoundException("Premium Grade Not Found"));
+                .orElseThrow(() -> new EntityNotFoundException("Premium Grade Not Found"));
         premiumOctane.updateGallonsReduceInventorySales(fuelSales[2]);
         premimumFuelRepository.save(premiumOctane);
         Diesel diesel = dieselRepository.findByOctane(40)
-                .orElseThrow(()-> new EntityNotFoundException("Diesel Not Found"));
+                .orElseThrow(() -> new EntityNotFoundException("Diesel Not Found"));
         diesel.updateGallonsReduceInventorySales(fuelSales[3]);
         dieselRepository.save(diesel);
         //return new Fuel[]{regularOctane,premiumOctane,diesel};
@@ -99,33 +99,37 @@ public class FuelService {
 
     @Transactional
     public FuelDeliveryResponse<FuelDelivery> updateFuelDeliveryRepo(FuelDelivery fuelDelivery) throws Exception {
-        FuelDelivery savedDelivery = fuelDeliveryRepository.save(fuelDelivery); // Initial save
-        //Need to update additional fields. JPA prevented from updating these fields.
-        updateFuelInventoryFromDelivery(savedDelivery);
-        return new FuelDeliveryResponse<>(true, "Fuel Successfully Delivered!", savedDelivery, null);
+        try {
+            FuelDelivery savedDelivery = fuelDeliveryRepository.save(fuelDelivery);
+            //Need to update additional fields past initial save to repo
+            updateFuelInventoryFromDelivery(savedDelivery);
+            return new FuelDeliveryResponse<>(true, "Fuel Successfully Delivered!", savedDelivery, null);
+        } catch (DataAccessException e) {
+            throw new DataAccessResourceFailureException("Failed to update fuel delivery: " + e.getMessage(), e);
+        }
     }
 
     private void updateFuelInventoryFromDelivery(FuelDelivery fuelDelivery) throws Exception {
         //updateDieselFuelDelivery(fuelDelivery.getDieselOrder().getDelivery_id(),fuelDelivery.getDieselOrder().getTotalGallons());
         String deliveryDate = fuelDelivery.getDeliveryDate();
         updateDieselFuelDelivery(fuelDelivery.getDieselOrder(), deliveryDate);
-        updateRegularOctaneFuelDelivery(fuelDelivery.getRegularOctaneOrder() ,deliveryDate);
-        updatePremiumOctaneFuelDelivery(fuelDelivery.getPremiumOctaneOrder(),deliveryDate);
+        updateRegularOctaneFuelDelivery(fuelDelivery.getRegularOctaneOrder(), deliveryDate);
+        updatePremiumOctaneFuelDelivery(fuelDelivery.getPremiumOctaneOrder(), deliveryDate);
     }
 
-    private Diesel updateDieselFuelDelivery(Diesel newDieselOrder, String deliveryDate) throws Exception{
+    private Diesel updateDieselFuelDelivery(Diesel newDieselOrder, String deliveryDate) throws Exception {
         return dieselRepository.findById(newDieselOrder.getDelivery_id())
                 .map(diesel -> {
                     diesel.updateGallonsAddInventory(newDieselOrder.getTotalGallons());
                     diesel.setDeliveryDate(deliveryDate);
-                   // diesel.setNextDelivery_id(newDieselOrder.getDelivery_id() + 1 );
+                    // diesel.setNextDelivery_id(newDieselOrder.getDelivery_id() + 1 );
                     return dieselRepository.save(diesel);
                 })
                 //Throw Better Error!!
-                .orElseThrow(()-> new Exception("Error, could not accept Fuel Delivery "));
+                .orElseThrow(() -> new Exception("Error, could not accept Fuel Delivery "));
     }
 
-    private RegularOctane updateRegularOctaneFuelDelivery(RegularOctane newRegularOrder, String deliveryDate) throws Exception{
+    private RegularOctane updateRegularOctaneFuelDelivery(RegularOctane newRegularOrder, String deliveryDate) throws Exception {
         return regularFuelRepository.findById(newRegularOrder.getDelivery_id())
                 .map(regularOctane -> {
                     regularOctane.updateGallonsAddInventory(newRegularOrder.getTotalGallons());
@@ -133,7 +137,7 @@ public class FuelService {
                     return regularFuelRepository.save(regularOctane);
                 })
                 //Throw Better Error!!
-                .orElseThrow(()-> new Exception("Error, could not accept Fuel Delivery "));
+                .orElseThrow(() -> new Exception("Error, could not accept Fuel Delivery "));
     }
 
     private PremiumOctane updatePremiumOctaneFuelDelivery(PremiumOctane newPremiumOrder, String deliveryDate) throws Exception {
@@ -144,25 +148,28 @@ public class FuelService {
                     return premimumFuelRepository.save(premiumOctane);
                 })
                 //Throw Better Error!!
-                .orElseThrow(()-> new Exception("Error, could not accept Fuel Delivery "));
+                .orElseThrow(() -> new Exception("Error, could not accept Fuel Delivery "));
     }
 
     @Transactional
-    public Diesel updateDieselInventoryFIFOSales(double gallonsSold) {
+    //public Diesel updateDieselInventoryFIFOSales(double gallonsSold){
+    public FuelSaleRequest updateDieselInventoryFIFOSales(double gallonsSold) throws FuelSaleException {
         Optional<Diesel> dieselFirstRecord = dieselRepository.findFIFOAvailableGallons();
-        if(!dieselFirstRecord.isPresent()) {
-            return null;
+        if (!dieselFirstRecord.isPresent()) {
+            throw new FuelSaleException("No available fuel to consume. there are" + gallonsSold + " unaccounted for");
         }
         Diesel fifoDiesel = dieselFirstRecord.get();
+        double originalFifoGallonState;
         if (fifoDiesel.getAvailableGallons() > gallonsSold) {
             fifoDiesel.updateGallonsReduceInventorySales(gallonsSold);
             dieselRepository.save(fifoDiesel);
-            return fifoDiesel;
+            return new FuelSaleRequest(fifoDiesel.getOctane(), gallonsSold, (gallonsSold * 1.99), "Diesel Fuel Updated");
         }
         if (fifoDiesel.getAvailableGallons() < gallonsSold) {
             Optional<Diesel> dieselSecondRecord = dieselRepository.findNextFifoNextAvailableGallons();
-
             double negativeCarryOver = fifoDiesel.getAvailableGallons() - gallonsSold;
+            //In event of Rollback, we can return the first available gallons to report to users that the inventory was not consumed.
+            originalFifoGallonState = fifoDiesel.getAvailableGallons();
             fifoDiesel.setAvailableGallons(fifoDiesel.getAvailableGallons() - fifoDiesel.getAvailableGallons());
             if (dieselSecondRecord.isPresent()) {
                 Diesel newFifoDieselBatch = dieselSecondRecord.get();
@@ -178,71 +185,81 @@ public class FuelService {
                 //dieselRepository.delete(fifoDiesel);
 
                 fifoDiesel.setFlagInactive();
-                return newFifoDieselBatch;
+                return new FuelSaleRequest(fifoDiesel.getOctane(), gallonsSold, (gallonsSold * 1.99), ("Diesel Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoDieselBatch.getDelivery_id().toString()));
+            }
+            if (!dieselSecondRecord.isPresent() && fifoDiesel.getAvailableGallons() == 0) {
+                throw new FuelSaleException("Next batch of fuel is unavailable. " + (negativeCarryOver * -1) + " gallons are not accounted for." +
+                        "Due to Transaction Failure, a rollback occurred. " + originalFifoGallonState + " needs to be also accounted for.");
             }
         }
-        //Return something more meaningful.
-        return null;
+        return new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
     }
 
     @Transactional
-    public RegularOctane updateRegularOctaneInventoryFIFOSales(double gallonsSold) {
+    public FuelSaleRequest updateRegularOctaneInventoryFIFOSales(double gallonsSold) {
         Optional<RegularOctane> regularOctaneFirstRecord = regularFuelRepository.findFIFOAvailableGallons();
-        if(!regularOctaneFirstRecord.isPresent()) {
-            //Return something more meaningful.
-            return null;
+        if (!regularOctaneFirstRecord.isPresent()) {
+            throw new FuelSaleException("No available fuel to consume. there are" + gallonsSold + " unaccounted for");
         }
         RegularOctane fifoRegularOctane = regularOctaneFirstRecord.get();
+        double originalFifoGallonState;
         if (fifoRegularOctane.getAvailableGallons() > gallonsSold) {
             fifoRegularOctane.updateGallonsReduceInventorySales(gallonsSold);
             regularFuelRepository.save(fifoRegularOctane);
-            return fifoRegularOctane;
+            return new FuelSaleRequest(fifoRegularOctane.getOctane(), gallonsSold, (gallonsSold * 1.99), "Diesel Fuel Updated");
         }
-        if (fifoRegularOctane.getAvailableGallons() < gallonsSold) {
-            Optional<RegularOctane> regularOctaneNextAvailableBatch = regularFuelRepository.findNextFifoNextAvailableGallons();
+        if (fifoRegularOctane.getAvailableGallons() <= gallonsSold) {
             double negativeCarryOver = fifoRegularOctane.getAvailableGallons() - gallonsSold;
+            //In event of Rollback, we can return the first available gallons to report to users that the inventory was not consumed.
+            originalFifoGallonState = fifoRegularOctane.getAvailableGallons();
             fifoRegularOctane.setAvailableGallons(fifoRegularOctane.getAvailableGallons() - fifoRegularOctane.getAvailableGallons());
+            Optional<RegularOctane> regularOctaneNextAvailableBatch = regularFuelRepository.findNextFifoNextAvailableGallons();
             if (regularOctaneNextAvailableBatch.isPresent()) {
                 RegularOctane newFifoRegularBatch = regularOctaneNextAvailableBatch.get();
-                //Expire available gallons using getters rather than hardcoding 0.00
                 newFifoRegularBatch.setAvailableGallons(newFifoRegularBatch.getAvailableGallons() + negativeCarryOver);
                 regularFuelRepository.save(newFifoRegularBatch);
                 fifoRegularOctane.setFlagInactive();
-                return newFifoRegularBatch;
+                return new FuelSaleRequest(fifoRegularOctane.getOctane(), gallonsSold, (gallonsSold * 1.99), ("Diesel Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoRegularBatch.getDelivery_id().toString()));
+            }
+            if (!regularOctaneNextAvailableBatch.isPresent() && fifoRegularOctane.getAvailableGallons() == 0) {
+                throw new FuelSaleException("Next batch of fuel is unavailable. " + (negativeCarryOver * -1) + " gallons are not accounted for." +
+                        "Due to Transaction Failure, a rollback occurred. " + originalFifoGallonState + " needs to be also accounted for.");
             }
         }
-        //Return something more meaningful.
-        return null;
+        return new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
     }
 
     @Transactional
-    public PremiumOctane updatePremiumOctaneInventoryFIFOSales(double gallonsSold) {
+    public FuelSaleRequest updatePremiumOctaneInventoryFIFOSales(double gallonsSold) {
         Optional<PremiumOctane> premiumOctaneFirstRecord = premimumFuelRepository.findFIFOAvailableGallons();
-        if(!premiumOctaneFirstRecord.isPresent()) {
-            //Return something more meaningful.
-            return null;
+        if (!premiumOctaneFirstRecord.isPresent()) {
+            throw new FuelSaleException("No available fuel to consume. there are" + gallonsSold + " unaccounted for");
         }
         PremiumOctane fifoPremiumOctane = premiumOctaneFirstRecord.get();
+        double originalFifoGallonState;
         if (fifoPremiumOctane.getAvailableGallons() > gallonsSold) {
             fifoPremiumOctane.updateGallonsReduceInventorySales(gallonsSold);
             premimumFuelRepository.save(fifoPremiumOctane);
-            return fifoPremiumOctane;
+            return new FuelSaleRequest(fifoPremiumOctane.getOctane(), gallonsSold, (gallonsSold * 1.99), "Diesel Fuel Updated");
         }
         if (fifoPremiumOctane.getAvailableGallons() < gallonsSold) {
             Optional<PremiumOctane> premiumOctaneNextAvailableBatch = premimumFuelRepository.findNextFifoNextAvailableGallons();
+            originalFifoGallonState = fifoPremiumOctane.getAvailableGallons();
+            //In event of Rollback, we can return the first available gallons to report to users that the inventory was not consumed.
             double negativeCarryOver = fifoPremiumOctane.getAvailableGallons() - gallonsSold;
-            //Expire available gallons using getters rather than hardcoding 0.00
             fifoPremiumOctane.setAvailableGallons(fifoPremiumOctane.getAvailableGallons() - fifoPremiumOctane.getAvailableGallons());
             if (premiumOctaneNextAvailableBatch.isPresent()) {
                 PremiumOctane newFifoRegularBatch = premiumOctaneNextAvailableBatch.get();
-                //negativeCarryOver is a negative value, adding it prevents addition.
                 newFifoRegularBatch.setAvailableGallons(newFifoRegularBatch.getAvailableGallons() + negativeCarryOver);
                 premimumFuelRepository.save(newFifoRegularBatch);
                 fifoPremiumOctane.setFlagInactive();
-                return newFifoRegularBatch;
+                return new FuelSaleRequest(fifoPremiumOctane.getOctane(), gallonsSold, (gallonsSold * 1.99), ("Diesel Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoRegularBatch.getDelivery_id().toString()));
+            }
+            if (!premiumOctaneNextAvailableBatch.isPresent() && fifoPremiumOctane.getAvailableGallons() == 0) {
+                throw new FuelSaleException("Next batch of fuel is unavailable. " + (negativeCarryOver * -1) + " gallons are not accounted for." +
+                        "Due to Transaction Failure, a rollback occurred. " + originalFifoGallonState + " needs to be also accounted for.");
             }
         }
-        //Return something more meaningful.
-        return null;
+        return new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
     }
 }

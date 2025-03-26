@@ -65,15 +65,13 @@ public class ProcessingService {
         double fuelSalesDiesel = Double.parseDouble(dtopMap.get("DIESEL_TRANSACTIONS").replaceAll("[$,]", ""));
 
         double merchandiseSales = Double.parseDouble(dtopMap.get("TOTAL_CONVENIENCE_STORE_SALES").replaceAll("[$,]", ""));
-        double nonRestaurantSales = Double.parseDouble(dtopMap.get("NON_RESTAURANT_FOOD").replaceAll("[$,]", ""));
-        double bottledBeverage = Double.parseDouble(dtopMap.get("BOTTLED_BEVERAGES").replaceAll("[$,]", ""));
         double restaurantSales = Double.parseDouble(dtopMap.get("TOTAL_RESTAURANT_SALES").replaceAll("[$,]", ""));
         double tobaccoSale = Double.parseDouble(dtopMap.get("TOTAL_TOBACCO_SALES").replaceAll("[$,]", ""));
 
         return new ShiftReportDto(date, shiftNumber, employeeID, managerID, posCashTil1, posCashTil2,
                // fuelSaleRegular, fuelSalesMidGrade, fuelSalesPremium, fuelSalesDiesel,
                 new Double[]{fuelSaleRegular, fuelSalesMidGrade, fuelSalesPremium, fuelSalesDiesel},
-                merchandiseSales, restaurantSales, tobaccoSale, nonRestaurantSales, bottledBeverage);
+                merchandiseSales, restaurantSales, tobaccoSale, 0.00, 0.00);
     }
 
     private ShiftReport createShiftReport(ShiftReportDto shiftReportDto){

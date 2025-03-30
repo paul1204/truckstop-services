@@ -73,7 +73,7 @@ public class MerchandiseService {
 
 
         //Totals
-        double total = Double.parseDouble(lines[lines.length - 1].split(",")[7]);
+        double total = Double.parseDouble(lines[lines.length - 1].split(",")[1]);
         String company = lines[0].split(",")[0];
 
         for(int i = 2; i <= lines.length-1; i++){
@@ -82,13 +82,13 @@ public class MerchandiseService {
             //New Item, add to inventory
             if(!currentInventory.containsKey(merchandiseInfo[0].trim())) {
                 // System.out.println(merchandiseInfo[0].trim());
-                if (Objects.equals(merchandiseInfo[merchandiseInfo.length - 2].trim(), "D")) {
+                if (Objects.equals(merchandiseInfo[merchandiseInfo.length - 1].trim(), "D")) {
                     beverageRepository.save(new ColdBeverage(
                             merchandiseInfo[0], merchandiseInfo[1], Double.parseDouble(merchandiseInfo[2]), merchandiseInfo[3],
                             Integer.parseInt(merchandiseInfo[4]), merchandiseInfo[5]
                     ));
                 }
-                if (Objects.equals(merchandiseInfo[merchandiseInfo.length - 2].trim(), "NR")) {
+                if (Objects.equals(merchandiseInfo[merchandiseInfo.length - 1].trim(), "NR")) {
                     nonRestaurantRepository.save(new NonRestaurantFood(
                             merchandiseInfo[0], merchandiseInfo[1], Double.parseDouble(merchandiseInfo[2]), merchandiseInfo[3],
                             Integer.parseInt(merchandiseInfo[4]), merchandiseInfo[5]
@@ -97,11 +97,11 @@ public class MerchandiseService {
             }
             //Existing Product, update inventory
             else{
-                if(Objects.equals(merchandiseInfo[merchandiseInfo.length - 2].trim(), "D")){
+                if(Objects.equals(merchandiseInfo[merchandiseInfo.length - 1].trim(), "D")){
                         ColdBeverage restockBeverage = beverageRepository.findBySkuCode(merchandiseInfo[0]).orElseThrow(()-> new EntityNotFoundException("Not in Stock" + merchandiseInfo[0] + " - " + merchandiseInfo[1] ));
                         restockBeverage.increaseInventory(Integer.parseInt(merchandiseInfo[4]));
                 }
-                if(Objects.equals(merchandiseInfo[merchandiseInfo.length - 2].trim(), "NR")){
+                if(Objects.equals(merchandiseInfo[merchandiseInfo.length - 1].trim(), "NR")){
                     NonRestaurantFood restockFood = nonRestaurantRepository.findBySkuCode(merchandiseInfo[0]).orElseThrow(()-> new EntityNotFoundException("Not in Stock" + merchandiseInfo[0] + " - " + merchandiseInfo[1] ));
                     restockFood.increaseInventory(Integer.parseInt(merchandiseInfo[4]));
                 }

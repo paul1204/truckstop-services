@@ -32,7 +32,7 @@ public class ProcessingController {
 
     @GetMapping("/postShift")
     public ResponseEntity<String> process() {
-        return new ResponseEntity<>("Hello! Please use HTTP POST to upload file from path reports/shift/shift1.txt", HttpStatus.CREATED);
+        return new ResponseEntity<>("Hello! Please use HTTP POST to upload files from path reports/shift/shift1.txt", HttpStatus.CREATED);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/postShift")
@@ -53,7 +53,7 @@ public class ProcessingController {
                     rawShiftString = new String(rawShiftReport.getBytes(), StandardCharsets.UTF_8);
                     shiftReportDto[0] = processingService.parsePOSShiftFile(rawShiftString);
                     processingService.parseShiftDataAndSaveToRepo(shiftReportDto[0]);
-                    processingService.updateFuelInventory(shiftReportDto[0]);
+             //       processingService.updateFuelInventory(shiftReportDto[0]);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

@@ -40,14 +40,14 @@ public class ProcessingService {
         this.merchandiseManagerClient = merchandiseManagerClient;
     }
 
-    public ShiftReportDto parsePOSShiftFile(String rawDtoString){
+    public ShiftReportDto parsePOSShiftFile(String rawDtoString) {
         String[] lines = rawDtoString.split("\n");
         System.out.println(rawDtoString);
         Map<String, String> dtopMap = new HashMap<>();
 
-        for(String line : lines){
-            String[] data = line.split(":",2);
-            if(data.length == 2){
+        for (String line : lines) {
+            String[] data = line.split(":", 2);
+            if (data.length == 2) {
                 dtopMap.put(data[0].trim(), data[1].trim());
             }
         }
@@ -69,12 +69,12 @@ public class ProcessingService {
         double tobaccoSale = Double.parseDouble(dtopMap.get("TOTAL_TOBACCO_SALES").replaceAll("[$,]", ""));
 
         return new ShiftReportDto(date, shiftNumber, employeeID, managerID, posCashTil1, posCashTil2,
-               // fuelSaleRegular, fuelSalesMidGrade, fuelSalesPremium, fuelSalesDiesel,
+                // fuelSaleRegular, fuelSalesMidGrade, fuelSalesPremium, fuelSalesDiesel,
                 new Double[]{fuelSaleRegular, fuelSalesMidGrade, fuelSalesPremium, fuelSalesDiesel},
                 merchandiseSales, restaurantSales, tobaccoSale, 0.00, 0.00);
     }
 
-    private ShiftReport createShiftReport(ShiftReportDto shiftReportDto){
+    private ShiftReport createShiftReport(ShiftReportDto shiftReportDto) {
         ShiftReport shiftReport = shiftReportRepository.findByShiftNumber(shiftReportDto.shiftNumber())
                 .orElse(new ShiftReport());
         shiftReport.setDate(shiftReportDto.date());
@@ -84,11 +84,11 @@ public class ProcessingService {
         shiftReport.setPosCashTil1(shiftReportDto.posCashTil1());
         shiftReport.setPosCashTil2(shiftReportDto.posCashTil2());
 
-        FuelSales fuelSale = new FuelSales();
-        fuelSale.setRegularGasolineTransactions(shiftReportDto.fuelSales()[0]);
-        fuelSale.setMidGradeGasolineTransactions(shiftReportDto.fuelSales()[1]);
-        fuelSale.setPremiumGasolineTransactions(shiftReportDto.fuelSales()[2]);
-        fuelSale.setDieselTransactions(shiftReportDto.fuelSales()[3]);
+//        FuelSales fuelSale = new FuelSales();
+//        fuelSale.setRegularGasolineTransactions(shiftReportDto.fuelSales()[0]);
+//        fuelSale.setMidGradeGasolineTransactions(shiftReportDto.fuelSales()[1]);
+//        fuelSale.setPremiumGasolineTransactions(shiftReportDto.fuelSales()[2]);
+//        fuelSale.setDieselTransactions(shiftReportDto.fuelSales()[3]);
 
         MerchandiseSales merchandiseSales = new MerchandiseSales();
         merchandiseSales.setMerchandiseSales(shiftReportDto.merchandiseSales());
@@ -101,13 +101,13 @@ public class ProcessingService {
         TobaccoSales tobaccoSales = new TobaccoSales();
         tobaccoSales.setTobaccoSales(shiftReportDto.tobaccoSales());
 
-        fuelSale.setShiftReport(shiftReport);
+        //   fuelSale.setShiftReport(shiftReport);
         merchandiseSales.setShiftReport(shiftReport);
         restaurantSales.setShiftReport(shiftReport);
         tobaccoSales.setShiftReport(shiftReport);
 
         // Save the entities
-        shiftReport.setFuelSales(fuelSale);
+        //  shiftReport.setFuelSales(fuelSale);
         shiftReport.setMerchandiseSales(merchandiseSales);
         shiftReport.setRestaurantSales(restaurantSales);
         shiftReport.setTobaccoSales(tobaccoSales);
@@ -119,67 +119,66 @@ public class ProcessingService {
         List<InventoryDto> bottledDrinkInventory = new ArrayList<>();
         List<InventoryDto> nonRestaurantInventory = new ArrayList<>();
         List<InventoryDto> restaurantInventory = new ArrayList<>();
-       try{
-        BufferedReader br = new BufferedReader(new InputStreamReader(inventoryReport.getInputStream(), StandardCharsets.UTF_8));
-        String line;
-        boolean isBottled = false;
-        boolean isNonRestaurant = false;
-        boolean isRestaurant = false;
-        while((line = br.readLine()) != null){
-            line = line.trim();
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(inventoryReport.getInputStream(), StandardCharsets.UTF_8));
+            String line;
+            boolean isBottled = false;
+            boolean isNonRestaurant = false;
+            boolean isRestaurant = false;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
 
-            if (line.startsWith("BOTTLED_DRINKS_DETAILS")){
-                isBottled = true;
-                isNonRestaurant = false;
-                isRestaurant = false;
-                continue;
-            }
+                if (line.startsWith("BOTTLED_DRINKS_DETAILS")) {
+                    isBottled = true;
+                    isNonRestaurant = false;
+                    isRestaurant = false;
+                    continue;
+                }
 
-            if (line.startsWith("NON_RESTAURANT_DETAILS")){
-                isBottled = false;
-                isNonRestaurant = true;
-                isRestaurant = false;
-                continue;
-            }
-            if (line.startsWith("RESTAURANT_DETAILS")){
-                isBottled = false;
-                isNonRestaurant = false;
-                isRestaurant = true;
-                continue;
-            }
+                if (line.startsWith("NON_RESTAURANT_DETAILS")) {
+                    isBottled = false;
+                    isNonRestaurant = true;
+                    isRestaurant = false;
+                    continue;
+                }
+                if (line.startsWith("RESTAURANT_DETAILS")) {
+                    isBottled = false;
+                    isNonRestaurant = false;
+                    isRestaurant = true;
+                    continue;
+                }
 
 
-            if(isBottled && line.startsWith("SKU_CODE")){
-                String[] parts = line.split(",");
-                String skuCode = parts[0].split(":")[1].trim();
-                int qty = Integer.parseInt(parts[1].split(":")[1].trim());
-                bottledDrinkInventory.add(new InventoryDto("BOTTLED_DRINK", skuCode, qty));
-            }
+                if (isBottled && line.startsWith("SKU_CODE")) {
+                    String[] parts = line.split(",");
+                    String skuCode = parts[0].split(":")[1].trim();
+                    int qty = Integer.parseInt(parts[1].split(":")[1].trim());
+                    bottledDrinkInventory.add(new InventoryDto("BOTTLED_DRINK", skuCode, qty));
+                }
 
-            if(isNonRestaurant && line.startsWith("SKU_CODE")){
-                String[] parts = line.split(",");
-                String skuCode = parts[0].split(":")[1].trim();
-                int qty = Integer.parseInt(parts[1].split(":")[1].trim());
-                nonRestaurantInventory.add(new InventoryDto("NON_RESTAURANT",skuCode, qty));
-            }
-            if(isRestaurant && line.startsWith("SKU_CODE")){
-                String[] parts = line.split(",");
-                String skuCode = parts[0].split(":")[1].trim();
-                int qty = Integer.parseInt(parts[1].split(":")[1].trim());
-                restaurantInventory.add(new InventoryDto("HOT_FOOD",skuCode, qty));
-            }
+                if (isNonRestaurant && line.startsWith("SKU_CODE")) {
+                    String[] parts = line.split(",");
+                    String skuCode = parts[0].split(":")[1].trim();
+                    int qty = Integer.parseInt(parts[1].split(":")[1].trim());
+                    nonRestaurantInventory.add(new InventoryDto("NON_RESTAURANT", skuCode, qty));
+                }
+                if (isRestaurant && line.startsWith("SKU_CODE")) {
+                    String[] parts = line.split(",");
+                    String skuCode = parts[0].split(":")[1].trim();
+                    int qty = Integer.parseInt(parts[1].split(":")[1].trim());
+                    restaurantInventory.add(new InventoryDto("HOT_FOOD", skuCode, qty));
+                }
 
+            }
+        } catch (Exception e) {
+            //Change this!!!
+            e.printStackTrace();
         }
-       }
-       catch(Exception e){
-           //Change this!!!
-           e.printStackTrace();
-       }
         return List.of(bottledDrinkInventory, nonRestaurantInventory, restaurantInventory);
     }
 
     //  @Transactional
-    public void parseShiftDataAndSaveToRepo(ShiftReportDto shiftReportDto){
+    public void parseShiftDataAndSaveToRepo(ShiftReportDto shiftReportDto) {
         ShiftReport s = createShiftReport(shiftReportDto);
         saveToRepository(s);
     }
@@ -188,39 +187,17 @@ public class ProcessingService {
     public void updateFuelInventory(ShiftReportDto shiftReportDto) throws IOException {
         merchandiseManagerClient.updateFuelInventoryReduceGallons(shiftReportDto.fuelSales());
     }
-    private void saveToRepository(ShiftReport shiftReport){
+
+    private void saveToRepository(ShiftReport shiftReport) {
         shiftReportRepository.save(shiftReport);
     }
 
     //@Transactional
-    public void updateInventory(List<List<InventoryDto>> inventoryList){
-       merchandiseManagerClient.updateMerchandiseInventoryFromSales(inventoryList);
+    public void updateInventory(List<List<InventoryDto>> inventoryList) {
+        merchandiseManagerClient.updateMerchandiseInventoryFromSales(inventoryList);
     }
 
-    public void pushToAccountingService(ShiftReport posReport){
+    public void pushToAccountingService(ShiftReport posReport) {
         //make API call to Revenue Management Controller
     }
-
-//    public DailySalesDto getDailySales(String date){
-//        List<ShiftReport> shiftReports = shiftReportRepository.findByDate(date);
-//
-//        double totalFuelSales = shiftReports.stream()
-//                .mapToDouble(shift -> shift.getFuelSales().getRegularGasolineTransactions() +
-//                        shift.getFuelSales().getMidGradeGasolineTransactions() +
-//                        shift.getFuelSales().getPremiumGasolineTransactions() +
-//                        shift.getFuelSales().getDieselTransactions())
-//                .sum();
-//
-//        double totalMerchandiseSales = shiftReports.stream()
-//                .mapToDouble(shift -> shift.getMerchandiseSales().getMerchandiseSales())
-//                .sum();
-//
-//        double totalRestaurantSales = shiftReports.stream()
-//                .mapToDouble(s -> s.getRestaurantSales().getRestaurantSalesSales())
-//                .sum();
-//        double totalTobaccoSales = shiftReports.stream()
-//                .mapToDouble(s -> s.getTobaccoSales().getTobaccoSales())
-//                .sum();
-//        return new DailySalesDto(date, totalFuelSales, totalMerchandiseSales, totalRestaurantSales, totalTobaccoSales);
-//    }
 }

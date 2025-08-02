@@ -1,6 +1,7 @@
 package com.truckstopservices.inventory.fuel.service;
 
 import com.truckstopservices.accounting.accountsPayable.service.implementation.AccountsPayableImplementation;
+import com.truckstopservices.accounting.model.Invoice;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
@@ -103,10 +104,46 @@ public class FuelService {
             FuelDelivery savedDelivery = fuelDeliveryRepository.save(fuelDelivery);
             //Need to update additional fields past initial save to repo
             updateFuelInventoryFromDelivery(savedDelivery);
-            return new FuelDeliveryResponse<>(true, "Fuel Successfully Delivered!", null, null);
+
+            // Calculate total amount for the invoice
+            double totalAmount = calculateTotalAmount(fuelDelivery);
+
+            // Create and save the invoice
+            Invoice vendorInvoice = accountsPayableImplementation.createInvoice(
+                fuelDelivery.getCompanyName(),
+                fuelDelivery.getDeliveryDate(),
+                totalAmount
+            );
+
+            return new FuelDeliveryResponse<>(true, "Fuel Successfully Delivered!", new FuelDelivery[0], vendorInvoice);
         } catch (DataAccessException e) {
             throw new DataAccessResourceFailureException("Failed to update fuel delivery: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Calculate the total amount for the invoice based on the fuel delivery
+     * @param fuelDelivery The fuel delivery
+     * @return The total amount
+     */
+    private double calculateTotalAmount(FuelDelivery fuelDelivery) {
+        double dieselAmount = 0;
+        double regularAmount = 0;
+        double premiumAmount = 0;
+
+        if (fuelDelivery.getDieselOrder() != null) {
+            dieselAmount = fuelDelivery.getDieselOrder().getPricePerGallon() * fuelDelivery.getDieselOrder().getTotalGallons();
+        }
+
+        if (fuelDelivery.getRegularOctaneOrder() != null) {
+            regularAmount = fuelDelivery.getRegularOctaneOrder().getPricePerGallon() * fuelDelivery.getRegularOctaneOrder().getTotalGallons();
+        }
+
+        if (fuelDelivery.getPremiumOctaneOrder() != null) {
+            premiumAmount = fuelDelivery.getPremiumOctaneOrder().getPricePerGallon() * fuelDelivery.getPremiumOctaneOrder().getTotalGallons();
+        }
+
+        return dieselAmount + regularAmount + premiumAmount;
     }
 
     private void updateFuelInventoryFromDelivery(FuelDelivery fuelDelivery) throws Exception {
@@ -156,7 +193,7 @@ public class FuelService {
     public FuelSaleRequest updateDieselInventoryFIFOSales(double gallonsSold) throws FuelSaleException {
         Optional<Diesel> dieselFirstRecord = dieselRepository.findFIFOAvailableGallons();
         if (!dieselFirstRecord.isPresent()) {
-            throw new FuelSaleException("No available fuel to consume. there are" + gallonsSold + " unaccounted for");
+            throw new FuelSaleException("No available fuel to consume. there are " + gallonsSold + " gallons unaccounted for");
         }
         Diesel fifoDiesel = dieselFirstRecord.get();
         double originalFifoGallonState;
@@ -199,7 +236,7 @@ public class FuelService {
     public FuelSaleRequest updateRegularOctaneInventoryFIFOSales(double gallonsSold) {
         Optional<RegularOctane> regularOctaneFirstRecord = regularFuelRepository.findFIFOAvailableGallons();
         if (!regularOctaneFirstRecord.isPresent()) {
-            throw new FuelSaleException("No available fuel to consume. there are" + gallonsSold + " unaccounted for");
+            throw new FuelSaleException("No available fuel to consume. there are " + gallonsSold + " gallons unaccounted for");
         }
         RegularOctane fifoRegularOctane = regularOctaneFirstRecord.get();
         double originalFifoGallonState;
@@ -233,27 +270,27 @@ public class FuelService {
     public FuelSaleRequest updatePremiumOctaneInventoryFIFOSales(double gallonsSold) {
         Optional<PremiumOctane> premiumOctaneFirstRecord = premimumFuelRepository.findFIFOAvailableGallons();
         if (!premiumOctaneFirstRecord.isPresent()) {
-            throw new FuelSaleException("No available fuel to consume. there are" + gallonsSold + " unaccounted for");
+            throw new FuelSaleException("No available fuel to consume. there are " + gallonsSold + " gallons unaccounted for");
         }
         PremiumOctane fifoPremiumOctane = premiumOctaneFirstRecord.get();
         double originalFifoGallonState;
         if (fifoPremiumOctane.getAvailableGallons() > gallonsSold) {
             fifoPremiumOctane.updateGallonsReduceInventorySales(gallonsSold);
             premimumFuelRepository.save(fifoPremiumOctane);
-            return new FuelSaleRequest(fifoPremiumOctane.getOctane(), gallonsSold, (gallonsSold * 1.99), "Diesel Fuel Updated");
+            return new FuelSaleRequest(fifoPremiumOctane.getOctane(), gallonsSold, (gallonsSold * 1.99), "Premium Fuel Updated");
         }
-        if (fifoPremiumOctane.getAvailableGallons() < gallonsSold) {
-            Optional<PremiumOctane> premiumOctaneNextAvailableBatch = premimumFuelRepository.findNextFifoNextAvailableGallons();
-            originalFifoGallonState = fifoPremiumOctane.getAvailableGallons();
-            //In event of Rollback, we can return the first available gallons to report to users that the inventory was not consumed.
+        if (fifoPremiumOctane.getAvailableGallons() <= gallonsSold) {
             double negativeCarryOver = fifoPremiumOctane.getAvailableGallons() - gallonsSold;
+            //In event of Rollback, we can return the first available gallons to report to users that the inventory was not consumed.
+            originalFifoGallonState = fifoPremiumOctane.getAvailableGallons();
             fifoPremiumOctane.setAvailableGallons(fifoPremiumOctane.getAvailableGallons() - fifoPremiumOctane.getAvailableGallons());
+            Optional<PremiumOctane> premiumOctaneNextAvailableBatch = premimumFuelRepository.findNextFifoNextAvailableGallons();
             if (premiumOctaneNextAvailableBatch.isPresent()) {
-                PremiumOctane newFifoRegularBatch = premiumOctaneNextAvailableBatch.get();
-                newFifoRegularBatch.setAvailableGallons(newFifoRegularBatch.getAvailableGallons() + negativeCarryOver);
-                premimumFuelRepository.save(newFifoRegularBatch);
+                PremiumOctane newFifoPremiumBatch = premiumOctaneNextAvailableBatch.get();
+                newFifoPremiumBatch.setAvailableGallons(newFifoPremiumBatch.getAvailableGallons() + negativeCarryOver);
+                premimumFuelRepository.save(newFifoPremiumBatch);
                 fifoPremiumOctane.setFlagInactive();
-                return new FuelSaleRequest(fifoPremiumOctane.getOctane(), gallonsSold, (gallonsSold * 1.99), ("Diesel Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoRegularBatch.getDelivery_id().toString()));
+                return new FuelSaleRequest(fifoPremiumOctane.getOctane(), gallonsSold, (gallonsSold * 1.99), ("Premium Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoPremiumBatch.getDelivery_id().toString()));
             }
             if (!premiumOctaneNextAvailableBatch.isPresent() && fifoPremiumOctane.getAvailableGallons() == 0) {
                 throw new FuelSaleException("Next batch of fuel is unavailable. " + (negativeCarryOver * -1) + " gallons are not accounted for." +

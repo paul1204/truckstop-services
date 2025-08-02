@@ -2,12 +2,8 @@ package com.truckstopservices.parking.controller;
 
 import com.truckstopservices.parking.dto.ParkingRequest;
 import com.truckstopservices.parking.dto.ParkingResponse;
-import com.truckstopservices.parking.entity.ParkingRate;
 import com.truckstopservices.parking.entity.ParkingRate.RateType;
-import com.truckstopservices.parking.entity.ParkingSpot;
 import com.truckstopservices.parking.exception.ParkingException;
-import com.truckstopservices.parking.repository.ParkingRateRepository;
-import com.truckstopservices.parking.repository.ParkingSpotRepository;
 import com.truckstopservices.parking.service.ParkingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,16 +17,10 @@ import java.util.List;
 public class ParkingController {
 
     private final ParkingService parkingService;
-    private final ParkingSpotRepository parkingSpotRepository;
-    private final ParkingRateRepository parkingRateRepository;
 
     @Autowired
-    public ParkingController(ParkingService parkingService, 
-                            ParkingSpotRepository parkingSpotRepository,
-                            ParkingRateRepository parkingRateRepository) {
+    public ParkingController(ParkingService parkingService) {
         this.parkingService = parkingService;
-        this.parkingSpotRepository = parkingSpotRepository;
-        this.parkingRateRepository = parkingRateRepository;
     }
 
     @GetMapping("/spots")

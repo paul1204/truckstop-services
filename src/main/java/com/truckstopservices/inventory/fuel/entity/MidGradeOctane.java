@@ -14,9 +14,9 @@ public class MidGradeOctane extends Fuel implements CalculateFuelPrice {
     public MidGradeOctane(){
         super();
     }
-    public MidGradeOctane(int octane, double pricePerGallon, double initalGallons) {
-        super(octane, pricePerGallon, initalGallons, new ArrayList<Double>(List.of(pricePerGallon)), new ArrayList<Double>(List.of(initalGallons)));
-    }
+//    public MidGradeOctane(int octane, double pricePerGallon, double initalGallons) {
+//        super(octane, pricePerGallon, initalGallons, new ArrayList<Double>(List.of(pricePerGallon)), new ArrayList<Double>(List.of(initalGallons)));
+//    }
 
     @Override
     public double calculateGallonsToDispense(double amount) {

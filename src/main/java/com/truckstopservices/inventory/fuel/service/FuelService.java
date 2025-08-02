@@ -2,9 +2,13 @@ package com.truckstopservices.inventory.fuel.service;
 
 import com.truckstopservices.accounting.accountsPayable.service.implementation.AccountsPayableImplementation;
 import com.truckstopservices.accounting.model.Invoice;
+import com.truckstopservices.accounting.pos.dto.Receipt;
+import com.truckstopservices.accounting.pos.enums.SalesType;
+import com.truckstopservices.accounting.pos.service.POSService;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
+import com.truckstopservices.inventory.fuel.dto.FuelSaleResponse;
 import com.truckstopservices.inventory.fuel.entity.*;
 import com.truckstopservices.inventory.fuel.repository.*;
 //import com.truckstopservices.inventory.fuel.repository.FuelRepository;
@@ -41,14 +45,18 @@ public class FuelService {
     @Autowired
     private AccountsPayableImplementation accountsPayableImplementation;
 
+    @Autowired
+    private POSService posService;
+
     public FuelService(DieselRepository dieselRepository, RegularFuelRepository regularFuelRepository,
                        MidGradeFuelRepository midGradeFuelRepository, PremimumFuelRepository premimumFuelRepository,
-                       AccountsPayableImplementation accountsPayableImplementation) {
+                       AccountsPayableImplementation accountsPayableImplementation, POSService posService) {
         this.dieselRepository = dieselRepository;
         this.regularFuelRepository = regularFuelRepository;
         this.midGradeFuelRepository = midGradeFuelRepository;
         this.premimumFuelRepository = premimumFuelRepository;
         this.accountsPayableImplementation = accountsPayableImplementation;
+        this.posService = posService;
     }
 
     public List<FuelInventoryResponse> getAllFuelInventory() {
@@ -184,8 +192,7 @@ public class FuelService {
     }
 
     @Transactional
-    //public Diesel updateDieselInventoryFIFOSales(double gallonsSold){
-    public FuelSaleRequest updateDieselInventoryFIFOSales(double gallonsSold) throws FuelSaleException {
+    public FuelSaleResponse updateDieselInventoryFIFOSales(double gallonsSold) throws FuelSaleException {
         Optional<Diesel> dieselFirstRecord = dieselRepository.findFIFOAvailableGallons();
         if (!dieselFirstRecord.isPresent()) {
             throw new FuelSaleException("No available fuel to consume. there are " + gallonsSold + " gallons unaccounted for");
@@ -195,7 +202,14 @@ public class FuelService {
         if (fifoDiesel.getAvailableGallons() > gallonsSold) {
             fifoDiesel.updateGallonsReduceInventorySales(gallonsSold);
             dieselRepository.save(fifoDiesel);
-            return new FuelSaleRequest(fifoDiesel.getOctane(), gallonsSold, (gallonsSold * 1.99), "Diesel Fuel Updated");
+
+            double totalPrice = gallonsSold * 1.99;
+            FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(fifoDiesel.getOctane(), gallonsSold, totalPrice, "Diesel Fuel Updated");
+
+
+            Receipt receipt = posService.createPOSRecord(totalPrice, SalesType.FUEL);
+
+            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
         }
         if (fifoDiesel.getAvailableGallons() < gallonsSold) {
             Optional<Diesel> dieselSecondRecord = dieselRepository.findNextFifoNextAvailableGallons();
@@ -217,18 +231,34 @@ public class FuelService {
                 //dieselRepository.delete(fifoDiesel);
 
                 fifoDiesel.setFlagInactive();
-                return new FuelSaleRequest(fifoDiesel.getOctane(), gallonsSold, (gallonsSold * 1.99), ("Diesel Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoDieselBatch.getDelivery_id().toString()));
+
+                double totalPrice = gallonsSold * 1.99;
+                FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(
+                    fifoDiesel.getOctane(), 
+                    gallonsSold, 
+                    totalPrice, 
+                    "Diesel Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoDieselBatch.getDelivery_id().toString()
+                );
+
+                // Create POS record and get receipt
+                Receipt receipt = posService.createPOSRecord(totalPrice, SalesType.FUEL);
+
+                // Return response with receipt
+                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
             }
             if (!dieselSecondRecord.isPresent() && fifoDiesel.getAvailableGallons() == 0) {
                 throw new FuelSaleException("Next batch of fuel is unavailable. " + (negativeCarryOver * -1) + " gallons are not accounted for." +
                         "Due to Transaction Failure, a rollback occurred. " + originalFifoGallonState + " needs to be also accounted for.");
             }
         }
-        return new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
+
+        FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
+        Receipt receipt = posService.createPOSRecord(0, SalesType.FUEL);
+        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
     }
 
     @Transactional
-    public FuelSaleRequest updateRegularOctaneInventoryFIFOSales(double gallonsSold) {
+    public FuelSaleResponse updateRegularOctaneInventoryFIFOSales(double gallonsSold) {
         Optional<RegularOctane> regularOctaneFirstRecord = regularFuelRepository.findFIFOAvailableGallons();
         if (!regularOctaneFirstRecord.isPresent()) {
             throw new FuelSaleException("No available fuel to consume. there are " + gallonsSold + " gallons unaccounted for");
@@ -238,7 +268,15 @@ public class FuelService {
         if (fifoRegularOctane.getAvailableGallons() > gallonsSold) {
             fifoRegularOctane.updateGallonsReduceInventorySales(gallonsSold);
             regularFuelRepository.save(fifoRegularOctane);
-            return new FuelSaleRequest(fifoRegularOctane.getOctane(), gallonsSold, (gallonsSold * 1.99), "Diesel Fuel Updated");
+
+            double totalPrice = gallonsSold * 1.99;
+            FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(fifoRegularOctane.getOctane(), gallonsSold, totalPrice, "Regular Fuel Updated");
+
+            // Create POS record and get receipt
+            Receipt receipt = posService.createPOSRecord(totalPrice, SalesType.FUEL);
+
+            // Return response with receipt
+            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
         }
         if (fifoRegularOctane.getAvailableGallons() <= gallonsSold) {
             double negativeCarryOver = fifoRegularOctane.getAvailableGallons() - gallonsSold;
@@ -251,18 +289,35 @@ public class FuelService {
                 newFifoRegularBatch.setAvailableGallons(newFifoRegularBatch.getAvailableGallons() + negativeCarryOver);
                 regularFuelRepository.save(newFifoRegularBatch);
                 fifoRegularOctane.setFlagInactive();
-                return new FuelSaleRequest(fifoRegularOctane.getOctane(), gallonsSold, (gallonsSold * 1.99), ("Diesel Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoRegularBatch.getDelivery_id().toString()));
+
+                double totalPrice = gallonsSold * 1.99;
+                FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(
+                    fifoRegularOctane.getOctane(), 
+                    gallonsSold, 
+                    totalPrice, 
+                    "Regular Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoRegularBatch.getDelivery_id().toString()
+                );
+
+                // Create POS record and get receipt
+                Receipt receipt = posService.createPOSRecord(totalPrice, SalesType.FUEL);
+
+                // Return response with receipt
+                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
             }
             if (!regularOctaneNextAvailableBatch.isPresent() && fifoRegularOctane.getAvailableGallons() == 0) {
                 throw new FuelSaleException("Next batch of fuel is unavailable. " + (negativeCarryOver * -1) + " gallons are not accounted for." +
                         "Due to Transaction Failure, a rollback occurred. " + originalFifoGallonState + " needs to be also accounted for.");
             }
         }
-        return new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
+
+        FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
+        // Create a dummy receipt for the error case
+        Receipt receipt = posService.createPOSRecord(0, SalesType.FUEL);
+        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
     }
 
     @Transactional
-    public FuelSaleRequest updatePremiumOctaneInventoryFIFOSales(double gallonsSold) {
+    public FuelSaleResponse updatePremiumOctaneInventoryFIFOSales(double gallonsSold) {
         Optional<PremiumOctane> premiumOctaneFirstRecord = premimumFuelRepository.findFIFOAvailableGallons();
         if (!premiumOctaneFirstRecord.isPresent()) {
             throw new FuelSaleException("No available fuel to consume. there are " + gallonsSold + " gallons unaccounted for");
@@ -272,7 +327,15 @@ public class FuelService {
         if (fifoPremiumOctane.getAvailableGallons() > gallonsSold) {
             fifoPremiumOctane.updateGallonsReduceInventorySales(gallonsSold);
             premimumFuelRepository.save(fifoPremiumOctane);
-            return new FuelSaleRequest(fifoPremiumOctane.getOctane(), gallonsSold, (gallonsSold * 1.99), "Premium Fuel Updated");
+
+            double totalPrice = gallonsSold * 1.99;
+            FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(fifoPremiumOctane.getOctane(), gallonsSold, totalPrice, "Premium Fuel Updated");
+
+            // Create POS record and get receipt
+            Receipt receipt = posService.createPOSRecord(totalPrice, SalesType.FUEL);
+
+            // Return response with receipt
+            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
         }
         if (fifoPremiumOctane.getAvailableGallons() <= gallonsSold) {
             double negativeCarryOver = fifoPremiumOctane.getAvailableGallons() - gallonsSold;
@@ -285,13 +348,30 @@ public class FuelService {
                 newFifoPremiumBatch.setAvailableGallons(newFifoPremiumBatch.getAvailableGallons() + negativeCarryOver);
                 premimumFuelRepository.save(newFifoPremiumBatch);
                 fifoPremiumOctane.setFlagInactive();
-                return new FuelSaleRequest(fifoPremiumOctane.getOctane(), gallonsSold, (gallonsSold * 1.99), ("Premium Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoPremiumBatch.getDelivery_id().toString()));
+
+                double totalPrice = gallonsSold * 1.99;
+                FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(
+                    fifoPremiumOctane.getOctane(), 
+                    gallonsSold, 
+                    totalPrice, 
+                    "Premium Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoPremiumBatch.getDelivery_id().toString()
+                );
+
+                // Create POS record and get receipt
+                Receipt receipt = posService.createPOSRecord(totalPrice, SalesType.FUEL);
+
+                // Return response with receipt
+                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
             }
             if (!premiumOctaneNextAvailableBatch.isPresent() && fifoPremiumOctane.getAvailableGallons() == 0) {
                 throw new FuelSaleException("Next batch of fuel is unavailable. " + (negativeCarryOver * -1) + " gallons are not accounted for." +
                         "Due to Transaction Failure, a rollback occurred. " + originalFifoGallonState + " needs to be also accounted for.");
             }
         }
-        return new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
+
+        FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
+        // Create a dummy receipt for the error case
+        Receipt receipt = posService.createPOSRecord(0, SalesType.FUEL);
+        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
     }
 }

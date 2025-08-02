@@ -13,6 +13,41 @@ HF132,Philly Cheesesteak,12,Regular,9.99,119.88
 HF133,Chicken Tenders,18,Small,6.99,125.82
 HF134,French Fries,25,Large,3.99,99.75
 HF135,Onion Rings,15,Regular,4.49,67.35
+HF136,Cheeseburger,15,Regular,6.99,104.85
+HF137,Double Cheeseburger,10,Regular,8.99,89.90
+HF138,Bacon Cheeseburger,12,Regular,7.99,95.88
+HF139,Mushroom Swiss Burger,8,Regular,7.99,63.92
+HF140,BBQ Bacon Burger,10,Regular,8.49,84.90
+HF141,Jalapeño Burger,8,Regular,7.99,63.92
+HF142,Chicken Quesadilla,12,Regular,7.49,89.88
+HF143,Beef Quesadilla,10,Regular,7.99,79.90
+HF144,Cheese Quesadilla,8,Regular,5.99,47.92
+HF145,Chicken Burrito,12,Regular,8.49,101.88
+HF146,Beef Burrito,10,Regular,8.99,89.90
+HF147,Bean Burrito,8,Regular,6.99,55.92
+HF148,Nachos with Cheese,15,Large,5.99,89.85
+HF149,Loaded Nachos,12,Large,8.99,107.88
+HF150,Taco Salad,10,Bowl,7.99,79.90
+HF151,Chicken Wrap,15,Regular,6.99,104.85
+HF152,Grilled Chicken Sandwich,12,Regular,7.49,89.88
+HF153,Buffalo Chicken Sandwich,10,Regular,7.49,74.90
+HF154,Fish Sandwich,8,Regular,6.99,55.92
+HF155,Mozzarella Sticks,15,6 Pieces,5.99,89.85
+HF156,Jalapeño Poppers,12,6 Pieces,5.49,65.88
+HF157,Chicken Wings,10,8 Pieces,9.99,99.90
+HF158,Buffalo Wings,10,8 Pieces,9.99,99.90
+HF159,BBQ Wings,10,8 Pieces,9.99,99.90
+HF160,Garlic Parmesan Wings,10,8 Pieces,9.99,99.90
+HF161,Loaded Potato Skins,8,4 Pieces,6.99,55.92
+HF162,Chili Cheese Fries,12,Large,5.99,71.88
+HF163,Loaded Fries,10,Large,6.99,69.90
+HF164,Sweet Potato Fries,15,Regular,4.49,67.35
+HF165,Tater Tots,15,Regular,3.99,59.85
+HF166,Loaded Tater Tots,12,Regular,5.99,71.88
+HF167,Chicken Alfredo,8,Bowl,9.99,79.92
+HF168,Spaghetti and Meatballs,8,Bowl,9.99,79.92
+HF169,Mac and Cheese,12,Bowl,7.99,95.88
+HF170,Loaded Mac and Cheese,10,Bowl,9.99,99.90
 BF201,Scrambled Eggs,20,Plate,4.99,99.80
 BF202,Bacon (4 strips),30,Plate,3.99,119.70
 BF203,Sausage Patty,25,Each,2.49,62.25
@@ -20,4 +55,101 @@ BF204,Hash Browns,20,Each,1.99,39.80
 BF205,Breakfast Burrito,15,Each,6.99,104.85
 BF206,Pancakes (3),12,Stack,5.49,65.88
 BF207,Biscuits and Gravy,10,Plate,7.99,79.90
-Totals,1396.54
+BF208,French Toast,12,3 Pieces,5.99,71.88
+BF209,Belgian Waffle,10,Each,5.99,59.90
+BF210,Breakfast Platter,8,Plate,9.99,79.92
+BF211,Omelette,12,Each,7.99,95.88
+BF212,Denver Omelette,10,Each,8.99,89.90
+BF213,Veggie Omelette,8,Each,7.99,63.92
+BF214,Cheese Omelette,10,Each,6.99,69.90
+BF215,Breakfast Sandwich,15,Each,4.99,74.85
+BF216,Breakfast Bowl,12,Bowl,7.99,95.88
+BF217,Yogurt Parfait,15,Cup,3.99,59.85
+BF218,Oatmeal,12,Bowl,3.49,41.88
+BF219,Fruit Cup,15,Cup,3.99,59.85
+BF220,Breakfast Combo,10,Plate,10.99,109.90
+SF301,Garden Salad,15,Bowl,5.99,89.85
+SF302,Caesar Salad,12,Bowl,6.99,83.88
+SF303,Grilled Chicken Salad,10,Bowl,8.99,89.90
+SF304,Chef Salad,8,Bowl,8.99,71.92
+SF305,Cobb Salad,10,Bowl,8.99,89.90
+SF306,Greek Salad,8,Bowl,7.99,63.92
+SF307,Spinach Salad,10,Bowl,7.99,79.90
+SF308,Fruit Salad,15,Cup,4.99,74.85
+SF309,Pasta Salad,12,Cup,4.49,53.88
+SF310,Potato Salad,12,Cup,3.99,47.88
+SF311,Coleslaw,15,Cup,2.99,44.85
+SF312,Veggie Wrap,10,Each,6.99,69.90
+SF313,Turkey Wrap,12,Each,7.99,95.88
+SF314,Ham Wrap,12,Each,7.99,95.88
+SF315,Veggie Sandwich,10,Each,6.99,69.90
+SF316,Turkey Sandwich,12,Each,7.99,95.88
+SF317,Ham Sandwich,12,Each,7.99,95.88
+SF318,Club Sandwich,10,Each,8.99,89.90
+SF319,BLT Sandwich,12,Each,7.49,89.88
+SF320,Grilled Cheese,15,Each,4.99,74.85
+DR401,Fountain Drink,30,Small,1.99,59.70
+DR402,Fountain Drink,25,Medium,2.49,62.25
+DR403,Fountain Drink,20,Large,2.99,59.80
+DR404,Bottled Water,40,16.9oz,1.49,59.60
+DR405,Sparkling Water,20,16.9oz,1.99,39.80
+DR406,Coffee,30,Small,1.99,59.70
+DR407,Coffee,25,Medium,2.49,62.25
+DR408,Coffee,20,Large,2.99,59.80
+DR409,Hot Tea,15,Cup,1.99,29.85
+DR410,Iced Tea,25,Regular,2.49,62.25
+DR411,Sweet Tea,25,Regular,2.49,62.25
+DR412,Lemonade,20,Regular,2.99,59.80
+DR413,Orange Juice,15,Small,2.49,37.35
+DR414,Apple Juice,15,Small,2.49,37.35
+DR415,Milk,20,Carton,1.99,39.80
+DR416,Chocolate Milk,20,Carton,2.29,45.80
+DR417,Hot Chocolate,15,Cup,2.49,37.35
+DR418,Milkshake,12,Regular,4.99,59.88
+DR419,Smoothie,10,Regular,5.99,59.90
+DR420,Energy Drink,15,Can,3.49,52.35
+DS501,Ice Cream,15,Cup,3.99,59.85
+DS502,Ice Cream Sundae,12,Cup,5.99,71.88
+DS503,Banana Split,8,Each,6.99,55.92
+DS504,Milkshake,10,Regular,4.99,49.90
+DS505,Chocolate Chip Cookie,25,Each,1.49,37.25
+DS506,Sugar Cookie,25,Each,1.49,37.25
+DS507,Oatmeal Raisin Cookie,20,Each,1.49,29.80
+DS508,Brownie,20,Each,2.49,49.80
+DS509,Chocolate Cake,15,Slice,3.99,59.85
+DS510,Cheesecake,12,Slice,4.99,59.88
+DS511,Apple Pie,15,Slice,3.99,59.85
+DS512,Cherry Pie,15,Slice,3.99,59.85
+DS513,Peach Cobbler,12,Cup,4.49,53.88
+DS514,Cinnamon Roll,15,Each,3.49,52.35
+DS515,Donut,25,Each,1.49,37.25
+SN601,Potato Chips,30,Bag,1.49,44.70
+SN602,Tortilla Chips,25,Bag,1.49,37.25
+SN603,Pretzels,25,Bag,1.49,37.25
+SN604,Popcorn,20,Bag,1.99,39.80
+SN605,Trail Mix,15,Bag,2.49,37.35
+SN606,Mixed Nuts,15,Bag,2.99,44.85
+SN607,Granola Bar,25,Each,1.49,37.25
+SN608,Protein Bar,20,Each,2.99,59.80
+SN609,Beef Jerky,15,Bag,3.99,59.85
+SN610,Cheese Stick,25,Each,1.29,32.25
+SN611,Chocolate Covered Pretzels,15,Bag,2.99,44.85
+SN612,Yogurt Covered Raisins,15,Bag,2.49,37.35
+SN613,Dried Fruit Mix,12,Bag,2.99,35.88
+SN614,Peanut Butter Crackers,20,Pack,1.49,29.80
+SN615,Cheese Crackers,20,Pack,1.49,29.80
+SN616,Graham Crackers,15,Pack,1.99,29.85
+SN617,Animal Crackers,15,Pack,1.99,29.85
+SN618,Rice Crispy Treat,20,Each,1.49,29.80
+SN619,Fruit Snacks,25,Pack,0.99,24.75
+SN620,Candy Bar,25,Each,1.49,37.25
+HF171,Chicken Noodle Soup,12,Bowl,4.99,59.88
+HF172,Tomato Soup,12,Bowl,3.99,47.88
+HF173,Vegetable Soup,10,Bowl,3.99,39.90
+HF174,Chili,12,Bowl,5.99,71.88
+HF175,Loaded Baked Potato,10,Each,4.99,49.90
+SF321,Hummus with Pita,8,Plate,5.99,47.92
+SF322,Veggie Platter,10,Plate,6.99,69.90
+SF323,Fruit Platter,10,Plate,7.99,79.90
+SF324,Chicken Caesar Wrap,12,Each,7.99,95.88
+Totals,9524.64

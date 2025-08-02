@@ -41,19 +41,14 @@ public class FuelService {
     @Autowired
     private AccountsPayableImplementation accountsPayableImplementation;
 
-    @Autowired
-    private HistoricalFuelRepository historicalFuelRepository;
-
-
     public FuelService(DieselRepository dieselRepository, RegularFuelRepository regularFuelRepository,
                        MidGradeFuelRepository midGradeFuelRepository, PremimumFuelRepository premimumFuelRepository,
-                       AccountsPayableImplementation accountsPayableImplementation, HistoricalFuelRepository historicalFuelRepository) {
+                       AccountsPayableImplementation accountsPayableImplementation) {
         this.dieselRepository = dieselRepository;
         this.regularFuelRepository = regularFuelRepository;
         this.midGradeFuelRepository = midGradeFuelRepository;
         this.premimumFuelRepository = premimumFuelRepository;
         this.accountsPayableImplementation = accountsPayableImplementation;
-        this.historicalFuelRepository = historicalFuelRepository;
     }
 
     public List<FuelInventoryResponse> getAllFuelInventory() {

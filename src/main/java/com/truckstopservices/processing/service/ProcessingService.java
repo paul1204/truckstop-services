@@ -4,7 +4,6 @@ import com.truckstopservices.inventory.fuel.service.FuelService;
 import com.truckstopservices.inventory.merchandise.repository.BeverageRepository;
 import com.truckstopservices.inventory.merchandise.service.MerchandiseService;
 import com.truckstopservices.processing.client.MerchandiseManager;
-import com.truckstopservices.processing.dto.DailySalesDto;
 import com.truckstopservices.processing.dto.InventoryDto;
 import com.truckstopservices.processing.entity.*;
 import com.truckstopservices.processing.dto.ShiftReportDto;

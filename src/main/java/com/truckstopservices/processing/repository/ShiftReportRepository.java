@@ -16,4 +16,5 @@ public interface ShiftReportRepository extends JpaRepository<ShiftReport, Long> 
     List<MerchandiseSales> findMerchandiseSalesIdByShiftId(Long id);
     List<RestaurantSales> findRestaurantSalesIdByShiftId(Long id);
     List<TobaccoSales> findTobaccoSalesIdByShiftId(Long id);
+    List<ShiftReport> findByDate(String date);
 }

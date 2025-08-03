@@ -199,4 +199,8 @@ public class ProcessingService {
     public void pushToAccountingService(ShiftReport posReport) {
         //make API call to Revenue Management Controller
     }
+    
+    public List<ShiftReport> getShiftsByDate(String date) {
+        return shiftReportRepository.findByDate(date);
+    }
 }

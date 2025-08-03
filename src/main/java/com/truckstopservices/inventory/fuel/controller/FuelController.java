@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/inventory/fuel")
+@RequestMapping("fuel")
 public class FuelController {
 
     @Autowired
@@ -39,20 +39,7 @@ public class FuelController {
     @GetMapping("/viewInventoryChartData")
     @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<FuelChartDataResponse>> viewInventoryChartData() {
-        List<FuelInventoryResponse> fuelInventory = fuelService.getAllFuelInventory();
-
-        List<FuelChartDataResponse> chartData = new ArrayList<>();
-
-        for (int i = 0; i < fuelInventory.size(); i++) {
-            FuelInventoryResponse fuel = fuelInventory.get(i);
-            chartData.add(new FuelChartDataResponse(
-                i,                      // id
-                "Total Gallons",        // series
-                fuel.fuelName(),        // group
-                fuel.totalGallons()     // value
-            ));
-        }
-
+        List<FuelChartDataResponse> chartData = fuelService.getFuelInventoryChartData();
         return new ResponseEntity<>(chartData, HttpStatus.OK);
     }
 

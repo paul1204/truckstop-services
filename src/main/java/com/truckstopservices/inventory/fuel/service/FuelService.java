@@ -5,6 +5,7 @@ import com.truckstopservices.accounting.model.Invoice;
 import com.truckstopservices.accounting.pos.dto.Receipt;
 import com.truckstopservices.accounting.pos.enums.SalesType;
 import com.truckstopservices.accounting.pos.service.POSService;
+import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
@@ -63,23 +64,32 @@ public class FuelService {
         List<FuelInventoryResponse> fuelInventoryList = new ArrayList<>();
         fuelInventoryList.addAll(
                 dieselRepository.findAll().stream()
-                        .map(diesel -> new FuelInventoryResponse("Diesel", diesel.getTotalGallons()))
+                        .map(diesel -> new FuelInventoryResponse("Diesel", diesel.getAvailableGallons()))
                         .toList());
         fuelInventoryList.addAll(
                 regularFuelRepository.findAll().stream()
-                        .map(regularOctane -> new FuelInventoryResponse("87", regularOctane.getTotalGallons()))
+                        .map(regularOctane -> new FuelInventoryResponse("87", regularOctane.getAvailableGallons()))
                         .toList());
         fuelInventoryList.addAll(
                 midGradeFuelRepository.findAll().stream()
-                        .map(midGradeOctane -> new FuelInventoryResponse("89", midGradeOctane.getTotalGallons()))
+                        .map(midGradeOctane -> new FuelInventoryResponse("89", midGradeOctane.getAvailableGallons()))
                         .toList());
         fuelInventoryList.addAll(
                 premimumFuelRepository.findAll().stream()
-                        .map(premiumOctane -> new FuelInventoryResponse("93", premiumOctane.getTotalGallons()))
+                        .map(premiumOctane -> new FuelInventoryResponse("93", premiumOctane.getAvailableGallons()))
                         .toList());
-
-        return fuelInventoryList;
+//        return fuelInventoryList;
+        // Aggregate by fuelName and sum totalGallons
+        return fuelInventoryList.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        FuelInventoryResponse::fuelName,
+                        java.util.stream.Collectors.summingDouble(FuelInventoryResponse::totalGallons)))
+                .entrySet().stream()
+                .map(entry -> new FuelInventoryResponse(entry.getKey(), entry.getValue()))
+                .toList();
     }
+    
+
 
     public void updateFuelInventoryDeductAvailableGallonsFromSales(Double[] fuelSales) {
         RegularOctane regularOctane = regularFuelRepository.findByOctane(87)
@@ -211,7 +221,7 @@ public class FuelService {
 
             return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
         }
-        if (fifoDiesel.getAvailableGallons() < gallonsSold) {
+        if (fifoDiesel.getAvailableGallons() <= gallonsSold) {
             Optional<Diesel> dieselSecondRecord = dieselRepository.findNextFifoNextAvailableGallons();
             double negativeCarryOver = fifoDiesel.getAvailableGallons() - gallonsSold;
             //In event of Rollback, we can return the first available gallons to report to users that the inventory was not consumed.
@@ -373,5 +383,21 @@ public class FuelService {
         // Create a dummy receipt for the error case
         Receipt receipt = posService.createPOSRecord(0, SalesType.FUEL);
         return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
+    }
+    public List<FuelChartDataResponse> getFuelInventoryChartData() {
+        List<FuelInventoryResponse> fuelInventory = getAllFuelInventory();
+        List<FuelChartDataResponse> chartData = new ArrayList<>();
+
+        for (int i = 0; i < fuelInventory.size(); i++) {
+            FuelInventoryResponse fuel = fuelInventory.get(i);
+            chartData.add(new FuelChartDataResponse(
+                    i,                      // id
+                    "Total Gallons",        // series
+                    fuel.fuelName(),        // group
+                    fuel.totalGallons()     // value
+            ));
+        }
+
+        return chartData;
     }
 }

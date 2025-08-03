@@ -1,5 +1,6 @@
 package com.truckstopservices.inventory.fuel.controller;
 
+import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleResponse;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -28,9 +30,30 @@ public class FuelController {
     }
 
     @GetMapping("/viewInventory")
+    @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<FuelInventoryResponse>> viewInventory() {
         List<FuelInventoryResponse> response = fuelService.getAllFuelInventory();
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/viewInventoryChartData")
+    @CrossOrigin(origins = "http://localhost:8000")
+    public ResponseEntity<List<FuelChartDataResponse>> viewInventoryChartData() {
+        List<FuelInventoryResponse> fuelInventory = fuelService.getAllFuelInventory();
+
+        List<FuelChartDataResponse> chartData = new ArrayList<>();
+
+        for (int i = 0; i < fuelInventory.size(); i++) {
+            FuelInventoryResponse fuel = fuelInventory.get(i);
+            chartData.add(new FuelChartDataResponse(
+                i,                      // id
+                "Total Gallons",        // series
+                fuel.fuelName(),        // group
+                fuel.totalGallons()     // value
+            ));
+        }
+
+        return new ResponseEntity<>(chartData, HttpStatus.OK);
     }
 
     @PostMapping("/update/FuelInventory/reduceGallons")

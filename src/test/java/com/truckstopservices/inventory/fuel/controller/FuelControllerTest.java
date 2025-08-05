@@ -32,13 +32,13 @@ public class FuelControllerTest {
     @Test
     public void testViewInventoryChartData() {
         // Arrange
-        List<FuelInventoryResponse> mockInventory = Arrays.asList(
-            new FuelInventoryResponse("Diesel", 12000),
-            new FuelInventoryResponse("87", 14000),
-            new FuelInventoryResponse("93", 5000)
+        List<FuelChartDataResponse> mockChartData = Arrays.asList(
+            new FuelChartDataResponse(0, "Total Gallons", "Diesel", 12000),
+            new FuelChartDataResponse(1, "Total Gallons", "87", 14000),
+            new FuelChartDataResponse(2, "Total Gallons", "93", 5000)
         );
         
-        when(fuelService.getAllFuelInventory()).thenReturn(mockInventory);
+        when(fuelService.getFuelInventoryChartData()).thenReturn(mockChartData);
         
         // Act
         ResponseEntity<List<FuelChartDataResponse>> response = fuelController.viewInventoryChartData();

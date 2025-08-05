@@ -1,5 +1,6 @@
 package com.truckstopservices.inventory.fuel.service;
 
+import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.entity.Diesel;
 import com.truckstopservices.inventory.fuel.entity.RegularOctane;
@@ -47,23 +48,23 @@ public class FuelServiceTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        fuelService = new FuelService(dieselRepository, regularFuelRepository, 
-                                     midGradeFuelRepository, premimumFuelRepository,
-                                     accountsPayableImplementation, posService);
+        fuelService = new FuelService(dieselRepository, regularFuelRepository,
+                midGradeFuelRepository, premimumFuelRepository,
+                accountsPayableImplementation, posService);
     }
-
+    
     @Test
-    public void testGetAllFuelInventory_ShouldAggregateByFuelName() {
+    public void testGetFuelInventoryChartData() {
         // Arrange
         Diesel diesel1 = new Diesel();
-        diesel1.setTotalGallons(10000);
+        diesel1.setAvailableGallons(10000);
         Diesel diesel2 = new Diesel();
-        diesel2.setTotalGallons(2000);
+        diesel2.setAvailableGallons(2000);
         
         RegularOctane regular1 = new RegularOctane();
-        regular1.setTotalGallons(5000);
+        regular1.setAvailableGallons(5000);
         RegularOctane regular2 = new RegularOctane();
-        regular2.setTotalGallons(9000);
+        regular2.setAvailableGallons(9000);
         
         when(dieselRepository.findAll()).thenReturn(Arrays.asList(diesel1, diesel2));
         when(regularFuelRepository.findAll()).thenReturn(Arrays.asList(regular1, regular2));
@@ -71,21 +72,30 @@ public class FuelServiceTest {
         when(premimumFuelRepository.findAll()).thenReturn(List.of());
         
         // Act
-        List<FuelInventoryResponse> result = fuelService.getAllFuelInventory();
-        
-        // Convert result to map for easier assertion
-        Map<String, Double> resultMap = result.stream()
-                .collect(Collectors.toMap(
-                        FuelInventoryResponse::fuelName,
-                        FuelInventoryResponse::totalGallons
-                ));
+        List<FuelChartDataResponse> result = fuelService.getFuelInventoryChartData();
         
         // Assert
         assertEquals(2, result.size());
-        assertEquals(12000.0, resultMap.get("Diesel"));
-        assertEquals(14000.0, resultMap.get("87"));
+        
+        // Verify the first chart data item (Diesel)
+        FuelChartDataResponse dieselData = result.stream()
+                .filter(data -> "Diesel".equals(data.group()))
+                .findFirst()
+                .orElseThrow();
+        assertEquals(0, dieselData.id());
+        assertEquals("Total Gallons", dieselData.series());
+        assertEquals(12000.0, dieselData.value());
+        
+        // Verify the second chart data item (Regular 87)
+        FuelChartDataResponse regularData = result.stream()
+                .filter(data -> "87".equals(data.group()))
+                .findFirst()
+                .orElseThrow();
+        assertEquals(1, regularData.id());
+        assertEquals("Total Gallons", regularData.series());
+        assertEquals(14000.0, regularData.value());
         
         // Debug output
-        System.out.println("[DEBUG_LOG] Aggregated fuel inventory: " + result);
+        System.out.println("[DEBUG_LOG] Aggregated fuel inventory chart data: " + result);
     }
 }

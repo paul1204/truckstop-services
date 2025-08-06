@@ -1,5 +1,6 @@
 package com.truckstopservices.inventory.fuel.controller;
 
+import com.truckstopservices.accounting.pos.dto.Receipt;
 import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("truckdriver/fuel")
+@RequestMapping("truck-driver/fuel")
 public class TruckDriverFuelController {
 
     @Autowired
@@ -28,18 +29,22 @@ public class TruckDriverFuelController {
         this.truckDriverFuelService = truckDriverFuelService;
     }
 
-    @GetMapping("/viewInventory")
-    @CrossOrigin(origins = "http://localhost:8000")
-    public ResponseEntity<List<FuelInventoryResponse>> viewInventory() {
-        List<FuelInventoryResponse> response = truckDriverFuelService.getAllDieselInventory();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
     @GetMapping("/viewInventoryChartData")
     @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<FuelChartDataResponse>> viewInventoryChartData() {
         List<FuelChartDataResponse> chartData = truckDriverFuelService.getDieselInventoryChartData();
         return new ResponseEntity<>(chartData, HttpStatus.OK);
+    }
+
+    @PutMapping("/update/FuelInventory/FuelDelivery")
+    public ResponseEntity<FuelDeliveryResponse<FuelDelivery>> fuelDeliveryUpdateRepo(@RequestBody FuelDelivery fuelDelivery) {
+        try {
+            return new ResponseEntity<>(truckDriverFuelService.updateDieselDeliveryRepo(fuelDelivery), HttpStatus.OK);
+        } catch (DataAccessException e) {
+            throw new DataAccessResourceFailureException("Failed to update fuel delivery: " + e.getMessage(), e);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new FuelDeliveryResponse<>(false, e.getMessage(), null, null), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping("/update/Diesel/FIFO")
@@ -48,7 +53,9 @@ public class TruckDriverFuelController {
             FuelSaleResponse fuelSold = truckDriverFuelService.updateDieselInventoryFIFOSales(fuelSaleRequest.gallonsSold());
             return new ResponseEntity<>(fuelSold, HttpStatus.OK);
         } catch (FuelSaleException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            FuelSaleRequest errorRequest = new FuelSaleRequest(0, 0, 0, e.getMessage());
+            FuelSaleResponse errorResponse = FuelSaleResponse.fromFuelSaleRequestAndReceipt(errorRequest, null);
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
     }
 }

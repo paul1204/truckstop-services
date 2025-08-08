@@ -1,8 +1,10 @@
 package com.truckstopservices.inventory.fuel.controller;
 
+import com.truckstopservices.accounting.houseaccount.entity.HouseAccountTransaction;
 import com.truckstopservices.accounting.pos.dto.Receipt;
 import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
+import com.truckstopservices.inventory.fuel.dto.FuelSaleHouseAccountResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleResponse;
 import com.truckstopservices.inventory.fuel.entity.FuelDelivery;
@@ -58,4 +60,21 @@ public class TruckDriverFuelController {
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PutMapping("/update/Diesel/FIFO/HouseAccount/{houseAccountNumber}")
+    public ResponseEntity<FuelSaleHouseAccountResponse> updateDieselFuelFIFOHouseAccount(
+            @RequestBody FuelSaleRequest fuelSaleRequest,
+            @PathVariable String houseAccountNumber) {
+        try {
+            FuelSaleHouseAccountResponse fuelSold = truckDriverFuelService.updateDieselInventoryFIFOSalesHouseAccount(
+                    fuelSaleRequest.gallonsSold(), 
+                    houseAccountNumber);
+            return new ResponseEntity<>(fuelSold, HttpStatus.OK);
+        } catch (FuelSaleException e) {
+            FuelSaleRequest errorRequest = new FuelSaleRequest(0, 0, 0, e.getMessage());
+            FuelSaleHouseAccountResponse errorResponse = FuelSaleHouseAccountResponse.fromFuelSaleRequestAndHouseAccountTransaction(errorRequest, null);
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }

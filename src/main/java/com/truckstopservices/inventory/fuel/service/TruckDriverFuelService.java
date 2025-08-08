@@ -1,6 +1,8 @@
 package com.truckstopservices.inventory.fuel.service;
 
 import com.truckstopservices.accounting.accountsPayable.service.implementation.AccountsPayableImplementation;
+import com.truckstopservices.accounting.houseaccount.entity.HouseAccountTransaction;
+import com.truckstopservices.accounting.houseaccount.service.HouseAccountTransactionService;
 import com.truckstopservices.accounting.model.Invoice;
 import com.truckstopservices.accounting.pos.dto.Receipt;
 import com.truckstopservices.accounting.pos.enums.SalesType;
@@ -8,6 +10,7 @@ import com.truckstopservices.accounting.pos.service.POSService;
 import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
+import com.truckstopservices.inventory.fuel.dto.FuelSaleHouseAccountResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleResponse;
 import com.truckstopservices.inventory.fuel.entity.Diesel;
@@ -39,15 +42,20 @@ public class TruckDriverFuelService {
 
     @Autowired
     private POSService posService;
+    
+    @Autowired
+    private HouseAccountTransactionService houseAccountTransactionService;
 
     public TruckDriverFuelService(DieselRepository dieselRepository,
                        FuelDeliveryRepository fuelDeliveryRepository,
                        AccountsPayableImplementation accountsPayableImplementation,
-                       POSService posService) {
+                       POSService posService,
+                       HouseAccountTransactionService houseAccountTransactionService) {
         this.dieselRepository = dieselRepository;
         this.fuelDeliveryRepository = fuelDeliveryRepository;
         this.accountsPayableImplementation = accountsPayableImplementation;
         this.posService = posService;
+        this.houseAccountTransactionService = houseAccountTransactionService;
     }
 
     public List<FuelChartDataResponse> getDieselInventoryChartData() {
@@ -160,5 +168,34 @@ public class TruckDriverFuelService {
         FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No diesel fuel was sold, inventory unchanged.");
         Receipt receipt = posService.createPOSRecord(0, SalesType.FUEL);
         return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
+    }
+    
+    public HouseAccountTransactionService getHouseAccountTransactionService() {
+        return houseAccountTransactionService;
+    }
+    
+    @Transactional
+    public FuelSaleHouseAccountResponse updateDieselInventoryFIFOSalesHouseAccount(double gallonsSold, String houseAccountNumber) throws FuelSaleException {
+        // Reuse the logic from updateDieselInventoryFIFOSales to handle inventory updates
+        FuelSaleResponse fuelSaleResponse = updateDieselInventoryFIFOSales(gallonsSold);
+        
+        // Use the receipt number from fuelSaleResponse as the invoice number for consistency
+        String invoiceNumber = fuelSaleResponse.receipt().receiptId();
+        HouseAccountTransaction transaction = new HouseAccountTransaction(
+            invoiceNumber, 
+            houseAccountNumber, 
+            fuelSaleResponse.totalPrice(), 
+            fuelSaleResponse.gallonsSold()
+        );
+        HouseAccountTransaction savedTransaction = houseAccountTransactionService.createTransaction(transaction);
+        
+        FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(
+            fuelSaleResponse.octane(),
+            fuelSaleResponse.gallonsSold(),
+            fuelSaleResponse.totalPrice(),
+            fuelSaleResponse.specialMessage()
+        );
+        
+        return FuelSaleHouseAccountResponse.fromFuelSaleRequestAndHouseAccountTransaction(fuelSaleRequest, savedTransaction);
     }
 }

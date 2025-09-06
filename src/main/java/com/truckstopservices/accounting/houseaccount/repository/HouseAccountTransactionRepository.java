@@ -25,10 +25,10 @@ public interface HouseAccountTransactionRepository extends JpaRepository<HouseAc
     /**
      * Find all transactions for a specific house account.
      * 
-     * @param houseAccountNumber The house account number to filter by
+     * @param houseAccountId The house account ID to filter by
      * @return A list of transactions for the specified house account
      */
-    List<HouseAccountTransaction> findByHouseAccountNumber(String houseAccountNumber);
+    List<HouseAccountTransaction> findByHouseAccountId(String houseAccountId);
     
     /**
      * Find transactions that occurred on a specific date.

@@ -1,6 +1,6 @@
 package com.truckstopservices.inventory.fuel.service;
 
-import com.truckstopservices.accounting.accountsPayable.service.implementation.AccountsPayableImplementation;
+import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.houseaccount.entity.HouseAccountTransaction;
 import com.truckstopservices.accounting.houseaccount.service.HouseAccountTransactionService;
 import com.truckstopservices.accounting.model.Invoice;
@@ -9,7 +9,6 @@ import com.truckstopservices.accounting.pos.enums.SalesType;
 import com.truckstopservices.accounting.pos.service.POSService;
 import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryResponse;
-import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleHouseAccountResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleResponse;
@@ -38,7 +37,7 @@ public class TruckDriverFuelService {
     private FuelDeliveryRepository fuelDeliveryRepository;
 
     @Autowired
-    private AccountsPayableImplementation accountsPayableImplementation;
+    private InvoiceServiceImpl invoiceService;
 
     @Autowired
     private POSService posService;
@@ -47,13 +46,13 @@ public class TruckDriverFuelService {
     private HouseAccountTransactionService houseAccountTransactionService;
 
     public TruckDriverFuelService(DieselRepository dieselRepository,
-                       FuelDeliveryRepository fuelDeliveryRepository,
-                       AccountsPayableImplementation accountsPayableImplementation,
-                       POSService posService,
-                       HouseAccountTransactionService houseAccountTransactionService) {
+                                  FuelDeliveryRepository fuelDeliveryRepository,
+                                  InvoiceServiceImpl invoiceService,
+                                  POSService posService,
+                                  HouseAccountTransactionService houseAccountTransactionService) {
         this.dieselRepository = dieselRepository;
         this.fuelDeliveryRepository = fuelDeliveryRepository;
-        this.accountsPayableImplementation = accountsPayableImplementation;
+        this.invoiceService = invoiceService;
         this.posService = posService;
         this.houseAccountTransactionService = houseAccountTransactionService;
     }
@@ -83,7 +82,7 @@ public class TruckDriverFuelService {
             updateDieselFuelDelivery(savedDelivery.getDieselOrder(), savedDelivery.getDeliveryDate());
             double totalAmount = fuelDelivery.getDieselOrder().getPricePerGallon() * 
                                 fuelDelivery.getDieselOrder().getTotalGallons();
-            Invoice vendorInvoice = accountsPayableImplementation.createInvoice(
+            Invoice vendorInvoice = invoiceService.createInvoice(
                 fuelDelivery.getCompanyName(),
                 fuelDelivery.getDeliveryDate(),
                 totalAmount

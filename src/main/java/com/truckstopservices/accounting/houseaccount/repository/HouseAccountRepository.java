@@ -22,12 +22,12 @@ public interface HouseAccountRepository extends JpaRepository<HouseAccount, Stri
     List<HouseAccount> findByAccountStanding(AccountStanding accountStanding);
     
     /**
-     * Find accounts by name containing the search term (case insensitive).
+     * Find accounts by company name containing the search term (case insensitive).
      * 
-     * @param name The name search term
-     * @return A list of house accounts with names containing the search term
+     * @param name The company name search term
+     * @return A list of house accounts with company names containing the search term
      */
-    List<HouseAccount> findByCustomerNumber(String name);
+    List<HouseAccount> findByCompanyName(String name);
     
     /**
      * Find accounts by phone number.

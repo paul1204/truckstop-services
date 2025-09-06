@@ -1,6 +1,6 @@
 package com.truckstopservices.inventory.fuel.service;
 
-import com.truckstopservices.accounting.accountsPayable.service.implementation.AccountsPayableImplementation;
+import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.model.Invoice;
 import com.truckstopservices.accounting.pos.dto.Receipt;
 import com.truckstopservices.accounting.pos.enums.SalesType;
@@ -44,19 +44,19 @@ public class FuelService {
     private FuelDeliveryRepository fuelDeliveryRepository;
 
     @Autowired
-    private AccountsPayableImplementation accountsPayableImplementation;
+    private InvoiceServiceImpl invoiceService;
 
     @Autowired
     private POSService posService;
 
     public FuelService(DieselRepository dieselRepository, RegularFuelRepository regularFuelRepository,
                        MidGradeFuelRepository midGradeFuelRepository, PremimumFuelRepository premimumFuelRepository,
-                       AccountsPayableImplementation accountsPayableImplementation, POSService posService) {
+                       InvoiceServiceImpl invoiceService, POSService posService) {
         this.dieselRepository = dieselRepository;
         this.regularFuelRepository = regularFuelRepository;
         this.midGradeFuelRepository = midGradeFuelRepository;
         this.premimumFuelRepository = premimumFuelRepository;
-        this.accountsPayableImplementation = accountsPayableImplementation;
+        this.invoiceService = invoiceService;
         this.posService = posService;
     }
 
@@ -122,7 +122,7 @@ public class FuelService {
             double totalAmount = calculateTotalAmount(fuelDelivery);
 
             // Create and save the invoice
-            Invoice vendorInvoice = accountsPayableImplementation.createInvoice(
+            Invoice vendorInvoice = invoiceService.createInvoice(
                 fuelDelivery.getCompanyName(),
                 fuelDelivery.getDeliveryDate(),
                 totalAmount

@@ -1,6 +1,6 @@
 package com.truckstopservices.inventory.merchandise.service;
 
-import com.truckstopservices.accounting.accountsPayable.service.implementation.AccountsPayableImplementation;
+import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.model.Invoice;
 import com.truckstopservices.inventory.merchandise.beverages.entity.ColdBeverage;
 import com.truckstopservices.inventory.merchandise.model.Consumable;
@@ -39,15 +39,15 @@ public class MerchandiseService {
     private RestaurantRepository restaurantRepository;
 
     @Autowired
-    private AccountsPayableImplementation accountsPayableImplementation;
+    private InvoiceServiceImpl invoiceService;
 
 
     public MerchandiseService(BeverageRepository beverageRepository, NonRestaurantRepository nonRestaurantRepository,
-                              RestaurantRepository restaurantRepository, AccountsPayableImplementation accountsPayableImplementation) {
+                              RestaurantRepository restaurantRepository, InvoiceServiceImpl invoiceService) {
         this.beverageRepository = beverageRepository;
         this.nonRestaurantRepository = nonRestaurantRepository;
         this.restaurantRepository = restaurantRepository;
-        this.accountsPayableImplementation = accountsPayableImplementation;
+        this.invoiceService = invoiceService;
     }
 
     @Transactional
@@ -108,12 +108,12 @@ public class MerchandiseService {
             }
         }
 
-        return accountsPayableImplementation.createInvoice(company, "02/09/2025",total);
+        return invoiceService.createInvoice(company, "02/09/2025",total);
     }
 
     private void createInvoiceForMerchant(String company,Double total){
         //Create Invoice, Make payable to company
-        //accountsPayableImplementation.createInvoice(company, "02/09/2025",total);
+        //invoiceService.createInvoice(company, "02/09/2025",total);
         //Process Payment
     }
 

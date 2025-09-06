@@ -1,6 +1,6 @@
 package com.truckstopservices.inventory.restaurant.service;
 
-import com.truckstopservices.accounting.accountsPayable.service.implementation.AccountsPayableImplementation;
+import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.model.Invoice;
 import com.truckstopservices.inventory.merchandise.model.DeliveryItemInfo;
 import com.truckstopservices.inventory.merchandise.nonRestaurant.entity.NonRestaurantFood;
@@ -24,11 +24,11 @@ public class RestaurantService {
     private RestaurantRepository restaurantRepository;
 
     @Autowired
-    private AccountsPayableImplementation accountsPayableImplementation;
+    private InvoiceServiceImpl invoiceService;
 
-    public RestaurantService(RestaurantRepository restaurantRepository,AccountsPayableImplementation accountsPayableImplementation){
+    public RestaurantService(RestaurantRepository restaurantRepository, InvoiceServiceImpl invoiceService){
         this.restaurantRepository = restaurantRepository;
-        this.accountsPayableImplementation = accountsPayableImplementation;
+        this.invoiceService = invoiceService;
     }
 
     public void updateRestaurantInventory(InventoryDto product){
@@ -68,6 +68,6 @@ public class RestaurantService {
                 hotFood.increaseInventory(Integer.parseInt(deliveryInfo[2]));
             }
         }
-        return accountsPayableImplementation.createInvoice(company, "02/09/2025",total);
+        return invoiceService.createInvoice(company, "02/09/2025",total);
     }
 }

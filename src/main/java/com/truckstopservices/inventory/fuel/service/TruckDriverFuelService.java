@@ -175,7 +175,7 @@ public class TruckDriverFuelService {
     }
     
     @Transactional
-    public FuelSaleHouseAccountResponse updateDieselInventoryFIFOSalesHouseAccount(double gallonsSold, String houseAccountNumber) throws FuelSaleException {
+    public FuelSaleHouseAccountResponse updateDieselInventoryFIFOSalesHouseAccount(double gallonsSold, String houseAccountId) throws FuelSaleException {
         // Reuse the logic from updateDieselInventoryFIFOSales to handle inventory updates
         FuelSaleResponse fuelSaleResponse = updateDieselInventoryFIFOSales(gallonsSold);
         
@@ -183,7 +183,7 @@ public class TruckDriverFuelService {
         String invoiceNumber = fuelSaleResponse.receipt().receiptId();
         HouseAccountTransaction transaction = new HouseAccountTransaction(
             invoiceNumber, 
-            houseAccountNumber, 
+            houseAccountId,
             fuelSaleResponse.totalPrice(), 
             fuelSaleResponse.gallonsSold()
         );

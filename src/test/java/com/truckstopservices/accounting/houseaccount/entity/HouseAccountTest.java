@@ -13,14 +13,14 @@ public class HouseAccountTest {
 
     @BeforeEach
     void setUp() {
-        houseAccount = new HouseAccount("CUST123", "Test Company", "555-123-4567", "123 Main St");
+        houseAccount = new HouseAccount("CUST123", "555-123-4567", "123 Main St");
     }
 
     @Test
     void constructor_SetsDefaultValues() {
         // Verify default values are set correctly
-        assertEquals("CUST123", houseAccount.getCustomerNumber());
-        assertEquals("Test Company", houseAccount.getName());
+        assertNull(houseAccount.getHouseAccountId()); // ID will be null until persisted
+        assertEquals("CUST123", houseAccount.getCompanyName());
         assertEquals("555-123-4567", houseAccount.getPhoneNumber());
         assertEquals("123 Main St", houseAccount.getAddress());
         assertEquals(1000.0, houseAccount.getCreditLimit());

@@ -25,11 +25,11 @@ public class HouseAccountConfig {
     public CommandLineRunner initializeHouseAccounts() {
         return args -> {
             // Create sample house accounts
-            createHouseAccount("ACME001", "ACME Trucking", "555-123-4567", "123 Main St, Truckville, TX 75001", 1000.00);
-            createHouseAccount("FAST003", "Fast Freight Inc", "555-234-5678", "456 Highway Dr, Speedway, CA 90210", 1500.00);
-            createHouseAccount("HAUL003", "Heavy Haulers LLC", "555-345-6789", "789 Industrial Blvd, Loadtown, NY 10001", 2000.00);
-            createHouseAccount("ROAD004", "Roadrunner Transport", "555-456-7890", "321 Express Way, Quickville, FL 33101", 1200.00);
-            createHouseAccount("SHIP005", "Shipment Solutions", "555-567-8901", "654 Logistics Ave, Cargotown, IL 60601", 800.00);
+            createHouseAccount("ACME", "555-123-4567", "123 Main St, Truckville, TX 75001", 1000.00);
+            createHouseAccount("Fast Freight Inc", "555-234-5678", "456 Highway Dr, Speedway, CA 90210", 1500.00);
+            createHouseAccount("Heavy Haulers LLC", "555-345-6789", "789 Industrial Blvd, Loadtown, NY 10001", 2000.00);
+            createHouseAccount("Roadrunner Transport", "555-456-7890", "321 Express Way, Quickville, FL 33101", 1200.00);
+            createHouseAccount("Shipment Solutions", "555-567-8901", "654 Logistics Ave, Cargotown, IL 60601", 800.00);
             
             System.out.println("House accounts initialized successfully!");
         };
@@ -38,19 +38,18 @@ public class HouseAccountConfig {
     /**
      * Helper method to create a house account.
      */
-    private void createHouseAccount(String customerNumber, String name, String phoneNumber, String address, Double creditLimit) {
+    private void createHouseAccount(String companyName, String phoneNumber, String address, Double creditLimit) {
         try {
             HouseAccountRequest request = new HouseAccountRequest();
-            request.setCustomerNumber(customerNumber);
-            request.setName(name);
+            request.setCompanyName(companyName);
             request.setPhoneNumber(phoneNumber);
             request.setAddress(address);
             request.setCreditLimit(creditLimit);
             
             houseAccountService.createHouseAccount(request);
-            System.out.println("Created house account: " + name);
+            System.out.println("Created house account: " + companyName);
         } catch (Exception e) {
-            System.err.println("Failed to create house account " + name + ": " + e.getMessage());
+            System.err.println("Failed to create house account " + companyName + ": " + e.getMessage());
         }
     }
 }

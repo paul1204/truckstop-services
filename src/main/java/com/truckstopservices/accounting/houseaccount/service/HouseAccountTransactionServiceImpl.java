@@ -53,8 +53,8 @@ public class HouseAccountTransactionServiceImpl implements HouseAccountTransacti
     
     @Override
     @Transactional(readOnly = true)
-    public List<HouseAccountTransaction> getTransactionsByHouseAccountNumber(String houseAccountNumber) {
-        return transactionRepository.findByHouseAccountNumber(houseAccountNumber);
+    public List<HouseAccountTransaction> getTransactionsByHouseAccountId(String houseAccountId) {
+        return transactionRepository.findByHouseAccountId(houseAccountId);
     }
     
     @Override

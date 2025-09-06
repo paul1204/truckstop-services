@@ -39,10 +39,10 @@ public interface HouseAccountTransactionService {
     /**
      * Get all transactions for a specific house account.
      * 
-     * @param houseAccountNumber The house account number
+     * @param houseAccountId The house account ID
      * @return A list of transactions for the specified house account
      */
-    List<HouseAccountTransaction> getTransactionsByHouseAccountNumber(String houseAccountNumber);
+    List<HouseAccountTransaction> getTransactionsByHouseAccountId(String houseAccountId);
     
     /**
      * Get all transactions that occurred on a specific date.

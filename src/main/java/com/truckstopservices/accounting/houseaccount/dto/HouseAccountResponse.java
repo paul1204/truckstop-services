@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
  * DTO for house account responses.
  */
 public class HouseAccountResponse {
-    private String customerNumber;
-    private String name;
+    private String houseAccountId; // Auto-generated UID
+    private String companyName; // Business identifier
     private String phoneNumber;
     private String address;
     private Double creditLimit;
@@ -30,8 +30,8 @@ public class HouseAccountResponse {
      * @param houseAccount The house account entity
      */
     public HouseAccountResponse(HouseAccount houseAccount) {
-        this.customerNumber = houseAccount.getCustomerNumber();
-        this.name = houseAccount.getName();
+        this.houseAccountId = houseAccount.getHouseAccountId();
+        this.companyName = houseAccount.getCompanyName();
         this.phoneNumber = houseAccount.getPhoneNumber();
         this.address = houseAccount.getAddress();
         this.creditLimit = houseAccount.getCreditLimit();
@@ -43,21 +43,22 @@ public class HouseAccountResponse {
     }
     
     // Getters and setters
-    public String getCustomerNumber() {
-        return customerNumber;
+    public String getHouseAccountId() {
+        return houseAccountId;
     }
     
-    public void setCustomerNumber(String customerNumber) {
-        this.customerNumber = customerNumber;
+    public void setHouseAccountId(String houseAccountId) {
+        this.houseAccountId = houseAccountId;
     }
     
-    public String getName() {
-        return name;
+    public String getCompanyName() {
+        return companyName;
     }
     
-    public void setName(String name) {
-        this.name = name;
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
+    
     
     public String getPhoneNumber() {
         return phoneNumber;

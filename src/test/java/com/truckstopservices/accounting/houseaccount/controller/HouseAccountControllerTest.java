@@ -44,11 +44,11 @@ public class HouseAccountControllerTest {
     @BeforeEach
     void setUp() {
         // Setup test data
-        validRequest = new HouseAccountRequest("CUST123", "Test Company", "555-123-4567", "123 Main St", 1000.0);
+        validRequest = new HouseAccountRequest("Test Company", "555-123-4567", "123 Main St", 1000.0);
         
         mockResponse = new HouseAccountResponse();
-        mockResponse.setCustomerNumber("CUST123");
-        mockResponse.setName("Test Company");
+        mockResponse.setHouseAccountId("CUST123");
+        mockResponse.setCompanyName("Test Company");
         mockResponse.setPhoneNumber("555-123-4567");
         mockResponse.setAddress("123 Main St");
         mockResponse.setCreditLimit(1000.0);
@@ -67,8 +67,8 @@ public class HouseAccountControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validRequest)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.customerNumber").value("CUST123"))
-                .andExpect(jsonPath("$.name").value("Test Company"));
+                .andExpect(jsonPath("$.houseAccountId").value("CUST123"))
+                .andExpect(jsonPath("$.companyName").value("Test Company"));
     }
 
     @Test
@@ -77,8 +77,8 @@ public class HouseAccountControllerTest {
 
         mockMvc.perform(get("/accounting/house-accounts/CUST123"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.customerNumber").value("CUST123"))
-                .andExpect(jsonPath("$.name").value("Test Company"));
+                .andExpect(jsonPath("$.houseAccountId").value("CUST123"))
+                .andExpect(jsonPath("$.companyName").value("Test Company"));
     }
 
     @Test
@@ -95,8 +95,8 @@ public class HouseAccountControllerTest {
 
         mockMvc.perform(get("/accounting/house-accounts"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].customerNumber").value("CUST123"))
-                .andExpect(jsonPath("$[0].name").value("Test Company"));
+                .andExpect(jsonPath("$[0].houseAccountId").value("CUST123"))
+                .andExpect(jsonPath("$[0].companyName").value("Test Company"));
     }
 
 //    @Test
@@ -127,7 +127,7 @@ public class HouseAccountControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"standing\": \"PAST_DUE\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.customerNumber").value("CUST123"));
+                .andExpect(jsonPath("$.houseAccountId").value("CUST123"));
     }
 
     @Test
@@ -138,7 +138,7 @@ public class HouseAccountControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"creditLimit\": 1500.0}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.customerNumber").value("CUST123"));
+                .andExpect(jsonPath("$.houseAccountId").value("CUST123"));
     }
     
     @Test
@@ -147,7 +147,7 @@ public class HouseAccountControllerTest {
 
         mockMvc.perform(get("/accounting/house-accounts/standing/GOOD"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].customerNumber").value("CUST123"));
+                .andExpect(jsonPath("$[0].houseAccountId").value("CUST123"));
     }
     
     @Test
@@ -162,7 +162,7 @@ public class HouseAccountControllerTest {
         
         mockMvc.perform(get("/accounting/house-accounts/search/CUST123"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].customerNumber").value("CUST123"));
+                .andExpect(jsonPath("$[0].houseAccountId").value("CUST123"));
     }
     
     @Test
@@ -172,7 +172,7 @@ public class HouseAccountControllerTest {
         
         mockMvc.perform(get("/accounting/house-accounts/search/Test"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].customerNumber").value("CUST123"));
+                .andExpect(jsonPath("$[0].houseAccountId").value("CUST123"));
     }
     
     @Test
@@ -181,6 +181,6 @@ public class HouseAccountControllerTest {
         
         mockMvc.perform(get("/accounting/house-accounts/phone/555-123-4567"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].customerNumber").value("CUST123"));
+                .andExpect(jsonPath("$[0].houseAccountId").value("CUST123"));
     }
 }

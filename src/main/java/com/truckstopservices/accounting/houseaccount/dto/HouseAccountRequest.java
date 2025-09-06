@@ -4,8 +4,7 @@ package com.truckstopservices.accounting.houseaccount.dto;
  * DTO for creating or updating a house account.
  */
 public class HouseAccountRequest {
-    private String customerNumber; // UID
-    private String name;
+    private String companyName; // Optional business identifier, not used as PK anymore
     private String phoneNumber;
     private String address;
     private Double creditLimit;
@@ -14,30 +13,28 @@ public class HouseAccountRequest {
     public HouseAccountRequest() {
     }
     
-    public HouseAccountRequest(String customerNumber, String name, String phoneNumber, String address, Double creditLimit) {
-        this.customerNumber = customerNumber;
-        this.name = name;
+//    public HouseAccountRequest(String phoneNumber, String address, Double creditLimit) {
+//        this.phoneNumber = phoneNumber;
+//        this.address = address;
+//        this.creditLimit = creditLimit;
+//    }
+    
+    public HouseAccountRequest(String companyName, String phoneNumber, String address, Double creditLimit) {
+        this.companyName = companyName;
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.creditLimit = creditLimit;
     }
     
     // Getters and setters
-    public String getCustomerNumber() {
-        return customerNumber;
+    public String getCompanyName() {
+        return companyName;
     }
     
-    public void setCustomerNumber(String customerNumber) {
-        this.customerNumber = customerNumber;
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
     
-    public String getName() {
-        return name;
-    }
-    
-    public void setName(String name) {
-        this.name = name;
-    }
     
     public String getPhoneNumber() {
         return phoneNumber;

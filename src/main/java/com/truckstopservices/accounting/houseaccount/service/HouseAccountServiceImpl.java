@@ -30,24 +30,24 @@ public class HouseAccountServiceImpl implements HouseAccountService {
     @Override
     @Transactional
     public HouseAccountResponse createHouseAccount(HouseAccountRequest request) {
-        // Check if account already exists
-        if (houseAccountRepository.existsById(request.getCustomerNumber())) {
-            throw HouseAccountException.accountAlreadyExists(request.getCustomerNumber());
+        // Create new account with auto-generated ID and company name
+        String companyName = request.getCompanyName();
+        if (companyName == null || companyName.isEmpty()) {
+            // Generate a default company name if not provided
+            companyName = "Company-" + System.currentTimeMillis();
         }
         
-        // Create new account
         HouseAccount houseAccount = new HouseAccount(
-            request.getCustomerNumber(),
-            request.getName(),
+            companyName,
             request.getPhoneNumber(),
             request.getAddress()
         );
-        
+
         // Set credit limit if provided, otherwise use default
         if (request.getCreditLimit() != null) {
             houseAccount.setCreditLimit(request.getCreditLimit());
         }
-        
+
         // Save and return
         HouseAccount savedAccount = houseAccountRepository.save(houseAccount);
         return HouseAccountResponse.fromEntity(savedAccount);
@@ -55,8 +55,8 @@ public class HouseAccountServiceImpl implements HouseAccountService {
     
     @Override
     @Transactional(readOnly = true)
-    public HouseAccountResponse getHouseAccount(String customerNumber) {
-        HouseAccount houseAccount = findAccountById(customerNumber);
+    public HouseAccountResponse getHouseAccount(String id) {
+        HouseAccount houseAccount = findAccountById(id);
         return HouseAccountResponse.fromEntity(houseAccount);
     }
     
@@ -70,14 +70,11 @@ public class HouseAccountServiceImpl implements HouseAccountService {
     
     @Override
     @Transactional
-    public HouseAccountResponse updateHouseAccount(String customerNumber, HouseAccountRequest request) {
-        HouseAccount houseAccount = findAccountById(customerNumber);
+    public HouseAccountResponse updateHouseAccount(String id, HouseAccountRequest request) {
+        HouseAccount houseAccount = findAccountById(id);
         
         // Update fields if provided
-        if (request.getName() != null) {
-            houseAccount.setName(request.getName());
-        }
-        
+
         if (request.getPhoneNumber() != null) {
             houseAccount.setPhoneNumber(request.getPhoneNumber());
         }
@@ -90,6 +87,10 @@ public class HouseAccountServiceImpl implements HouseAccountService {
             houseAccount.setCreditLimit(request.getCreditLimit());
         }
         
+        if (request.getCompanyName() != null) {
+            houseAccount.setCompanyName(request.getCompanyName());
+        }
+        
         houseAccount.setUpdatedAt(LocalDateTime.now());
         
         // Save and return
@@ -99,18 +100,18 @@ public class HouseAccountServiceImpl implements HouseAccountService {
     
     @Override
     @Transactional
-    public void deleteHouseAccount(String customerNumber) {
-        if (!houseAccountRepository.existsById(customerNumber)) {
-            throw HouseAccountException.accountNotFound(customerNumber);
+    public void deleteHouseAccount(String id) {
+        if (!houseAccountRepository.existsById(id)) {
+            throw HouseAccountException.accountNotFound(id);
         }
         
-        houseAccountRepository.deleteById(customerNumber);
+        houseAccountRepository.deleteById(id);
     }
     
     @Override
     @Transactional
-    public HouseAccountResponse updateAccountStanding(String customerNumber, AccountStanding standing) {
-        HouseAccount houseAccount = findAccountById(customerNumber);
+    public HouseAccountResponse updateAccountStanding(String id, AccountStanding standing) {
+        HouseAccount houseAccount = findAccountById(id);
         
         // Update standing and handle reset of good standing duration if needed
         houseAccount.setAccountStanding(standing);
@@ -131,7 +132,7 @@ public class HouseAccountServiceImpl implements HouseAccountService {
     @Override
     @Transactional(readOnly = true)
     public List<HouseAccountResponse> findByName(String name) {
-        return houseAccountRepository.findByCustomerNumber(name).stream()
+        return houseAccountRepository.findByCompanyName(name).stream()
             .map(HouseAccountResponse::fromEntity)
             .collect(Collectors.toList());
     }
@@ -146,8 +147,8 @@ public class HouseAccountServiceImpl implements HouseAccountService {
     
     @Override
     @Transactional
-    public HouseAccountResponse updateCreditLimit(String customerNumber, Double creditLimit) {
-        HouseAccount houseAccount = findAccountById(customerNumber);
+    public HouseAccountResponse updateCreditLimit(String id, Double creditLimit) {
+        HouseAccount houseAccount = findAccountById(id);
         
         houseAccount.setCreditLimit(creditLimit);
         houseAccount.setUpdatedAt(LocalDateTime.now());
@@ -160,12 +161,12 @@ public class HouseAccountServiceImpl implements HouseAccountService {
     /**
      * Helper method to find an account by ID or throw an exception if not found.
      * 
-     * @param customerNumber The customer number
+     * @param id The account ID
      * @return The house account
      * @throws HouseAccountException if the account is not found
      */
-    private HouseAccount findAccountById(String customerNumber) {
-        return houseAccountRepository.findById(customerNumber)
-            .orElseThrow(() -> HouseAccountException.accountNotFound(customerNumber));
+    private HouseAccount findAccountById(String id) {
+        return houseAccountRepository.findById(id)
+            .orElseThrow(() -> HouseAccountException.accountNotFound(id));
     }
 }

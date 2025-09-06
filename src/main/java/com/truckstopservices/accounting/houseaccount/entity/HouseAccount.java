@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 public class HouseAccount {
     
     @Id
-    private String customerNumber; // UID
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String houseAccountId; // Auto-generated UID
     
-    private String name;
+    private String companyName;
     private String phoneNumber;
     private String address;
     
@@ -54,10 +55,10 @@ public class HouseAccount {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
-    
-    public HouseAccount(String customerNumber, String name, String phoneNumber, String address) {
-        this.customerNumber = customerNumber;
-        this.name = name;
+
+
+    public HouseAccount(String companyName, String phoneNumber, String address) {
+        this.companyName = companyName;
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.createdAt = LocalDateTime.now();
@@ -65,21 +66,22 @@ public class HouseAccount {
     }
     
     // Getters and setters
-    public String getCustomerNumber() {
-        return customerNumber;
+    public String getHouseAccountId() {
+        return houseAccountId;
     }
     
-    public void setCustomerNumber(String customerNumber) {
-        this.customerNumber = customerNumber;
+    public void setHouseAccountId(String houseAccountId) {
+        this.houseAccountId = houseAccountId;
     }
     
-    public String getName() {
-        return name;
+    public String getCompanyName() {
+        return companyName;
     }
     
-    public void setName(String name) {
-        this.name = name;
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
+    
     
     public String getPhoneNumber() {
         return phoneNumber;

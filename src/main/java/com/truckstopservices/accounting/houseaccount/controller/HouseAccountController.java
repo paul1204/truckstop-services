@@ -44,15 +44,15 @@ public class HouseAccountController {
     }
     
     /**
-     * Get a house account by customer number.
+     * Get a house account by ID.
      * 
-     * @param customerNumber The customer number
+     * @param houseAccountId The house account ID
      * @return The house account response
      */
-    @GetMapping("/{customerNumber}")
-    public ResponseEntity<HouseAccountResponse> getHouseAccount(@PathVariable String customerNumber) {
+    @GetMapping("/{houseAccountId}")
+    public ResponseEntity<HouseAccountResponse> getHouseAccount(@PathVariable String houseAccountId) {
         try {
-            HouseAccountResponse response = houseAccountService.getHouseAccount(customerNumber);
+            HouseAccountResponse response = houseAccountService.getHouseAccount(houseAccountId);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (HouseAccountException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -73,13 +73,13 @@ public class HouseAccountController {
     /**
      * Delete a house account.
      * 
-     * @param customerNumber The customer number
+     * @param houseAccountId The house account ID
      * @return A response with no content
      */
-    @DeleteMapping("/{customerNumber}")
-    public ResponseEntity<Void> deleteHouseAccount(@PathVariable String customerNumber) {
+    @DeleteMapping("/{houseAccountId}")
+    public ResponseEntity<Void> deleteHouseAccount(@PathVariable String houseAccountId) {
         try {
-            houseAccountService.deleteHouseAccount(customerNumber);
+            houseAccountService.deleteHouseAccount(houseAccountId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (HouseAccountException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

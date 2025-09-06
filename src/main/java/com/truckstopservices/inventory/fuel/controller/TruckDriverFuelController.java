@@ -61,14 +61,14 @@ public class TruckDriverFuelController {
         }
     }
 
-    @PutMapping("/update/Diesel/FIFO/HouseAccount/{houseAccountNumber}")
+    @PutMapping("/update/Diesel/FIFO/HouseAccount/{houseAccountId}")
     public ResponseEntity<FuelSaleHouseAccountResponse> updateDieselFuelFIFOHouseAccount(
             @RequestBody FuelSaleRequest fuelSaleRequest,
-            @PathVariable String houseAccountNumber) {
+            @PathVariable String houseAccountId) {
         try {
             FuelSaleHouseAccountResponse fuelSold = truckDriverFuelService.updateDieselInventoryFIFOSalesHouseAccount(
                     fuelSaleRequest.gallonsSold(), 
-                    houseAccountNumber);
+                    houseAccountId);
             return new ResponseEntity<>(fuelSold, HttpStatus.OK);
         } catch (FuelSaleException e) {
             FuelSaleRequest errorRequest = new FuelSaleRequest(0, 0, 0, e.getMessage());

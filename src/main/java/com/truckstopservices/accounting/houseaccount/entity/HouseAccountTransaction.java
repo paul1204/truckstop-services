@@ -14,12 +14,15 @@ public class HouseAccountTransaction {
     @Column(name = "invoice_number", nullable = false, unique = true)
     private String invoiceNumber;
     
-    @Column(name = "house_account_number", nullable = false)
-    private String houseAccountNumber;
+    @Column(name = "house_account_id", nullable = false)
+    private String houseAccountId;
+
+//    @Column(name = "house_account_name", nullable = false)
+//    private String houseAccountName;
     
-    @ManyToOne
-    @JoinColumn(name = "house_account_number", referencedColumnName = "customerNumber", insertable = false, updatable = false)
-    private HouseAccount houseAccount;
+//    @ManyToOne
+//    @JoinColumn(name = "house_account_id", referencedColumnName = "houseAccountId", insertable = false, updatable = false)
+//    private HouseAccount houseAccount;
     
     @Column(name = "date_of_purchase", nullable = false)
     private LocalDate dateOfPurchase;
@@ -38,9 +41,9 @@ public class HouseAccountTransaction {
 //        this.dateDue = dateOfPurchase.plusDays(7);
     }
     
-    public HouseAccountTransaction(String invoiceNumber, String houseAccountNumber, Double amount, Double gallons) {
+    public HouseAccountTransaction(String invoiceNumber, String houseAccountId, Double amount, Double gallons ) {
         this.invoiceNumber = invoiceNumber;
-        this.houseAccountNumber = houseAccountNumber;
+        this.houseAccountId = houseAccountId;
         this.amount = amount;
         this.gallons = gallons;
         this.dateOfPurchase = LocalDate.now();
@@ -64,24 +67,23 @@ public class HouseAccountTransaction {
         this.invoiceNumber = invoiceNumber;
     }
     
-    public String getHouseAccountNumber() {
-        return houseAccountNumber;
+    public String getHouseAccountId() {
+        return houseAccountId;
     }
     
-    public void setHouseAccountNumber(String houseAccountNumber) {
-        this.houseAccountNumber = houseAccountNumber;
+    public void setHouseAccountId(String houseAccountId) {
+        this.houseAccountId = houseAccountId;
     }
-    
-    public HouseAccount getHouseAccount() {
-        return houseAccount;
-    }
-    
-    public void setHouseAccount(HouseAccount houseAccount) {
-        this.houseAccount = houseAccount;
-        if (houseAccount != null) {
-            this.houseAccountNumber = houseAccount.getCustomerNumber();
-        }
-    }
+//    public HouseAccount getHouseAccount() {
+//        return houseAccount;
+//    }
+//    public void setHouseAccount(HouseAccount houseAccount) {
+//        this.houseAccount = houseAccount;
+//        if (houseAccount != null) {
+//            this.houseAccountId = houseAccount.getHouseAccountId();
+//        }
+//    }
+
     
     public LocalDate getDateOfPurchase() {
         return dateOfPurchase;

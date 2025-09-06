@@ -1,7 +1,8 @@
 package com.truckstopservices.inventory.fuel.service;
 
-import com.truckstopservices.accounting.accountsPayable.service.implementation.AccountsPayableImplementation;
+import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.houseaccount.service.HouseAccountTransactionService;
+import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.model.Invoice;
 import com.truckstopservices.accounting.model.InvoiceDetail;
 import com.truckstopservices.accounting.pos.dto.Receipt;
@@ -39,7 +40,7 @@ public class TruckDriverFuelServiceTest {
     private FuelDeliveryRepository fuelDeliveryRepository;
 
     @Mock
-    private AccountsPayableImplementation accountsPayableImplementation;
+    private InvoiceServiceImpl invoiceServiceImpl;
 
     @Mock
     private POSService posService;
@@ -55,7 +56,7 @@ public class TruckDriverFuelServiceTest {
         truckDriverFuelService = new TruckDriverFuelService(
                 dieselRepository,
                 fuelDeliveryRepository,
-                accountsPayableImplementation,
+                invoiceServiceImpl,
                 posService,
                 houseAccountTransactionService
         );

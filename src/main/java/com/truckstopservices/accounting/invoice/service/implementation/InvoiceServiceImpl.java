@@ -1,7 +1,8 @@
-package com.truckstopservices.accounting.accountsPayable.service.implementation;
-import com.truckstopservices.accounting.accountsPayable.entity.InvoiceEntity;
-import com.truckstopservices.accounting.accountsPayable.repository.InvoiceRepository;
-import com.truckstopservices.accounting.accountsPayable.service.interfaces.AccountsPayableInterface;
+package com.truckstopservices.accounting.invoice.service.implementation;
+
+import com.truckstopservices.accounting.invoice.entity.InvoiceEntity;
+import com.truckstopservices.accounting.invoice.repository.InvoiceRepository;
+import com.truckstopservices.accounting.invoice.service.interfaces.InvoiceService;
 import com.truckstopservices.accounting.model.Invoice;
 import com.truckstopservices.accounting.model.InvoiceDetail;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Service
-public class AccountsPayableImplementation implements AccountsPayableInterface {
+public class InvoiceServiceImpl implements InvoiceService {
 
     @Autowired
     private InvoiceRepository invoiceRepository;
 
-    public AccountsPayableImplementation(InvoiceRepository invoiceRepository) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository) {
         this.invoiceRepository = invoiceRepository;
     }
 

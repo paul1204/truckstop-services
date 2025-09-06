@@ -1,4 +1,4 @@
-package com.truckstopservices.accounting.accountsPayable.entity;
+package com.truckstopservices.accounting.invoice.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

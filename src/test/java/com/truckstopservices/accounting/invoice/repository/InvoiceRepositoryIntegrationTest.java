@@ -1,6 +1,6 @@
-package com.truckstopservices.accounting.accountsPayable.repository;
+package com.truckstopservices.accounting.invoice.repository;
 
-import com.truckstopservices.accounting.accountsPayable.entity.InvoiceEntity;
+import com.truckstopservices.accounting.invoice.entity.InvoiceEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

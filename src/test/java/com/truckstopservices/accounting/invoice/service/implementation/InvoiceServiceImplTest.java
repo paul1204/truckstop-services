@@ -1,7 +1,7 @@
-package com.truckstopservices.accounting.accountsPayable.service.implementation;
+package com.truckstopservices.accounting.invoice.service.implementation;
 
-import com.truckstopservices.accounting.accountsPayable.entity.InvoiceEntity;
-import com.truckstopservices.accounting.accountsPayable.repository.InvoiceRepository;
+import com.truckstopservices.accounting.invoice.entity.InvoiceEntity;
+import com.truckstopservices.accounting.invoice.repository.InvoiceRepository;
 import com.truckstopservices.accounting.model.Invoice;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,17 +13,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
-class AccountsPayableImplementationTest {
+class InvoiceServiceImplTest {
 
     @Mock
     private InvoiceRepository invoiceRepository;
 
-    private AccountsPayableImplementation accountsPayableImplementation;
+    private InvoiceServiceImpl invoiceService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        accountsPayableImplementation = new AccountsPayableImplementation(invoiceRepository);
+        invoiceService = new InvoiceServiceImpl(invoiceRepository);
     }
 
     @Test
@@ -34,7 +34,7 @@ class AccountsPayableImplementationTest {
         Double amount = 100.0;
 
         // Act
-        Invoice result = accountsPayableImplementation.createInvoice(companyName, date, amount);
+        Invoice result = invoiceService.createInvoice(companyName, date, amount);
 
         // Assert
         assertNotNull(result);

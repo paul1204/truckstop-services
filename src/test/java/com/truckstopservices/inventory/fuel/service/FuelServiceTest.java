@@ -8,7 +8,7 @@ import com.truckstopservices.inventory.fuel.repository.DieselRepository;
 import com.truckstopservices.inventory.fuel.repository.MidGradeFuelRepository;
 import com.truckstopservices.inventory.fuel.repository.PremimumFuelRepository;
 import com.truckstopservices.inventory.fuel.repository.RegularFuelRepository;
-import com.truckstopservices.accounting.accountsPayable.service.implementation.AccountsPayableImplementation;
+import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.pos.service.POSService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ public class FuelServiceTest {
     private PremimumFuelRepository premimumFuelRepository;
 
     @Mock
-    private AccountsPayableImplementation accountsPayableImplementation;
+    private InvoiceServiceImpl invoiceServiceImpl;
 
     @Mock
     private POSService posService;
@@ -50,7 +50,7 @@ public class FuelServiceTest {
         MockitoAnnotations.openMocks(this);
         fuelService = new FuelService(dieselRepository, regularFuelRepository,
                 midGradeFuelRepository, premimumFuelRepository,
-                accountsPayableImplementation, posService);
+                invoiceServiceImpl, posService);
     }
     
     @Test

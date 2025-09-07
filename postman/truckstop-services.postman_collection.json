@@ -1,0 +1,408 @@
+{
+	"info": {
+		"_postman_id": "f21250c5-44f4-46e6-9604-effc728047ae",
+		"name": "truckstop-services",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38822918"
+	},
+	"item": [
+		{
+			"name": "Merchandise Delivery",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "merchandiseInventoryOrder",
+							"type": "file",
+							"src": "/C:/Users/Anjali/Documents/Coding/truckstop-services/reports/order/merchandise_delivery.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/api/inventory/delivery/merchandise",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"inventory",
+						"delivery",
+						"merchandise"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Restaurant Delivery",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "order",
+							"type": "file",
+							"src": "/C:/Users/Anjali/Documents/Coding/truckstop-services/reports/order/merchandise_order.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/api/inventory/delivery",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"inventory",
+						"delivery"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update sales",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update sales 2",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fuel Delivery One",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"companyName\": \"Oil Solutions\",\r\n  \"fuelDelivery_ID\": \"TD-20241027-001\",\r\n  \"deliveryDate\": \"02/17/2025\",\r\n  \"dieselOrder\": {\r\n    \"octane\": 40,\r\n    \"pricePerGallon\": 3.75,\r\n    \"totalGallons\": 1000.0\r\n  },\r\n  \"regularOctaneOrder\": {\r\n    \"octane\": 87,\r\n    \"pricePerGallon\": 3.25,\r\n    \"totalGallons\": 50000.0\r\n  },\r\n  \"premiumOctaneOrder\": {\r\n    \"octane\": 91,\r\n    \"pricePerGallon\": 4.10,\r\n    \"totalGallons\": 20000.0\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/fuel/update/FuelInventory/FuelDelivery",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"fuel",
+						"update",
+						"FuelInventory",
+						"FuelDelivery"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fuel Delivery Two",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"companyName\": \"Oil Solutions\",\r\n  \"fuelDelivery_ID\": \"TD-20241027-002\",\r\n  \"deliveryDate\": \"02/20/2025\",\r\n  \"dieselOrder\": {\r\n    \"octane\": 40,\r\n    \"pricePerGallon\": 4.00,\r\n    \"totalGallons\": 20000.0\r\n  },\r\n  \"regularOctaneOrder\": {\r\n    \"octane\": 87,\r\n    \"pricePerGallon\": 3.50,\r\n    \"totalGallons\": 9000.0\r\n  },\r\n  \"premiumOctaneOrder\": {\r\n    \"octane\": 91,\r\n    \"pricePerGallon\": 4.20,\r\n    \"totalGallons\": 3000.0\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/fuel/update/FuelInventory/FuelDelivery",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"fuel",
+						"update",
+						"FuelInventory",
+						"FuelDelivery"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Diesel Sale - POS / FIFO",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"octane\": 40,\r\n    \"gallonsSold\" : 10,\r\n    \"totalPrice\": 5.99\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/inventory/fuel/update/FuelInventory/FIFO",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"inventory",
+						"fuel",
+						"update",
+						"FuelInventory",
+						"FIFO"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Diesel Sale - Truck Driver FIFO",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"octane\": 40,\r\n    \"gallonsSold\" : 10,\r\n    \"totalPrice\": 5.99\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/inventory/fuel/update/FuelInventory/FIFO",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"inventory",
+						"fuel",
+						"update",
+						"FuelInventory",
+						"FIFO"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Diesel Sale - Truck Driver House Account FIFO",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"octane\": 40,\r\n    \"gallonsSold\" : 10,\r\n    \"totalPrice\": 5.99\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/inventory/fuel/update/FuelInventory/FIFO",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"inventory",
+						"fuel",
+						"update",
+						"FuelInventory",
+						"FIFO"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Truck Driver Diesel Sale Chart",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"octane\": 40,\r\n    \"gallonsSold\" : 10,\r\n    \"totalPrice\": 5.99\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/inventory/fuel/update/FuelInventory/FIFO",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"inventory",
+						"fuel",
+						"update",
+						"FuelInventory",
+						"FIFO"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Regular Octane Sale - FIFO",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"octane\": 40,\r\n    \"gallonsSold\" : 10,\r\n    \"totalPrice\": 5.99\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/inventory/fuel/update/FuelInventory/FIFO",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"inventory",
+						"fuel",
+						"update",
+						"FuelInventory",
+						"FIFO"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Premium Octane Sale - FIFO Copy",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"octane\": 40,\r\n    \"gallonsSold\" : 10,\r\n    \"totalPrice\": 5.99\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/inventory/fuel/update/FuelInventory/FIFO",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"inventory",
+						"fuel",
+						"update",
+						"FuelInventory",
+						"FIFO"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "View Parking Spots",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "View Fuel Inventory for Front End",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "House - Account Info",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "order",
+							"type": "file",
+							"src": "/C:/Users/Anjali/Documents/Coding/truckstop-services/reports/order/merchandise_order.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/accounting/house-accounts/ACME001",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"accounting",
+						"house-accounts",
+						"ACME001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "House Account Diesel Purchase",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

@@ -119,6 +119,27 @@ public class FuelService {
     public FuelDeliveryResponse<FuelDelivery> updateFuelDeliveryRepo(FuelDelivery fuelDelivery) throws Exception {
         try {
             FuelDelivery savedDelivery = fuelDeliveryRepository.save(fuelDelivery);
+            try {
+                Diesel d = savedDelivery.getDieselOrder();
+                RegularOctane r = savedDelivery.getRegularOctaneOrder();
+                PremiumOctane p = savedDelivery.getPremiumOctaneOrder();
+                String deliveryDate = savedDelivery.getDeliveryDate();
+
+                if (d != null) {
+                    log.info("fuel_delivery_saved type=Diesel deliveryId={} octane={} totalGallons={} pricePerGallon={} deliveryDate={}",
+                            d.getDelivery_id(), d.getOctane(), d.getTotalGallons(), d.getPricePerGallon(), deliveryDate);
+                }
+                if (r != null) {
+                    log.info("fuel_delivery_saved type=Regular octane={} totalGallons={} pricePerGallon={} deliveryDate={}",
+                            r.getOctane(), r.getTotalGallons(), r.getPricePerGallon(), deliveryDate);
+                }
+                if (p != null) {
+                    log.info("fuel_delivery_saved type=Premium octane={} totalGallons={} pricePerGallon={} deliveryDate={}",
+                            p.getOctane(), p.getTotalGallons(), p.getPricePerGallon(), deliveryDate);
+                }
+            } catch (Exception e) {
+                log.warn("fuel_delivery_saved logging_error message={}", e.getMessage());
+            }
             //Need to update additional fields past initial save to repo
             updateFuelInventoryFromDelivery(savedDelivery);
 

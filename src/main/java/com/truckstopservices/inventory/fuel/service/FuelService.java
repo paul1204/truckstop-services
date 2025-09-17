@@ -20,6 +20,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,8 @@ import java.util.Optional;
 
 @Service
 public class FuelService {
+
+    private static final Logger log = LoggerFactory.getLogger(FuelService.class);
 
     @Autowired
     private DieselRepository dieselRepository;
@@ -203,6 +207,7 @@ public class FuelService {
 
     @Transactional
     public FuelSaleResponse updateDieselInventoryFIFOSales(double gallonsSold) throws FuelSaleException {
+        log.info("fuel_request type=Diesel gallons={}", gallonsSold);
         Optional<Diesel> dieselFirstRecord = dieselRepository.findFIFOAvailableGallons();
         if (!dieselFirstRecord.isPresent()) {
             throw new FuelSaleException("No available fuel to consume. there are " + gallonsSold + " gallons unaccounted for");
@@ -229,9 +234,10 @@ public class FuelService {
             fifoDiesel.setAvailableGallons(fifoDiesel.getAvailableGallons() - fifoDiesel.getAvailableGallons());
             if (dieselSecondRecord.isPresent()) {
                 Diesel newFifoDieselBatch = dieselSecondRecord.get();
-                //Expire available gallons using getters rather than hardcoding 0.00
-                newFifoDieselBatch.setAvailableGallons(newFifoDieselBatch.getAvailableGallons() + negativeCarryOver);
+                double updatedNextBatchOfGallons = newFifoDieselBatch.getAvailableGallons() + negativeCarryOver;
+                newFifoDieselBatch.setAvailableGallons(updatedNextBatchOfGallons);
                 dieselRepository.save(newFifoDieselBatch);
+                log.info("Current Batch Ending.. Switch to next available Batch type=Diesel gallons={}", updatedNextBatchOfGallons);
 
                 //Foreign Key Constraint when moving to historical table
                 //Issue #4
@@ -269,6 +275,7 @@ public class FuelService {
 
     @Transactional
     public FuelSaleResponse updateRegularOctaneInventoryFIFOSales(double gallonsSold) {
+        log.info("fuel_request type=Regular gallons={}", gallonsSold);
         Optional<RegularOctane> regularOctaneFirstRecord = regularFuelRepository.findFIFOAvailableGallons();
         if (!regularOctaneFirstRecord.isPresent()) {
             throw new FuelSaleException("No available fuel to consume. there are " + gallonsSold + " gallons unaccounted for");
@@ -296,8 +303,10 @@ public class FuelService {
             Optional<RegularOctane> regularOctaneNextAvailableBatch = regularFuelRepository.findNextFifoNextAvailableGallons();
             if (regularOctaneNextAvailableBatch.isPresent()) {
                 RegularOctane newFifoRegularBatch = regularOctaneNextAvailableBatch.get();
-                newFifoRegularBatch.setAvailableGallons(newFifoRegularBatch.getAvailableGallons() + negativeCarryOver);
+                double updatedNextBatchOfGallons = newFifoRegularBatch.getAvailableGallons() + negativeCarryOver;
+                newFifoRegularBatch.setAvailableGallons(updatedNextBatchOfGallons);
                 regularFuelRepository.save(newFifoRegularBatch);
+                log.info("Current Batch Ending.. Switch to next available Batch type=Regular gallons={}", updatedNextBatchOfGallons);
                 fifoRegularOctane.setFlagInactive();
 
                 double totalPrice = gallonsSold * 1.99;
@@ -328,6 +337,7 @@ public class FuelService {
 
     @Transactional
     public FuelSaleResponse updatePremiumOctaneInventoryFIFOSales(double gallonsSold) {
+        log.info("fuel_request type=Premium gallons={}", gallonsSold);
         Optional<PremiumOctane> premiumOctaneFirstRecord = premimumFuelRepository.findFIFOAvailableGallons();
         if (!premiumOctaneFirstRecord.isPresent()) {
             throw new FuelSaleException("No available fuel to consume. there are " + gallonsSold + " gallons unaccounted for");
@@ -355,8 +365,10 @@ public class FuelService {
             Optional<PremiumOctane> premiumOctaneNextAvailableBatch = premimumFuelRepository.findNextFifoNextAvailableGallons();
             if (premiumOctaneNextAvailableBatch.isPresent()) {
                 PremiumOctane newFifoPremiumBatch = premiumOctaneNextAvailableBatch.get();
-                newFifoPremiumBatch.setAvailableGallons(newFifoPremiumBatch.getAvailableGallons() + negativeCarryOver);
+                double updatedNextBatchOfGallons = newFifoPremiumBatch.getAvailableGallons() + negativeCarryOver;
+                newFifoPremiumBatch.setAvailableGallons(updatedNextBatchOfGallons);
                 premimumFuelRepository.save(newFifoPremiumBatch);
+                log.info("Current Batch Ending.. Switch to next available Batch type=Premium gallons={}", updatedNextBatchOfGallons);
                 fifoPremiumOctane.setFlagInactive();
 
                 double totalPrice = gallonsSold * 1.99;

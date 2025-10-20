@@ -32,6 +32,7 @@ public abstract class Fuel {
         this.octane = octane;
         this.pricePerGallon = pricePerGallon;
         this.totalGallons = initalFuelGallons;
+        this.availableGallons = initalFuelGallons;
     }
 
     public Long getDelivery_id() {

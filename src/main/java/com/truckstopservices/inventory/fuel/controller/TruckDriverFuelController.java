@@ -1,9 +1,6 @@
 package com.truckstopservices.inventory.fuel.controller;
 
-import com.truckstopservices.accounting.houseaccount.entity.HouseAccountTransaction;
-import com.truckstopservices.accounting.pos.dto.Receipt;
 import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
-import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleHouseAccountResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleResponse;

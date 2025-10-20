@@ -1,4 +1,4 @@
-package com.truckstopservices.accounting.pos.enums;
+package com.truckstopservices.accounting.receipt.enums;
 
 public enum SalesType {
     FUEL,

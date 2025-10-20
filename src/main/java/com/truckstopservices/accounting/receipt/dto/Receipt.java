@@ -1,6 +1,6 @@
-package com.truckstopservices.accounting.pos.dto;
+package com.truckstopservices.accounting.receipt.dto;
 
-import com.truckstopservices.accounting.pos.enums.SalesType;
+import com.truckstopservices.accounting.receipt.enums.SalesType;
 import java.time.LocalDateTime;
 
 public record Receipt(

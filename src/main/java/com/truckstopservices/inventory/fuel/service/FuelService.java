@@ -2,9 +2,9 @@ package com.truckstopservices.inventory.fuel.service;
 
 import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.model.Invoice;
-import com.truckstopservices.accounting.pos.dto.Receipt;
-import com.truckstopservices.accounting.pos.enums.SalesType;
-import com.truckstopservices.accounting.pos.service.POSService;
+import com.truckstopservices.accounting.receipt.dto.Receipt;
+import com.truckstopservices.accounting.receipt.enums.SalesType;
+import com.truckstopservices.accounting.receipt.service.ReceiptService;
 import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
@@ -51,17 +51,17 @@ public class FuelService {
     private InvoiceServiceImpl invoiceService;
 
     @Autowired
-    private POSService posService;
+    private ReceiptService receiptService;
 
     public FuelService(DieselRepository dieselRepository, RegularFuelRepository regularFuelRepository,
                        MidGradeFuelRepository midGradeFuelRepository, PremimumFuelRepository premimumFuelRepository,
-                       InvoiceServiceImpl invoiceService, POSService posService) {
+                       InvoiceServiceImpl invoiceService, ReceiptService receiptService) {
         this.dieselRepository = dieselRepository;
         this.regularFuelRepository = regularFuelRepository;
         this.midGradeFuelRepository = midGradeFuelRepository;
         this.premimumFuelRepository = premimumFuelRepository;
         this.invoiceService = invoiceService;
-        this.posService = posService;
+        this.receiptService = receiptService;
     }
 
     public List<FuelInventoryResponse> getAllFuelInventory() {
@@ -243,7 +243,7 @@ public class FuelService {
             FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(fifoDiesel.getOctane(), gallonsSold, totalPrice, "Diesel Fuel Updated");
 
 
-            Receipt receipt = posService.createPOSRecord(totalPrice, SalesType.FUEL);
+            Receipt receipt = receiptService.createReceiptRecord(totalPrice, SalesType.FUEL);
 
             return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
         }
@@ -277,8 +277,8 @@ public class FuelService {
                     "Diesel Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoDieselBatch.getDelivery_id().toString()
                 );
 
-                // Create POS record and get receipt
-                Receipt receipt = posService.createPOSRecord(totalPrice, SalesType.FUEL);
+                // Create receipt record and get receipt
+                Receipt receipt = receiptService.createReceiptRecord(totalPrice, SalesType.FUEL);
 
                 // Return response with receipt
                 return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
@@ -290,7 +290,7 @@ public class FuelService {
         }
 
         FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
-        Receipt receipt = posService.createPOSRecord(0, SalesType.FUEL);
+        Receipt receipt = receiptService.createReceiptRecord(0, SalesType.FUEL);
         return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
     }
 
@@ -310,8 +310,8 @@ public class FuelService {
             double totalPrice = gallonsSold * 1.99;
             FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(fifoRegularOctane.getOctane(), gallonsSold, totalPrice, "Regular Fuel Updated");
 
-            // Create POS record and get receipt
-            Receipt receipt = posService.createPOSRecord(totalPrice, SalesType.FUEL);
+            // Create receipt record and get receipt
+            Receipt receipt = receiptService.createReceiptRecord(totalPrice, SalesType.FUEL);
 
             // Return response with receipt
             return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
@@ -338,8 +338,8 @@ public class FuelService {
                     "Regular Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoRegularBatch.getDelivery_id().toString()
                 );
 
-                // Create POS record and get receipt
-                Receipt receipt = posService.createPOSRecord(totalPrice, SalesType.FUEL);
+                // Create receipt record and get receipt
+                Receipt receipt = receiptService.createReceiptRecord(totalPrice, SalesType.FUEL);
 
                 // Return response with receipt
                 return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
@@ -352,7 +352,7 @@ public class FuelService {
 
         FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
         // Create a dummy receipt for the error case
-        Receipt receipt = posService.createPOSRecord(0, SalesType.FUEL);
+        Receipt receipt = receiptService.createReceiptRecord(0, SalesType.FUEL);
         return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
     }
 
@@ -372,8 +372,8 @@ public class FuelService {
             double totalPrice = gallonsSold * 1.99;
             FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(fifoPremiumOctane.getOctane(), gallonsSold, totalPrice, "Premium Fuel Updated");
 
-            // Create POS record and get receipt
-            Receipt receipt = posService.createPOSRecord(totalPrice, SalesType.FUEL);
+            // Create receipt record and get receipt
+            Receipt receipt = receiptService.createReceiptRecord(totalPrice, SalesType.FUEL);
 
             // Return response with receipt
             return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
@@ -400,8 +400,8 @@ public class FuelService {
                     "Premium Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoPremiumBatch.getDelivery_id().toString()
                 );
 
-                // Create POS record and get receipt
-                Receipt receipt = posService.createPOSRecord(totalPrice, SalesType.FUEL);
+                // Create receipt record and get receipt
+                Receipt receipt = receiptService.createReceiptRecord(totalPrice, SalesType.FUEL);
 
                 // Return response with receipt
                 return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
@@ -414,7 +414,7 @@ public class FuelService {
 
         FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
         // Create a dummy receipt for the error case
-        Receipt receipt = posService.createPOSRecord(0, SalesType.FUEL);
+        Receipt receipt = receiptService.createReceiptRecord(0, SalesType.FUEL);
         return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
     }
     public List<FuelChartDataResponse> getFuelInventoryChartData() {

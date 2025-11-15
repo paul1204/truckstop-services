@@ -1,5 +1,7 @@
 package com.truckstopservices.inventory.fuel.service;
 
+import com.truckstopservices.accounting.houseaccount.entity.HouseAccount;
+import com.truckstopservices.accounting.houseaccount.repository.HouseAccountRepository;
 import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.houseaccount.entity.HouseAccountTransaction;
 import com.truckstopservices.accounting.houseaccount.service.HouseAccountTransactionService;
@@ -45,16 +47,21 @@ public class TruckDriverFuelService {
     @Autowired
     private HouseAccountTransactionService houseAccountTransactionService;
 
+    @Autowired
+    private HouseAccountRepository houseAccountRepository;
+
     public TruckDriverFuelService(DieselRepository dieselRepository,
                                   FuelDeliveryRepository fuelDeliveryRepository,
                                   InvoiceServiceImpl invoiceService,
                                   ReceiptService receiptService,
-                                  HouseAccountTransactionService houseAccountTransactionService) {
+                                  HouseAccountTransactionService houseAccountTransactionService,
+                                  HouseAccountRepository houseAccountRepository) {
         this.dieselRepository = dieselRepository;
         this.fuelDeliveryRepository = fuelDeliveryRepository;
         this.invoiceService = invoiceService;
         this.receiptService = receiptService;
         this.houseAccountTransactionService = houseAccountTransactionService;
+        this.houseAccountRepository = houseAccountRepository;
     }
 
     public List<FuelChartDataResponse> getDieselInventoryChartData() {
@@ -186,6 +193,20 @@ public class TruckDriverFuelService {
             fuelSaleResponse.totalPrice(), 
             fuelSaleResponse.gallonsSold()
         );
+
+        //Get House Account to update Amount and Gallons due
+        HouseAccount houseAccount = houseAccountRepository.findById(houseAccountId)
+                .orElseThrow(() -> new FuelSaleException("House account not found for id: " + houseAccountId));
+
+        houseAccount.setGallonsDue(
+                houseAccount.getGallonsDue() + fuelSaleResponse.gallonsSold()
+        );
+        houseAccount.setAmountDue(
+                houseAccount.getAmountDue() + fuelSaleResponse.totalPrice()
+        );
+
+        houseAccountRepository.save(houseAccount);
+
         HouseAccountTransaction savedTransaction = houseAccountTransactionService.createTransaction(transaction);
         
         FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(

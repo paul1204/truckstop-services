@@ -24,6 +24,9 @@ public class HouseAccount {
 
     @Column(name = "amount_due")
     private Double amountDue = 0.00;
+
+    @Column(name = "gallons_due")
+    private Double gallonsDue = 0.00;
     
     @Enumerated(EnumType.STRING)
     @Column(name = "account_standing")
@@ -110,6 +113,10 @@ public class HouseAccount {
     public Double getAmountDue() { return amountDue;}
 
     public void setAmountDue(Double amountDue) {this.amountDue = amountDue;}
+
+    public Double getGallonsDue() {return gallonsDue;}
+
+    public void setGallonsDue(Double gallonsDue) {this.gallonsDue = gallonsDue;}
 
     public AccountStanding getAccountStanding() {
         return accountStanding;

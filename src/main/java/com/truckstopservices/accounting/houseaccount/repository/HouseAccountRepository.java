@@ -52,4 +52,6 @@ public interface HouseAccountRepository extends JpaRepository<HouseAccount, Stri
      * @return A list of house accounts with credit limits less than or equal to the specified amount
      */
     List<HouseAccount> findByCreditLimitLessThanEqual(Double creditLimit);
+
+    HouseAccount findByHouseAccountId(String houseAccountId);
 }

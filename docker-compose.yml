@@ -1,13 +1,17 @@
-version: '3'
 services:
-  spring-app:
-    image: openjdk:20-jdk-slim
-    container_name: spring-app
-    ports:
-      - "8081:8080"
-    volumes:
-      - ./target/truckstop-services-0.0.1-SNAPSHOT.jar:/app/truck-stop-services.jar
-    working_dir: /app
-    command: ["java", "-jar", "truck-stop-services.jar"]
+  mysql:
+    image: mysql:8.3.0
+    container_name: truckstop-mysql
+    restart: always
     environment:
-      SPRING_PROFILES_ACTIVE: dev
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: truckstop_services
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db-data:/var/lib/mysql
+      - db-data:/var/log/mysql
+volumes:
+  db-data:

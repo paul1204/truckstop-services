@@ -54,10 +54,7 @@ public class ParkingService {
     public ParkingResponse createParkingSpotReservation(ParkingRequest request) {
         // Check if spot exists
         ParkingSpot parkingSpot = parkingSpotRepository.findBySpotNumber(request.spotNumber())
-                .orElseGet(() -> {
-                    ParkingSpot newSpot = new ParkingSpot(request.spotNumber(), false, null, null, null);
-                    return parkingSpotRepository.save(newSpot);
-                });
+                .orElseThrow(() -> new ParkingException("Parking Spot Not Found"));
 
         // Check if spot is available
         if (parkingSpot.isOccupied()) {

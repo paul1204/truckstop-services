@@ -18,7 +18,7 @@ public abstract class Fuel {
 
     private double availableGallons;
 
-    private double averagePrice;
+   // private double averagePrice;
 
     private Long nextDelivery_id;
 
@@ -89,13 +89,13 @@ public abstract class Fuel {
 
     public void updateGallonsAddInventory(double gallonsDelivered){this.availableGallons += gallonsDelivered;}
 
-    public double getAveragePrice() {
-        return averagePrice;
-    }
-
-    public void setAveragePrice(double averagePrice) {
-        this.averagePrice = averagePrice;
-    }
+//    public double getAveragePrice() {
+//        return averagePrice;
+//    }
+//
+//    public void setAveragePrice(double averagePrice) {
+//        this.averagePrice = averagePrice;
+//    }
 
     public Long getNextDelivery_id() {
         return nextDelivery_id;

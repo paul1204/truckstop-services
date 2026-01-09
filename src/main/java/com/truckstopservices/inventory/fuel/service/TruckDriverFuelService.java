@@ -6,9 +6,8 @@ import com.truckstopservices.accounting.invoice.service.implementation.InvoiceSe
 import com.truckstopservices.accounting.houseaccount.entity.HouseAccountTransaction;
 import com.truckstopservices.accounting.houseaccount.service.HouseAccountTransactionService;
 import com.truckstopservices.accounting.model.Invoice;
-import com.truckstopservices.accounting.receipt.dto.Receipt;
-import com.truckstopservices.accounting.receipt.enums.SalesType;
-import com.truckstopservices.accounting.receipt.service.ReceiptService;
+import com.truckstopservices.accounting.sales.service.SalesService;
+import com.truckstopservices.common.types.SalesType;
 import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleHouseAccountResponse;
@@ -40,9 +39,6 @@ public class TruckDriverFuelService {
 
     @Autowired
     private InvoiceServiceImpl invoiceService;
-
-    @Autowired
-    private ReceiptService receiptService;
     
     @Autowired
     private HouseAccountTransactionService houseAccountTransactionService;
@@ -50,18 +46,21 @@ public class TruckDriverFuelService {
     @Autowired
     private HouseAccountRepository houseAccountRepository;
 
+    @Autowired
+    private SalesService salesService;
+
     public TruckDriverFuelService(DieselRepository dieselRepository,
                                   FuelDeliveryRepository fuelDeliveryRepository,
                                   InvoiceServiceImpl invoiceService,
-                                  ReceiptService receiptService,
                                   HouseAccountTransactionService houseAccountTransactionService,
-                                  HouseAccountRepository houseAccountRepository) {
+                                  HouseAccountRepository houseAccountRepository,
+                                  SalesService salesService) {
         this.dieselRepository = dieselRepository;
         this.fuelDeliveryRepository = fuelDeliveryRepository;
         this.invoiceService = invoiceService;
-        this.receiptService = receiptService;
         this.houseAccountTransactionService = houseAccountTransactionService;
         this.houseAccountRepository = houseAccountRepository;
+        this.salesService = salesService;
     }
 
     public List<FuelChartDataResponse> getDieselInventoryChartData() {
@@ -138,8 +137,7 @@ public class TruckDriverFuelService {
             dieselRepository.save(fifoDiesel);
             double totalPrice = gallonsSold * 1.99;
             FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(fifoDiesel.getOctane(), gallonsSold, totalPrice, "Truck Driver Diesel Fuel Updated");
-            Receipt receipt = receiptService.createReceiptRecord(totalPrice, SalesType.FUEL);
-            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
+            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createSalesReturnReceipt(totalPrice, SalesType.FUEL));
         }
         
         if (fifoDiesel.getAvailableGallons() <= gallonsSold) {
@@ -163,8 +161,8 @@ public class TruckDriverFuelService {
                     (newFifoDieselBatch.getDelivery_id() != null ? newFifoDieselBatch.getDelivery_id().toString() : "N/A")
                 );
 
-                Receipt receipt = receiptService.createReceiptRecord(totalPrice, SalesType.FUEL);
-                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
+                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createSalesReturnReceipt(totalPrice, com.truckstopservices.common.types.SalesType.FUEL));
+
             }
             if (!dieselSecondRecord.isPresent() && fifoDiesel.getAvailableGallons() == 0) {
                 throw new FuelSaleException("Next batch of diesel fuel is unavailable. " + (negativeCarryOver * -1) + " gallons are not accounted for." +
@@ -172,8 +170,8 @@ public class TruckDriverFuelService {
             }
         }
         FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No diesel fuel was sold, inventory unchanged.");
-        Receipt receipt = receiptService.createReceiptRecord(0, SalesType.FUEL);
-        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, receipt);
+        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createSalesReturnReceipt(0.00, com.truckstopservices.common.types.SalesType.FUEL));
+
     }
     
     public HouseAccountTransactionService getHouseAccountTransactionService() {
@@ -216,6 +214,6 @@ public class TruckDriverFuelService {
             fuelSaleResponse.specialMessage()
         );
         
-        return FuelSaleHouseAccountResponse.fromFuelSaleRequestAndHouseAccountTransaction(fuelSaleRequest, savedTransaction);
+        return FuelSaleHouseAccountResponse.fromFuelSaleRequestAndHouseAccountTransaction(fuelSaleRequest, savedTransaction, salesService.createSalesReturnReceipt(fuelSaleResponse.totalPrice(), SalesType.FUEL));
     }
 }

@@ -1,6 +1,6 @@
 package com.truckstopservices.inventory.fuel.dto;
 
-import com.truckstopservices.accounting.receipt.dto.Receipt;
+import com.truckstopservices.accounting.sales.receipt.Receipt;
 
 public record FuelSaleResponse(
     int octane,

@@ -69,7 +69,7 @@ public class TruckDriverFuelController {
             return new ResponseEntity<>(fuelSold, HttpStatus.OK);
         } catch (FuelSaleException e) {
             FuelSaleRequest errorRequest = new FuelSaleRequest(0, 0, 0, e.getMessage());
-            FuelSaleHouseAccountResponse errorResponse = FuelSaleHouseAccountResponse.fromFuelSaleRequestAndHouseAccountTransaction(errorRequest, null);
+            FuelSaleHouseAccountResponse errorResponse = FuelSaleHouseAccountResponse.fromFuelSaleRequestAndHouseAccountTransaction(errorRequest, null, null);
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
     }

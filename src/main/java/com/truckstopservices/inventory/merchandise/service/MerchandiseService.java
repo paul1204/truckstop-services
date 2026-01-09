@@ -76,7 +76,7 @@ public class MerchandiseService {
         double total = Double.parseDouble(lines[lines.length - 1].split(",")[1]);
         String company = lines[0].split(",")[0];
 
-        for(int i = 2; i <= lines.length-1; i++){
+        for(int i = 1; i <= lines.length-1; i++){
             String[] merchandiseInfo = lines[i].split(",");
 
             //New Item, add to inventory

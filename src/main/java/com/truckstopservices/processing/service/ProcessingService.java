@@ -1,7 +1,7 @@
 package com.truckstopservices.processing.service;
 
 import com.truckstopservices.inventory.fuel.service.FuelService;
-import com.truckstopservices.inventory.merchandise.repository.BeverageRepository;
+import com.truckstopservices.inventory.merchandise.repository.BottledBeverageRepository;
 import com.truckstopservices.inventory.merchandise.service.MerchandiseService;
 import com.truckstopservices.processing.client.MerchandiseManager;
 import com.truckstopservices.processing.dto.InventoryDto;
@@ -10,7 +10,6 @@ import com.truckstopservices.processing.dto.ShiftReportDto;
 import com.truckstopservices.processing.repository.ShiftReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -29,13 +28,13 @@ public class ProcessingService {
     private MerchandiseService merchandiseService;
 
     @Autowired
-    private BeverageRepository beverageRepository;
+    private BottledBeverageRepository bottledBeverageRepository;
 
     @Autowired
     private final MerchandiseManager merchandiseManagerClient;
 
-    public ProcessingService(BeverageRepository beverageRepository, MerchandiseManager merchandiseManagerClient) {
-        this.beverageRepository = beverageRepository;
+    public ProcessingService(BottledBeverageRepository bottledBeverageRepository, MerchandiseManager merchandiseManagerClient) {
+        this.bottledBeverageRepository = bottledBeverageRepository;
         this.merchandiseManagerClient = merchandiseManagerClient;
     }
 
@@ -115,44 +114,44 @@ public class ProcessingService {
     }
 
     public List<List<InventoryDto>> parsePOSInventoryFile(MultipartFile inventoryReport) throws IOException {
-        List<InventoryDto> bottledDrinkInventory = new ArrayList<>();
+        List<InventoryDto> bottledBeverageInventory = new ArrayList<>();
         List<InventoryDto> nonRestaurantInventory = new ArrayList<>();
         List<InventoryDto> restaurantInventory = new ArrayList<>();
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(inventoryReport.getInputStream(), StandardCharsets.UTF_8));
             String line;
-            boolean isBottled = false;
+            boolean isBottledBeverage = false;
             boolean isNonRestaurant = false;
             boolean isRestaurant = false;
             while ((line = br.readLine()) != null) {
                 line = line.trim();
 
-                if (line.startsWith("BOTTLED_DRINKS_DETAILS")) {
-                    isBottled = true;
+                if (line.startsWith("BOTTLED_BEVERAGES_DETAILS")) {
+                    isBottledBeverage = true;
                     isNonRestaurant = false;
                     isRestaurant = false;
                     continue;
                 }
 
                 if (line.startsWith("NON_RESTAURANT_DETAILS")) {
-                    isBottled = false;
+                    isBottledBeverage = false;
                     isNonRestaurant = true;
                     isRestaurant = false;
                     continue;
                 }
                 if (line.startsWith("RESTAURANT_DETAILS")) {
-                    isBottled = false;
+                    isBottledBeverage = false;
                     isNonRestaurant = false;
                     isRestaurant = true;
                     continue;
                 }
 
 
-                if (isBottled && line.startsWith("SKU_CODE")) {
+                if (isBottledBeverage && line.startsWith("SKU_CODE")) {
                     String[] parts = line.split(",");
                     String skuCode = parts[0].split(":")[1].trim();
                     int qty = Integer.parseInt(parts[1].split(":")[1].trim());
-                    bottledDrinkInventory.add(new InventoryDto("BOTTLED_DRINK", skuCode, qty));
+                    bottledBeverageInventory.add(new InventoryDto("BOTTLED_BEVERAGE", skuCode, qty));
                 }
 
                 if (isNonRestaurant && line.startsWith("SKU_CODE")) {
@@ -173,7 +172,7 @@ public class ProcessingService {
             //Change this!!!
             e.printStackTrace();
         }
-        return List.of(bottledDrinkInventory, nonRestaurantInventory, restaurantInventory);
+        return List.of(bottledBeverageInventory, nonRestaurantInventory, restaurantInventory);
     }
 
     //  @Transactional

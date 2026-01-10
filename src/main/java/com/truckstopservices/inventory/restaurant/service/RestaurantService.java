@@ -3,7 +3,6 @@ package com.truckstopservices.inventory.restaurant.service;
 import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.model.Invoice;
 import com.truckstopservices.inventory.merchandise.model.DeliveryItemInfo;
-import com.truckstopservices.inventory.merchandise.nonRestaurant.entity.NonRestaurantFood;
 import com.truckstopservices.inventory.restaurant.entity.HotFood;
 import com.truckstopservices.inventory.restaurant.repository.RestaurantRepository;
 import com.truckstopservices.processing.dto.InventoryDto;

@@ -3,6 +3,7 @@ package com.truckstopservices.inventory.merchandise.service;
 import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.model.Invoice;
 import com.truckstopservices.inventory.merchandise.beverages.entity.BottledBeverage;
+import com.truckstopservices.inventory.merchandise.dto.BottledBeverageInventoryByBrand;
 import com.truckstopservices.inventory.merchandise.model.DeliveryItemInfo;
 //import com.truckstopservices.inventory.merchandise.model.DeliveryItemType;
 import com.truckstopservices.inventory.merchandise.packagedfood.entity.PackagedFood;
@@ -45,6 +46,10 @@ public class MerchandiseService {
         this.packagedFoodRepository = packagedFoodRepository;
         this.restaurantRepository = restaurantRepository;
         this.invoiceService = invoiceService;
+    }
+
+    public List<BottledBeverageInventoryByBrand> getAllBottledBeverages() {
+        return bottledBeverageRepository.findInventoryByBrand();
     }
 
     @Transactional

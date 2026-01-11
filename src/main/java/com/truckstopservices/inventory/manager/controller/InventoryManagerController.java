@@ -1,6 +1,7 @@
 package com.truckstopservices.inventory.manager.controller;
 
 import com.truckstopservices.accounting.model.Invoice;
+import com.truckstopservices.inventory.merchandise.dto.BottledBeverageCostByBrand;
 import com.truckstopservices.inventory.merchandise.dto.BottledBeverageInventoryByBrand;
 import com.truckstopservices.inventory.merchandise.service.MerchandiseService;
 import com.truckstopservices.inventory.restaurant.service.RestaurantService;
@@ -43,6 +44,12 @@ public class InventoryManagerController {
     @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<BottledBeverageInventoryByBrand>> getAllBottledBeverages() {
         return new ResponseEntity<>(merchandiseService.getAllBottledBeverages(), HttpStatus.OK);
+    }
+
+    @GetMapping("/bottledbeverageInventoryCostByBrand")
+    @CrossOrigin(origins = "http://localhost:8000")
+    public ResponseEntity<List<BottledBeverageCostByBrand>> returnInventoryCostByBrand() {
+        return new ResponseEntity<>(merchandiseService.returnInventoryCostByBrand(), HttpStatus.OK);
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/delivery/merchandise")

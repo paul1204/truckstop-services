@@ -3,6 +3,7 @@ package com.truckstopservices.inventory.merchandise.service;
 import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.model.Invoice;
 import com.truckstopservices.inventory.merchandise.beverages.entity.BottledBeverage;
+import com.truckstopservices.inventory.merchandise.dto.BottledBeverageCostByBrand;
 import com.truckstopservices.inventory.merchandise.dto.BottledBeverageInventoryByBrand;
 import com.truckstopservices.inventory.merchandise.model.DeliveryItemInfo;
 //import com.truckstopservices.inventory.merchandise.model.DeliveryItemType;
@@ -50,6 +51,10 @@ public class MerchandiseService {
 
     public List<BottledBeverageInventoryByBrand> getAllBottledBeverages() {
         return bottledBeverageRepository.findInventoryByBrand();
+    }
+
+    public List<BottledBeverageCostByBrand> returnInventoryCostByBrand() {
+        return bottledBeverageRepository.returnInventoryCostByBrand();
     }
 
     @Transactional

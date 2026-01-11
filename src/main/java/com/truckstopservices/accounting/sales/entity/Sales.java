@@ -28,9 +28,8 @@ public class Sales {
     @Column(name = "sales_type", nullable = false)
     private SalesType salesType;
 
-//    @OneToOne(fetch = FetchType.LAZY, optional = false)
-////    @JoinColumn(name = "sales_id", nullable = false)
-//    private ReceiptV2 receiptV2;
+    @Column(name = "shift_number")
+    private Integer shiftNumber;
 
     public Sales() {
     }
@@ -40,6 +39,14 @@ public class Sales {
         this.salesTime = salesTime;
         this.salesAmount = salesAmount;
         this.salesType = salesType;
+    }
+
+    public Sales(LocalDate salesDate, LocalTime salesTime, Double salesAmount, SalesType salesType, Integer shiftNumber) {
+        this.salesDate = salesDate;
+        this.salesTime = salesTime;
+        this.salesAmount = salesAmount;
+        this.salesType = salesType;
+        this.shiftNumber = shiftNumber;
     }
 
     public String getSalesId() {
@@ -80,5 +87,13 @@ public class Sales {
 
     public void setSalesType(SalesType salesType) {
         this.salesType = salesType;
+    }
+
+    public Integer getShiftNumber() {
+        return shiftNumber;
+    }
+
+    public void setShiftNumber(Integer shiftNumber) {
+        this.shiftNumber = shiftNumber;
     }
 }

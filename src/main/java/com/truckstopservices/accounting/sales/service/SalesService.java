@@ -31,7 +31,9 @@ public class SalesService {
     }
 
     public Receipt createSalesReturnReceipt(double amount, SalesType salesType){
-        Sales sales = new Sales(LocalDate.now(), LocalTime.now(), amount, salesType);
+        LocalTime now = LocalTime.now();
+        Integer shiftNumber = calculateShiftNumber(now);
+        Sales sales = new Sales(LocalDate.now(), now, amount, salesType, shiftNumber);
         salesRepository.save(sales);
         String receiptId = sales.getSalesId();
         return new Receipt(
@@ -42,6 +44,16 @@ public class SalesService {
         );
     }
 
-//    public Receipt createSalesReturnReceipt(String date, double totalPrice, com.truckstopservices.accounting.receipt.enums.SalesType salesType) {
-//    }
+    private Integer calculateShiftNumber(LocalTime time) {
+        int hour = time.getHour();
+        if (hour >= 0 && hour < 6) {
+            return 1;
+        } else if (hour >= 6 && hour < 12) {
+            return 2;
+        } else if (hour >= 12 && hour < 18) {
+            return 3;
+        } else {
+            return 4;
+        }
+    }
 }

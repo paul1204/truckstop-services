@@ -7,6 +7,7 @@ import com.truckstopservices.inventory.merchandise.dto.BottledBeverageCostByBran
 import com.truckstopservices.inventory.merchandise.dto.BottledBeverageInventoryByBrand;
 import com.truckstopservices.inventory.merchandise.model.DeliveryItemInfo;
 //import com.truckstopservices.inventory.merchandise.model.DeliveryItemType;
+import com.truckstopservices.inventory.merchandise.model.Consumable;
 import com.truckstopservices.inventory.merchandise.packagedfood.entity.PackagedFood;
 import com.truckstopservices.inventory.merchandise.repository.BottledBeverageRepository;
 import com.truckstopservices.inventory.merchandise.repository.PackagedFoodRepository;
@@ -55,6 +56,13 @@ public class MerchandiseService {
 
     public List<BottledBeverageCostByBrand> returnInventoryCostByBrand() {
         return bottledBeverageRepository.returnInventoryCostByBrand();
+    }
+
+    public List<Consumable> getAllMerchandise() {
+        List<Consumable> allMerchandise = new ArrayList<>();
+        allMerchandise.addAll(bottledBeverageRepository.findAll());
+        allMerchandise.addAll(packagedFoodRepository.findAll());
+        return allMerchandise;
     }
 
     @Transactional

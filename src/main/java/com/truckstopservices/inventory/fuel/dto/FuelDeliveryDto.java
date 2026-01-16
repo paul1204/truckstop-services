@@ -4,10 +4,10 @@ public record FuelDeliveryDto (
         String fuelDeliveryId,
         String date,
         double dieselQtyOrdered,
-        double dieselOrderedPricePerGallon,
+        double dieselOrderedCostPerGallon,
         double regularOctaneQtyOrdered,
-        double regularOctanePricePerGallon,
+        double regularOctaneCostPerGallon,
         double premiumOctaneQtyOrdered,
-        double premiumOctanePricePerGallon
+        double premiumOctaneCostPerGallon
 ){
 }

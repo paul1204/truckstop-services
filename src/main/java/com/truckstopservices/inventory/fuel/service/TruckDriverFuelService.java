@@ -86,7 +86,7 @@ public class TruckDriverFuelService {
             
             FuelDelivery savedDelivery = fuelDeliveryRepository.save(fuelDelivery);
             updateDieselFuelDelivery(savedDelivery.getDieselOrder(), savedDelivery.getDeliveryDate());
-            double totalAmount = fuelDelivery.getDieselOrder().getPricePerGallon() * 
+            double totalAmount = fuelDelivery.getDieselOrder().getCostPerGallon() *
                                 fuelDelivery.getDieselOrder().getTotalGallons();
             Invoice vendorInvoice = invoiceService.createInvoice(
                 fuelDelivery.getCompanyName(),
@@ -137,7 +137,7 @@ public class TruckDriverFuelService {
             dieselRepository.save(fifoDiesel);
             double totalPrice = gallonsSold * 1.99;
             FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(fifoDiesel.getOctane(), gallonsSold, totalPrice, "Truck Driver Diesel Fuel Updated");
-            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createSalesReturnReceipt(totalPrice, SalesType.FUEL));
+            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(totalPrice, SalesType.FUEL));
         }
         
         if (fifoDiesel.getAvailableGallons() <= gallonsSold) {
@@ -161,7 +161,7 @@ public class TruckDriverFuelService {
                     (newFifoDieselBatch.getDelivery_id() != null ? newFifoDieselBatch.getDelivery_id().toString() : "N/A")
                 );
 
-                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createSalesReturnReceipt(totalPrice, com.truckstopservices.common.types.SalesType.FUEL));
+                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(totalPrice, com.truckstopservices.common.types.SalesType.FUEL));
 
             }
             if (!dieselSecondRecord.isPresent() && fifoDiesel.getAvailableGallons() == 0) {
@@ -170,7 +170,7 @@ public class TruckDriverFuelService {
             }
         }
         FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No diesel fuel was sold, inventory unchanged.");
-        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createSalesReturnReceipt(0.00, com.truckstopservices.common.types.SalesType.FUEL));
+        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(0.00, com.truckstopservices.common.types.SalesType.FUEL));
 
     }
     
@@ -214,6 +214,6 @@ public class TruckDriverFuelService {
             fuelSaleResponse.specialMessage()
         );
         
-        return FuelSaleHouseAccountResponse.fromFuelSaleRequestAndHouseAccountTransaction(fuelSaleRequest, savedTransaction, salesService.createSalesReturnReceipt(fuelSaleResponse.totalPrice(), SalesType.FUEL));
+        return FuelSaleHouseAccountResponse.fromFuelSaleRequestAndHouseAccountTransaction(fuelSaleRequest, savedTransaction, salesService.createFuelSalesReturnReceipt(fuelSaleResponse.totalPrice(), SalesType.FUEL));
     }
 }

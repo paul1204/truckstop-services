@@ -35,7 +35,7 @@ public class InventoryManagerController {
     }
 
     @PutMapping
-    public ResponseEntity<String> updateMerchandiseInventoryFromSales(@RequestBody List<List<InventoryDto>> inventoryList){
+    public ResponseEntity<String> updateMerchandiseInventoryFromSales(@RequestBody List<InventoryDto> inventoryList){
         merchandiseService.reduceInventory(inventoryList);
         return new ResponseEntity<>("Inventory Updated", HttpStatus.OK);
     }

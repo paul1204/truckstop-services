@@ -3,8 +3,6 @@ package com.truckstopservices.inventory.fuel.model;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @MappedSuperclass
 public abstract class Fuel {
     @Id
@@ -12,10 +10,9 @@ public abstract class Fuel {
     private Long delivery_id;
     private int octane;
     String deliveryDate;
-    private double pricePerGallon;
-
+    private double costPerGallon;
+    private double retailPrice;
     private double totalGallons;
-
     private double availableGallons;
 
    // private double averagePrice;
@@ -27,10 +24,10 @@ public abstract class Fuel {
     public Fuel(){
     }
 
-    public Fuel(String deliveryDate, int octane, double pricePerGallon, double initalFuelGallons){
+    public Fuel(String deliveryDate, int octane, double costPerGallon, double initalFuelGallons){
         this.deliveryDate = deliveryDate;
         this.octane = octane;
-        this.pricePerGallon = pricePerGallon;
+        this.costPerGallon = costPerGallon;
         this.totalGallons = initalFuelGallons;
         this.availableGallons = initalFuelGallons;
     }
@@ -55,16 +52,16 @@ public abstract class Fuel {
         this.deliveryDate = date;
     }
 
-    public double getPricePerGallon() {
-        return pricePerGallon;
+    public double getCostPerGallon() {
+        return costPerGallon;
     }
 
-    public void setPricePerGallon(double pricePerGallon) {
-        this.pricePerGallon = pricePerGallon;
+    public void setCostPerGallon(double costPerGallon) {
+        this.costPerGallon = costPerGallon;
     }
 
     public double calculateTotalPrice(double quantity){
-        return getPricePerGallon() * quantity;
+        return getCostPerGallon() * quantity;
     };
 
     public double getTotalGallons() {
@@ -107,6 +104,13 @@ public abstract class Fuel {
 
     public void setFlagInactive(){
         this.active = false;
+    }
+    public double getRetailPrice() {
+        return retailPrice;
+    }
+
+    public void setRetailPrice(double retailPrice) {
+        this.retailPrice = retailPrice;
     }
 
 }

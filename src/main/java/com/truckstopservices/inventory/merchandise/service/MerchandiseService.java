@@ -66,11 +66,11 @@ public class MerchandiseService {
 
         //Get Current Inventory
         bottledBeverageRepository.findAll().forEach((BottledBeverage bottle)->{
-            currentInventory.put(bottle.getSkuCode(), new DeliveryItemInfo(bottle.getQty(), "Bottled Beverage"));
+            currentInventory.put(bottle.getSkuCode(), new DeliveryItemInfo(bottle.getQty(), "BOTTLED_BEVERAGE"));
         });
 
         packagedFoodRepository.findAll().forEach((PackagedFood packagedFood)->{
-            currentInventory.put(packagedFood.getSkuCode(), new DeliveryItemInfo(packagedFood.getQty(), "Packaged Food"));
+            currentInventory.put(packagedFood.getSkuCode(), new DeliveryItemInfo(packagedFood.getQty(), "PACKAGED_FOOD"));
         });
 
         //Parse Merchandise Order
@@ -124,9 +124,9 @@ public class MerchandiseService {
         //Process Payment
     }
 
-    public void reduceInventory(List<List<InventoryDto>> inventoryList){
-        List<InventoryDto> flattenItems = inventoryList.stream().flatMap(List::stream).toList();
-        flattenItems.forEach(product -> {
+    public void reduceInventory(List<InventoryDto> inventoryList){
+        List<InventoryDto> flattenItems = inventoryList.stream().toList();
+        inventoryList.forEach(product -> {
             switch(product.inventoryType()){
                 case "BOTTLED_BEVERAGE" -> updateBottledBeverageInventoryRepo(product);
                 case "NON_RESTAURANT" -> updatePackagedFoodInventoryRepo(product);

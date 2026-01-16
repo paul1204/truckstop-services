@@ -1,7 +1,9 @@
 package com.truckstopservices.accounting.sales.service;
 
+import com.truckstopservices.posdataingest.model.POSSaleDto;
 import com.truckstopservices.accounting.sales.dto.SalesByShift;
 import com.truckstopservices.accounting.sales.entity.Sales;
+import com.truckstopservices.accounting.sales.entity.SalesItem;
 import com.truckstopservices.accounting.sales.receipt.Receipt;
 import com.truckstopservices.common.types.SalesType;
 import com.truckstopservices.accounting.sales.repository.SalesRepository;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,9 +24,6 @@ public class SalesService {
 
     @Autowired
     private SalesRepository salesRepository;
-
-//    @Autowired
-//    private ReceiptV2Service receiptV2;
 
     public SalesService() {
     }
@@ -36,18 +36,42 @@ public class SalesService {
         return salesRepository.findSalesByTodayAllShifts();
     }
 
-    public Receipt createSalesReturnReceipt(double amount, SalesType salesType){
+    public Receipt createFuelSalesReturnReceipt(double amount, SalesType salesType){
         LocalTime now = LocalTime.now();
         Integer shiftNumber = calculateShiftNumber(now);
-        Sales sales = new Sales(LocalDate.now(), now, amount, salesType, shiftNumber);
+        Sales sales = new Sales(LocalDate.now(), now, amount,shiftNumber, new ArrayList<>());
+        SalesItem item = new SalesItem("Fuel", 1.00, 1.99, SalesType.FUEL);
+        sales.addSalesItem(item);
         salesRepository.save(sales);
-        log.info("Sales created with id: {}", sales.getSalesId());
+        log.info("Fuel Sales created with id: {}", sales.getSalesId());
         String receiptId = sales.getSalesId();
         return new Receipt(
                 receiptId,
                 sales.getSalesId(),
                 SalesType.FUEL,
                 amount
+        );
+    }
+
+    public Receipt createSaleFromPOS(POSSaleDto posSale){
+        LocalTime now = LocalTime.now();
+        Integer shiftNumber = calculateShiftNumber(now);
+        Sales sales = new Sales(LocalDate.now(), now, posSale.totalSalesAmount(), shiftNumber, new ArrayList<>());
+        List<SalesItem> items = posSale.salesItems();
+        if (items != null) {
+            for (SalesItem item : items) {
+                sales.addSalesItem(item);
+            }
+        }
+
+        salesRepository.save(sales);
+        String receiptId = sales.getSalesId();
+        log.info("Sales created with id: {}", sales.getSalesId());
+        return new Receipt(
+                receiptId,
+                sales.getSalesId(),
+                null,
+                posSale.totalSalesAmount()
         );
     }
 

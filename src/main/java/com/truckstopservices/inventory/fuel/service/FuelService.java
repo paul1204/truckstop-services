@@ -2,7 +2,6 @@ package com.truckstopservices.inventory.fuel.service;
 
 import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.model.Invoice;
-import com.truckstopservices.accounting.sales.receipt.Receipt;
 import com.truckstopservices.accounting.sales.repository.SalesRepository;
 import com.truckstopservices.accounting.sales.service.SalesService;
 import com.truckstopservices.common.types.SalesType;
@@ -131,16 +130,16 @@ public class FuelService {
                 String deliveryDate = savedDelivery.getDeliveryDate();
 
                 if (d != null) {
-                    log.info("fuel_delivery_saved type=Diesel deliveryId={} octane={} totalGallons={} pricePerGallon={} deliveryDate={}",
-                            d.getDelivery_id(), d.getOctane(), d.getTotalGallons(), d.getPricePerGallon(), deliveryDate);
+                    log.info("fuel_delivery_saved type=Diesel deliveryId={} octane={} totalGallons={} costPerGallon={} deliveryDate={}",
+                            d.getDelivery_id(), d.getOctane(), d.getTotalGallons(), d.getCostPerGallon(), deliveryDate);
                 }
                 if (r != null) {
-                    log.info("fuel_delivery_saved type=Regular octane={} totalGallons={} pricePerGallon={} deliveryDate={}",
-                            r.getOctane(), r.getTotalGallons(), r.getPricePerGallon(), deliveryDate);
+                    log.info("fuel_delivery_saved type=Regular octane={} totalGallons={} costPerGallon={} deliveryDate={}",
+                            r.getOctane(), r.getTotalGallons(), r.getCostPerGallon(), deliveryDate);
                 }
                 if (p != null) {
-                    log.info("fuel_delivery_saved type=Premium octane={} totalGallons={} pricePerGallon={} deliveryDate={}",
-                            p.getOctane(), p.getTotalGallons(), p.getPricePerGallon(), deliveryDate);
+                    log.info("fuel_delivery_saved type=Premium octane={} totalGallons={} costPerGallon={} deliveryDate={}",
+                            p.getOctane(), p.getTotalGallons(), p.getCostPerGallon(), deliveryDate);
                 }
             } catch (Exception e) {
                 log.warn("fuel_delivery_saved logging_error message={}", e.getMessage());
@@ -175,15 +174,15 @@ public class FuelService {
         double premiumAmount = 0;
 
         if (fuelDelivery.getDieselOrder() != null) {
-            dieselAmount = fuelDelivery.getDieselOrder().getPricePerGallon() * fuelDelivery.getDieselOrder().getTotalGallons();
+            dieselAmount = fuelDelivery.getDieselOrder().getCostPerGallon() * fuelDelivery.getDieselOrder().getTotalGallons();
         }
 
         if (fuelDelivery.getRegularOctaneOrder() != null) {
-            regularAmount = fuelDelivery.getRegularOctaneOrder().getPricePerGallon() * fuelDelivery.getRegularOctaneOrder().getTotalGallons();
+            regularAmount = fuelDelivery.getRegularOctaneOrder().getCostPerGallon() * fuelDelivery.getRegularOctaneOrder().getTotalGallons();
         }
 
         if (fuelDelivery.getPremiumOctaneOrder() != null) {
-            premiumAmount = fuelDelivery.getPremiumOctaneOrder().getPricePerGallon() * fuelDelivery.getPremiumOctaneOrder().getTotalGallons();
+            premiumAmount = fuelDelivery.getPremiumOctaneOrder().getCostPerGallon() * fuelDelivery.getPremiumOctaneOrder().getTotalGallons();
         }
 
         return dieselAmount + regularAmount + premiumAmount;
@@ -247,7 +246,7 @@ public class FuelService {
             double totalPrice = gallonsSold * 1.99;
             FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(fifoDiesel.getOctane(), gallonsSold, totalPrice, "Diesel Fuel Updated");
 
-            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, salesService.createSalesReturnReceipt(totalPrice, SalesType.FUEL));
+            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest, salesService.createFuelSalesReturnReceipt(totalPrice, SalesType.FUEL));
         }
         if (fifoDiesel.getAvailableGallons() <= gallonsSold) {
             Optional<Diesel> dieselSecondRecord = dieselRepository.findNextFifoNextAvailableGallons();
@@ -278,7 +277,7 @@ public class FuelService {
                     totalPrice, 
                     "Diesel Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoDieselBatch.getDelivery_id().toString()
                 );
-                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createSalesReturnReceipt(totalPrice, SalesType.FUEL));
+                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(totalPrice, SalesType.FUEL));
 
             }
             if (!dieselSecondRecord.isPresent() && fifoDiesel.getAvailableGallons() == 0) {
@@ -289,7 +288,7 @@ public class FuelService {
 
         FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
         //No sales should be generated - Fix this
-        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createSalesReturnReceipt(0.00, SalesType.FUEL));
+        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(0.00, SalesType.FUEL));
     }
 
     @Transactional
@@ -308,7 +307,7 @@ public class FuelService {
             double totalPrice = gallonsSold * 1.99;
             FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(fifoRegularOctane.getOctane(), gallonsSold, totalPrice, "Regular Fuel Updated");
 
-            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createSalesReturnReceipt(totalPrice, SalesType.FUEL));
+            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(totalPrice, SalesType.FUEL));
 
         }
         if (fifoRegularOctane.getAvailableGallons() <= gallonsSold) {
@@ -333,7 +332,7 @@ public class FuelService {
                     "Regular Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoRegularBatch.getDelivery_id().toString()
                 );
 
-                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createSalesReturnReceipt(totalPrice, SalesType.FUEL));
+                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(totalPrice, SalesType.FUEL));
 
             }
             if (!regularOctaneNextAvailableBatch.isPresent() && fifoRegularOctane.getAvailableGallons() == 0) {
@@ -344,7 +343,7 @@ public class FuelService {
 
         FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
 
-        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createSalesReturnReceipt(0.00, SalesType.FUEL));
+        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(0.00, SalesType.FUEL));
 
     }
 
@@ -365,7 +364,7 @@ public class FuelService {
             FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(fifoPremiumOctane.getOctane(), gallonsSold, totalPrice, "Premium Fuel Updated");
 
 
-            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createSalesReturnReceipt(totalPrice, SalesType.FUEL));
+            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(totalPrice, SalesType.FUEL));
 
         }
         if (fifoPremiumOctane.getAvailableGallons() <= gallonsSold) {
@@ -391,7 +390,7 @@ public class FuelService {
                 );
 
 
-                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createSalesReturnReceipt(totalPrice, SalesType.FUEL));
+                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(totalPrice, SalesType.FUEL));
 
             }
             if (!premiumOctaneNextAvailableBatch.isPresent() && fifoPremiumOctane.getAvailableGallons() == 0) {
@@ -402,7 +401,7 @@ public class FuelService {
 
         FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.");
 
-        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createSalesReturnReceipt(0.00, SalesType.FUEL));
+        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(0.00, SalesType.FUEL));
 
     }
     public List<FuelChartDataResponse> getFuelInventoryChartData() {

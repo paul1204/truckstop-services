@@ -4,6 +4,8 @@ import com.truckstopservices.common.types.SalesType;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "sales")
@@ -23,30 +25,23 @@ public class Sales {
     @Column(name = "sales_amount", nullable = false)
     private Double salesAmount;
 
- //   private SalesType salesType;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "sales_type", nullable = false)
-    private SalesType salesType;
-
     @Column(name = "shift_number")
     private Integer shiftNumber;
+
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SalesItem> salesItems;
 
     public Sales() {
     }
 
-    public Sales(LocalDate salesDate, LocalTime salesTime, Double salesAmount, SalesType salesType) {
+    public Sales(LocalDate salesDate, LocalTime salesTime, Double salesAmount,
+                 Integer shiftNumber, ArrayList<SalesItem> salesItems) {
         this.salesDate = salesDate;
         this.salesTime = salesTime;
         this.salesAmount = salesAmount;
-        this.salesType = salesType;
-    }
-
-    public Sales(LocalDate salesDate, LocalTime salesTime, Double salesAmount, SalesType salesType, Integer shiftNumber) {
-        this.salesDate = salesDate;
-        this.salesTime = salesTime;
-        this.salesAmount = salesAmount;
-        this.salesType = salesType;
+      //  this.salesType = salesType;
         this.shiftNumber = shiftNumber;
+        this.salesItems = salesItems;
     }
 
     public String getSalesId() {
@@ -81,13 +76,13 @@ public class Sales {
         this.salesAmount = salesAmount;
     }
 
-    public SalesType getSalesType() {
-        return salesType;
-    }
-
-    public void setSalesType(SalesType salesType) {
-        this.salesType = salesType;
-    }
+//    public SalesType getSalesType() {
+//        return salesType;
+//    }
+//
+//    public void setSalesType(SalesType salesType) {
+//        this.salesType = salesType;
+//    }
 
     public Integer getShiftNumber() {
         return shiftNumber;
@@ -95,5 +90,17 @@ public class Sales {
 
     public void setShiftNumber(Integer shiftNumber) {
         this.shiftNumber = shiftNumber;
+    }
+
+    public List<SalesItem> getSalesItems() {return salesItems;}
+
+    public void setSalesItems(List<SalesItem> salesItems) {this.salesItems = salesItems;}
+
+    public void addSalesItem(SalesItem item) {
+        if (salesItems == null) {
+            salesItems = new ArrayList<>();
+        }
+        salesItems.add(item);
+        item.setSale(this); // This is the magic line that fixes the NULL in DB
     }
 }

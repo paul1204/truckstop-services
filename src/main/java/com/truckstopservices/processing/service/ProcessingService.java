@@ -1,5 +1,6 @@
 package com.truckstopservices.processing.service;
 
+import com.truckstopservices.common.types.SalesType;
 import com.truckstopservices.inventory.fuel.service.FuelService;
 import com.truckstopservices.inventory.merchandise.repository.BottledBeverageRepository;
 import com.truckstopservices.inventory.merchandise.service.MerchandiseService;
@@ -121,27 +122,27 @@ public class ProcessingService {
             BufferedReader br = new BufferedReader(new InputStreamReader(inventoryReport.getInputStream(), StandardCharsets.UTF_8));
             String line;
             boolean isBottledBeverage = false;
-            boolean isNonRestaurant = false;
+            boolean isPackagedFood = false;
             boolean isRestaurant = false;
             while ((line = br.readLine()) != null) {
                 line = line.trim();
 
                 if (line.startsWith("BOTTLED_BEVERAGES_DETAILS")) {
                     isBottledBeverage = true;
-                    isNonRestaurant = false;
+                    isPackagedFood = false;
                     isRestaurant = false;
                     continue;
                 }
 
                 if (line.startsWith("NON_RESTAURANT_DETAILS")) {
                     isBottledBeverage = false;
-                    isNonRestaurant = true;
+                    isPackagedFood = true;
                     isRestaurant = false;
                     continue;
                 }
                 if (line.startsWith("RESTAURANT_DETAILS")) {
                     isBottledBeverage = false;
-                    isNonRestaurant = false;
+                    isPackagedFood = false;
                     isRestaurant = true;
                     continue;
                 }
@@ -151,20 +152,20 @@ public class ProcessingService {
                     String[] parts = line.split(",");
                     String skuCode = parts[0].split(":")[1].trim();
                     int qty = Integer.parseInt(parts[1].split(":")[1].trim());
-                    bottledBeverageInventory.add(new InventoryDto("BOTTLED_BEVERAGE", skuCode, qty));
+                    bottledBeverageInventory.add(new InventoryDto(SalesType.BOTTLED_BEVERAGE, skuCode, qty));
                 }
 
-                if (isNonRestaurant && line.startsWith("SKU_CODE")) {
+                if (isPackagedFood && line.startsWith("SKU_CODE")) {
                     String[] parts = line.split(",");
                     String skuCode = parts[0].split(":")[1].trim();
                     int qty = Integer.parseInt(parts[1].split(":")[1].trim());
-                    nonRestaurantInventory.add(new InventoryDto("NON_RESTAURANT", skuCode, qty));
+                    nonRestaurantInventory.add(new InventoryDto(SalesType.PACKAGED_FOOD, skuCode, qty));
                 }
                 if (isRestaurant && line.startsWith("SKU_CODE")) {
                     String[] parts = line.split(",");
                     String skuCode = parts[0].split(":")[1].trim();
                     int qty = Integer.parseInt(parts[1].split(":")[1].trim());
-                    restaurantInventory.add(new InventoryDto("HOT_FOOD", skuCode, qty));
+                    restaurantInventory.add(new InventoryDto(SalesType.RESTAURANT, skuCode, qty));
                 }
 
             }

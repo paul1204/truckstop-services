@@ -2,6 +2,7 @@ package com.truckstopservices.inventory.merchandise.service;
 
 import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.model.Invoice;
+import com.truckstopservices.common.types.SalesType;
 import com.truckstopservices.inventory.merchandise.beverages.entity.BottledBeverage;
 import com.truckstopservices.inventory.merchandise.dto.BottledBeverageCostByBrand;
 import com.truckstopservices.inventory.merchandise.dto.BottledBeverageInventoryByBrand;
@@ -50,12 +51,20 @@ public class MerchandiseService {
         this.invoiceService = invoiceService;
     }
 
-    public List<BottledBeverageInventoryByBrand> getAllBottledBeverages() {
-        return bottledBeverageRepository.findInventoryByBrand();
+    public List<BottledBeverageInventoryByBrand> getBottledBeverageInventoryByBrandSqlAgg() {
+        return bottledBeverageRepository.findInventoryByBrandSqlAgg();
     }
 
-    public List<BottledBeverageCostByBrand> returnInventoryCostByBrand() {
-        return bottledBeverageRepository.returnInventoryCostByBrand();
+    public List<BottledBeverage> getAllBottledBeverages() {
+        return bottledBeverageRepository.findAll();
+    }
+
+    public List<PackagedFood> getAllPackagedFood() {
+        return packagedFoodRepository.findAll();
+    }
+
+    public List<BottledBeverageCostByBrand> returnInventoryCostByBrandSqlAgg() {
+        return bottledBeverageRepository.returnInventoryCostByBrandSqlAgg();
     }
 
     public List<Consumable> getAllMerchandise() {
@@ -135,10 +144,10 @@ public class MerchandiseService {
     public void reduceInventory(List<InventoryDto> inventoryList){
         List<InventoryDto> flattenItems = inventoryList.stream().toList();
         inventoryList.forEach(product -> {
-            switch(product.inventoryType()){
-                case "BOTTLED_BEVERAGE" -> updateBottledBeverageInventoryRepo(product);
-                case "NON_RESTAURANT" -> updatePackagedFoodInventoryRepo(product);
-                case "HOT_FOOD" -> updateRestaurantInventory(product);
+            switch(product.salesType()){
+                case SalesType.BOTTLED_BEVERAGE -> updateBottledBeverageInventoryRepo(product);
+                case SalesType.PACKAGED_FOOD -> updatePackagedFoodInventoryRepo(product);
+                case SalesType.RESTAURANT -> updateRestaurantInventory(product);
             }
         });
     }

@@ -1,13 +1,14 @@
 package com.truckstopservices.inventory.manager.controller;
 
 import com.truckstopservices.accounting.model.Invoice;
+import com.truckstopservices.inventory.merchandise.beverages.entity.BottledBeverage;
 import com.truckstopservices.inventory.merchandise.dto.BottledBeverageCostByBrand;
 import com.truckstopservices.inventory.merchandise.dto.BottledBeverageInventoryByBrand;
 import com.truckstopservices.inventory.merchandise.model.Consumable;
+import com.truckstopservices.inventory.merchandise.packagedfood.entity.PackagedFood;
 import com.truckstopservices.inventory.merchandise.service.MerchandiseService;
 import com.truckstopservices.inventory.restaurant.service.RestaurantService;
 import com.truckstopservices.processing.dto.InventoryDto;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("api/inventory")
@@ -41,16 +41,27 @@ public class InventoryManagerController {
         return new ResponseEntity<>("Inventory Updated", HttpStatus.OK);
     }
 
-    @GetMapping("/bottledbeverageInventoryByBrand")
+    @GetMapping("/bottledbeverageInventoryByBrandSqlAgg")
     @CrossOrigin(origins = "http://localhost:8000")
-    public ResponseEntity<List<BottledBeverageInventoryByBrand>> getAllBottledBeverages() {
+    public ResponseEntity<List<BottledBeverageInventoryByBrand>> getBottledBeverageInventoryByBrandSqlAgg() {
+        return new ResponseEntity<>(merchandiseService.getBottledBeverageInventoryByBrandSqlAgg(), HttpStatus.OK);
+    }
+    @GetMapping("/bottledbeverageInventoryCostByBrandSqlAgg")
+    @CrossOrigin(origins = "http://localhost:8000")
+    public ResponseEntity<List<BottledBeverageCostByBrand>> returnInventoryCostByBrandSqlAgg() {
+        return new ResponseEntity<>(merchandiseService.returnInventoryCostByBrandSqlAgg(), HttpStatus.OK);
+    }
+
+    @GetMapping("/bottledBeverages")
+    @CrossOrigin(origins = "http://localhost:8000")
+    public ResponseEntity<List<BottledBeverage>> getAllBottledBeverages() {
         return new ResponseEntity<>(merchandiseService.getAllBottledBeverages(), HttpStatus.OK);
     }
 
-    @GetMapping("/bottledbeverageInventoryCostByBrand")
+    @GetMapping("/packagedFood")
     @CrossOrigin(origins = "http://localhost:8000")
-    public ResponseEntity<List<BottledBeverageCostByBrand>> returnInventoryCostByBrand() {
-        return new ResponseEntity<>(merchandiseService.returnInventoryCostByBrand(), HttpStatus.OK);
+    public ResponseEntity<List<PackagedFood>> getAllPackagedFood() {
+        return new ResponseEntity<>(merchandiseService.getAllPackagedFood(), HttpStatus.OK);
     }
 
     @GetMapping("/allMerchandise")

@@ -1,4 +1,6 @@
 package com.truckstopservices.processing.dto;
 
-public record InventoryDto(String inventoryType ,String skuCode, int qty) {
+import com.truckstopservices.common.types.SalesType;
+
+public record InventoryDto(SalesType salesType, String skuCode, int qty) {
 }

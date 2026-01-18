@@ -7,7 +7,7 @@ import jakarta.persistence.Entity;
 public class PackagedFood extends Consumable {
 
     public PackagedFood(){super();}
-    public PackagedFood(String skuCode, String name, double price, String brand, int qty, String size) {
-        super(skuCode, name, price, brand, qty, size);
+    public PackagedFood(String skuCode, String name, double costOfGoods, String brand, int qty, String size) {
+        super(skuCode, name, costOfGoods, brand, qty, size);
     }
 }

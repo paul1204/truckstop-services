@@ -36,11 +36,11 @@ public class SalesService {
         return salesRepository.findSalesByTodayAllShifts();
     }
 
-    public Receipt createFuelSalesReturnReceipt(double amount, SalesType salesType){
+    public Receipt createFuelSalesReturnReceipt(double amount, SalesType salesType, String fuelType){
         LocalTime now = LocalTime.now();
         Integer shiftNumber = calculateShiftNumber(now);
         Sales sales = new Sales(LocalDate.now(), now, amount,shiftNumber, new ArrayList<>());
-        SalesItem item = new SalesItem("Fuel", 1.00, 1.99, SalesType.FUEL);
+        SalesItem item = new SalesItem("Fuel", 1.00, 1.99, salesType, fuelType);
         sales.addSalesItem(item);
         salesRepository.save(sales);
         log.info("Fuel Sales created with id: {}", sales.getSalesId());

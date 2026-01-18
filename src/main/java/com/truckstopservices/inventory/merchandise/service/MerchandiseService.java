@@ -2,10 +2,14 @@ package com.truckstopservices.inventory.merchandise.service;
 
 import com.truckstopservices.accounting.invoice.service.implementation.InvoiceServiceImpl;
 import com.truckstopservices.accounting.model.Invoice;
+import com.truckstopservices.accounting.sales.entity.SalesItem;
+import com.truckstopservices.accounting.sales.receipt.Receipt;
+import com.truckstopservices.accounting.sales.service.SalesService;
 import com.truckstopservices.common.types.SalesType;
 import com.truckstopservices.inventory.merchandise.beverages.entity.BottledBeverage;
 import com.truckstopservices.inventory.merchandise.dto.BottledBeverageCostByBrand;
 import com.truckstopservices.inventory.merchandise.dto.BottledBeverageInventoryByBrand;
+import com.truckstopservices.inventory.merchandise.model.DeliveryItemDto;
 import com.truckstopservices.inventory.merchandise.model.DeliveryItemInfo;
 //import com.truckstopservices.inventory.merchandise.model.DeliveryItemType;
 import com.truckstopservices.inventory.merchandise.model.Consumable;
@@ -15,6 +19,7 @@ import com.truckstopservices.inventory.merchandise.repository.PackagedFoodReposi
 //import com.truckstopservices.inventory.merchandise.dto.InventoryDto;
 import com.truckstopservices.inventory.restaurant.entity.HotFood;
 import com.truckstopservices.inventory.restaurant.repository.RestaurantRepository;
+import com.truckstopservices.posdataingest.model.POSSaleDto;
 import com.truckstopservices.processing.dto.InventoryDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,13 +47,16 @@ public class MerchandiseService {
     @Autowired
     private InvoiceServiceImpl invoiceService;
 
+    @Autowired
+    private SalesService salesService;
 
     public MerchandiseService(BottledBeverageRepository bottledBeverageRepository, PackagedFoodRepository packagedFoodRepository,
-                              RestaurantRepository restaurantRepository, InvoiceServiceImpl invoiceService) {
+                              RestaurantRepository restaurantRepository, InvoiceServiceImpl invoiceService, SalesService salesService) {
         this.bottledBeverageRepository = bottledBeverageRepository;
         this.packagedFoodRepository = packagedFoodRepository;
         this.restaurantRepository = restaurantRepository;
         this.invoiceService = invoiceService;
+        this.salesService = salesService;
     }
 
     public List<BottledBeverageInventoryByBrand> getBottledBeverageInventoryByBrandSqlAgg() {
@@ -76,18 +84,18 @@ public class MerchandiseService {
 
     @Transactional
     public Invoice acceptMerchandiseDelivery(MultipartFile merchandiseInventoryOrder) throws IOException {
-        Map<String, DeliveryItemInfo> currentInventory = new HashMap<>();
+        Map<String, DeliveryItemDto> currentInventory = new HashMap<>();
         int bottledBeverageCount = (int) bottledBeverageRepository.count();
         int packagedFoodRepositoryCount = (int) packagedFoodRepository.count();
         Invoice invoice;
 
         //Get Current Inventory
         bottledBeverageRepository.findAll().forEach((BottledBeverage bottle)->{
-            currentInventory.put(bottle.getSkuCode(), new DeliveryItemInfo(bottle.getQty(), "BOTTLED_BEVERAGE"));
+            currentInventory.put(bottle.getSkuCode(), new DeliveryItemDto(bottle.getQty(), "BOTTLED_BEVERAGE"));
         });
 
         packagedFoodRepository.findAll().forEach((PackagedFood packagedFood)->{
-            currentInventory.put(packagedFood.getSkuCode(), new DeliveryItemInfo(packagedFood.getQty(), "PACKAGED_FOOD"));
+            currentInventory.put(packagedFood.getSkuCode(), new DeliveryItemDto(packagedFood.getQty(), "PACKAGED_FOOD"));
         });
 
         //Parse Merchandise Order
@@ -141,31 +149,42 @@ public class MerchandiseService {
         //Process Payment
     }
 
+    public Receipt reduceInventoryV2(POSSaleDto posSaleDto){
+        posSaleDto.salesItems().forEach(product -> {
+            switch(product.getSalesType()){
+                case SalesType.BOTTLED_BEVERAGE -> updateBottledBeverageInventoryRepo(product);
+                case SalesType.PACKAGED_FOOD -> updatePackagedFoodInventoryRepo(product);
+              //  case SalesType.RESTAURANT -> updateRestaurantInventory(product);
+            }
+        });
+        return salesService.createSaleFromPOS(posSaleDto);
+    }
+
     public void reduceInventory(List<InventoryDto> inventoryList){
         List<InventoryDto> flattenItems = inventoryList.stream().toList();
         inventoryList.forEach(product -> {
             switch(product.salesType()){
-                case SalesType.BOTTLED_BEVERAGE -> updateBottledBeverageInventoryRepo(product);
-                case SalesType.PACKAGED_FOOD -> updatePackagedFoodInventoryRepo(product);
-                case SalesType.RESTAURANT -> updateRestaurantInventory(product);
+           //     case SalesType.BOTTLED_BEVERAGE -> updateBottledBeverageInventoryRepo(product);
+           //     case SalesType.PACKAGED_FOOD -> updatePackagedFoodInventoryRepo(product);
+           //     case SalesType.RESTAURANT -> updateRestaurantInventory(product);
             }
         });
     }
 
-    private void updateBottledBeverageInventoryRepo(InventoryDto product){
-     BottledBeverage bottledBeverage = bottledBeverageRepository.findBySkuCode(product.skuCode()).orElseThrow(()-> new EntityNotFoundException("Bottled Beverage with " + product.skuCode() + " not found"));
-     bottledBeverage.reduceInventory(product.qty());
+    private void updateBottledBeverageInventoryRepo(SalesItem product){
+     BottledBeverage bottledBeverage = bottledBeverageRepository.findBySkuCode(product.getSkuCode()).orElseThrow(()-> new EntityNotFoundException("Bottled Beverage with " + product.getSkuCode() + " not found"));
+     bottledBeverage.reduceInventory(product.getQuantity());
      bottledBeverageRepository.save(bottledBeverage);
     }
 
-    private void updatePackagedFoodInventoryRepo(InventoryDto product){
-        PackagedFood packagedFood = packagedFoodRepository.findBySkuCode(product.skuCode()).orElseThrow(()-> new EntityNotFoundException("Packaged Food with " + product.skuCode() + " not found"));
-        packagedFood.reduceInventory(product.qty());
+    private void updatePackagedFoodInventoryRepo(SalesItem product){
+        PackagedFood packagedFood = packagedFoodRepository.findBySkuCode(product.getSkuCode()).orElseThrow(()-> new EntityNotFoundException("Packaged Food with " + product.getSkuCode() + " not found"));
+        packagedFood.reduceInventory(product.getQuantity());
         packagedFoodRepository.save(packagedFood);
     }
-    private void updateRestaurantInventory(InventoryDto product){
-        HotFood hotFood = restaurantRepository.findBySkuCode(product.skuCode()).orElseThrow(()-> new EntityNotFoundException("Hot Food with " + product.skuCode() + " not found"));
-        hotFood.reduceInventory(product.qty());
+    private void updateRestaurantInventory(SalesItem product){
+        HotFood hotFood = restaurantRepository.findBySkuCode(product.getSkuCode()).orElseThrow(()-> new EntityNotFoundException("Hot Food with " + product.getSkuCode() + " not found"));
+      //  hotFood.reduceInventory(product.getQuantity());
         restaurantRepository.save(hotFood);
     }
 }

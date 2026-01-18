@@ -11,6 +11,9 @@ public class SalesItem {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(name = "sku_code", nullable = false)
+    private String skuCode;
+
     @Column(name = "item_name", nullable = false)
     private String itemName;
 
@@ -20,7 +23,7 @@ public class SalesItem {
     @Column(name = "unit_price", nullable = false)
     private Double unitPrice;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "sales_type", length = 50)
     private SalesType salesType;
 
@@ -31,12 +34,14 @@ public class SalesItem {
     public SalesItem() {}
 
     public SalesItem(String itemName, Double quantity, Double unitPrice
-            , SalesType salesType
+            , SalesType salesType, String skuCode
+
     ) {
         this.itemName = itemName;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.salesType = salesType;
+        this.skuCode = skuCode;
     }
 
     public String getItemName() {
@@ -77,5 +82,13 @@ public class SalesItem {
 
     public void setSale(Sales sale) {
         this.sale = sale;
+    }
+
+    public String getSkuCode() {
+        return skuCode;
+    }
+
+    public void setSkuCode(String skuCode) {
+        this.skuCode = skuCode;
     }
 }

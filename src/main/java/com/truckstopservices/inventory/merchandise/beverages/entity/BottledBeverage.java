@@ -12,8 +12,8 @@ public class BottledBeverage extends Consumable {
         super();
     }
 
-    public BottledBeverage(String skuCode, String name, double price, String brand, int qty, String size) {
-        super(skuCode, name, price, brand, qty, size);
+    public BottledBeverage(String skuCode, String name, double costOfGoods, String brand, int qty, String size) {
+        super(skuCode, name, costOfGoods, brand, qty, size);
     }
 
 }

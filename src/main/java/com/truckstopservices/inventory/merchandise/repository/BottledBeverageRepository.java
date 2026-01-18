@@ -18,7 +18,7 @@ public interface BottledBeverageRepository extends JpaRepository<BottledBeverage
     @Query(value = "SELECT b.brand AS brand, SUM(b.qty) AS qty FROM bottled_beverage b GROUP BY b.brand", nativeQuery = true)
     List<BottledBeverageInventoryByBrand> findInventoryByBrandSqlAgg();
 
-    @Query(value = "SELECT b.brand AS brand, ROUND(SUM(b.price),2) AS price FROM bottled_beverage b GROUP BY b.brand ORDER BY price DESC", nativeQuery = true)
+    @Query(value = "SELECT b.brand AS brand, ROUND(SUM(b.cost_of_goods),2) AS price FROM bottled_beverage b GROUP BY b.brand ORDER BY price DESC", nativeQuery = true)
     List<BottledBeverageCostByBrand> returnInventoryCostByBrandSqlAgg();
 
 }

@@ -13,24 +13,27 @@ public abstract class Consumable {
 
     private String name;
 
-    private double price;
+    private double costOfGoods;
+
+    private double retailPrice;
 
     private String brand;
 
-    private int qty;
+    private Double qty;
 
     private String size;
 
     private String merchandiseType;
 
     public Consumable(){}
-    public Consumable(String skuCode, String name, double price, String brand, int qty, String size) {
+    public Consumable(String skuCode, String name, double costOfGoods, String brand, double qty, String size) {
         this.skuCode = skuCode;
         this.name = name;
-        this.price = price;
+        this.costOfGoods = costOfGoods;
         this.brand = brand;
         this.qty = qty;
         this.size = size;
+        this.retailPrice = Math.round(costOfGoods * 1.1 * 100.0) / 100.0;
     }
 
     public String getSkuCode() {
@@ -47,12 +50,21 @@ public abstract class Consumable {
         this.name = name;
     }
 
-    public double getPrice() {
-        return price;
+    public double getCostOfGoods() {
+        return costOfGoods;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public double getRetailPrice() {
+        return retailPrice;
+    }
+
+    public void setCostOfGoods(double costOfGoods) {
+        this.costOfGoods = costOfGoods;
+        this.retailPrice = Math.round(costOfGoods * 1.1 * 100.0) / 100.0;
+    }
+
+    public void setRetailPrice(double retailPrice) {
+        this.retailPrice = retailPrice;
     }
 
     public String getBrand() {
@@ -63,11 +75,11 @@ public abstract class Consumable {
         this.brand = brand;
     }
 
-    public int getQty() {
+    public double getQty() {
         return qty;
     }
 
-    public void setQty(int qty) {
+    public void setQty(double qty) {
         this.qty = qty;
     }
 
@@ -75,9 +87,7 @@ public abstract class Consumable {
 
     public void setSize(String size) {this.size = size;}
 
-    public void reduceInventory(int qty){
-        setQty(this.qty -= qty);
-    }
+    public void reduceInventory(double qty){setQty(this.qty -= qty);}
 
-    public void increaseInventory(int qty){this.qty += qty;}
+    public void increaseInventory(double qty){this.qty += qty;}
 }

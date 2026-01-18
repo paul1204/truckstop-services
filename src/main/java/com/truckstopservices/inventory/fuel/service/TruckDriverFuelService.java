@@ -123,7 +123,7 @@ public class TruckDriverFuelService {
     }
     
     @Transactional
-    public FuelSaleResponse updateDieselInventoryFIFOSales(double gallonsSold) throws FuelSaleException {
+    public FuelSaleResponse updateDieselInventoryFIFOSales(double gallonsSold, String terminal) throws FuelSaleException {
         Optional<Diesel> dieselFirstRecord = dieselRepository.findFIFOAvailableGallons();
         if (!dieselFirstRecord.isPresent()) {
             throw new FuelSaleException("No available diesel to consume. There are " + gallonsSold + " gallons unaccounted for");
@@ -136,8 +136,8 @@ public class TruckDriverFuelService {
             fifoDiesel.updateGallonsReduceInventorySales(gallonsSold);
             dieselRepository.save(fifoDiesel);
             double totalPrice = gallonsSold * 1.99;
-            FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(fifoDiesel.getOctane(), gallonsSold, totalPrice, "Truck Driver Diesel Fuel Updated");
-            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(totalPrice, SalesType.FUEL, "Diesel"));
+            FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(fifoDiesel.getOctane(), gallonsSold, totalPrice, "Truck Driver Diesel Fuel Updated", terminal);
+            return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(totalPrice, SalesType.FUEL, "Diesel", terminal));
         }
         
         if (fifoDiesel.getAvailableGallons() <= gallonsSold) {
@@ -158,10 +158,11 @@ public class TruckDriverFuelService {
                     gallonsSold, 
                     totalPrice, 
                     "Truck Driver Diesel Fuel Updated. New Batch of Fuel being used. Delivery ID: " + 
-                    (newFifoDieselBatch.getDelivery_id() != null ? newFifoDieselBatch.getDelivery_id().toString() : "N/A")
+                    (newFifoDieselBatch.getDelivery_id() != null ? newFifoDieselBatch.getDelivery_id().toString() : "N/A"),
+                    terminal
                 );
 
-                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(totalPrice, com.truckstopservices.common.types.SalesType.FUEL, "Diesel"));
+                return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(totalPrice, com.truckstopservices.common.types.SalesType.FUEL, "Diesel", terminal));
 
             }
             if (!dieselSecondRecord.isPresent() && fifoDiesel.getAvailableGallons() == 0) {
@@ -169,8 +170,8 @@ public class TruckDriverFuelService {
                         "Due to Transaction Failure, a rollback occurred. " + originalFifoGallonState + " needs to be also accounted for.");
             }
         }
-        FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No diesel fuel was sold, inventory unchanged.");
-        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(0.00, com.truckstopservices.common.types.SalesType.FUEL, "Diesel"));
+        FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No diesel fuel was sold, inventory unchanged.", null);
+        return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(0.00, com.truckstopservices.common.types.SalesType.FUEL, "Diesel", terminal));
 
     }
     
@@ -179,9 +180,9 @@ public class TruckDriverFuelService {
     }
     
     @Transactional
-    public FuelSaleHouseAccountResponse updateDieselInventoryFIFOSalesHouseAccount(double gallonsSold, String houseAccountId) throws FuelSaleException {
+    public FuelSaleHouseAccountResponse updateDieselInventoryFIFOSalesHouseAccount(double gallonsSold, String houseAccountId, String terminal) throws FuelSaleException {
         // Reuse the logic from updateDieselInventoryFIFOSales to handle inventory updates
-        FuelSaleResponse fuelSaleResponse = updateDieselInventoryFIFOSales(gallonsSold);
+        FuelSaleResponse fuelSaleResponse = updateDieselInventoryFIFOSales(gallonsSold, terminal);
         
         // Use the receipt number from fuelSaleResponse as the invoice number for consistency
         String invoiceNumber = fuelSaleResponse.receipt().receiptId();
@@ -211,9 +212,10 @@ public class TruckDriverFuelService {
             fuelSaleResponse.octane(),
             fuelSaleResponse.gallonsSold(),
             fuelSaleResponse.totalPrice(),
-            fuelSaleResponse.specialMessage()
+            fuelSaleResponse.specialMessage(),
+            fuelSaleResponse.terminal()
         );
         
-        return FuelSaleHouseAccountResponse.fromFuelSaleRequestAndHouseAccountTransaction(fuelSaleRequest, savedTransaction, salesService.createFuelSalesReturnReceipt(fuelSaleResponse.totalPrice(), SalesType.FUEL, "Diesel"));
+        return FuelSaleHouseAccountResponse.fromFuelSaleRequestAndHouseAccountTransaction(fuelSaleRequest, savedTransaction, salesService.createFuelSalesReturnReceipt(fuelSaleResponse.totalPrice(), SalesType.FUEL, "Diesel", terminal));
     }
 }

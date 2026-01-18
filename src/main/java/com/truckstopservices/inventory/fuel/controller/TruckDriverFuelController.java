@@ -49,10 +49,10 @@ public class TruckDriverFuelController {
     @PutMapping("/update/Diesel/FIFO")
     public ResponseEntity<FuelSaleResponse> updateDieselFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest) {
         try {
-            FuelSaleResponse fuelSold = truckDriverFuelService.updateDieselInventoryFIFOSales(fuelSaleRequest.gallonsSold());
+            FuelSaleResponse fuelSold = truckDriverFuelService.updateDieselInventoryFIFOSales(fuelSaleRequest.gallonsSold(), fuelSaleRequest.terminal());
             return new ResponseEntity<>(fuelSold, HttpStatus.OK);
         } catch (FuelSaleException e) {
-            FuelSaleRequest errorRequest = new FuelSaleRequest(0, 0, 0, e.getMessage());
+            FuelSaleRequest errorRequest = new FuelSaleRequest(0, 0.0, 0.0, e.getMessage(), fuelSaleRequest.terminal());
             FuelSaleResponse errorResponse = FuelSaleResponse.fromFuelSaleRequestAndReceipt(errorRequest, null);
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
@@ -65,10 +65,11 @@ public class TruckDriverFuelController {
         try {
             FuelSaleHouseAccountResponse fuelSold = truckDriverFuelService.updateDieselInventoryFIFOSalesHouseAccount(
                     fuelSaleRequest.gallonsSold(), 
-                    houseAccountId);
+                    houseAccountId,
+                    fuelSaleRequest.terminal());
             return new ResponseEntity<>(fuelSold, HttpStatus.OK);
         } catch (FuelSaleException e) {
-            FuelSaleRequest errorRequest = new FuelSaleRequest(0, 0, 0, e.getMessage());
+            FuelSaleRequest errorRequest = new FuelSaleRequest(0, 0.0, 0.0, e.getMessage(), fuelSaleRequest.terminal());
             FuelSaleHouseAccountResponse errorResponse = FuelSaleHouseAccountResponse.fromFuelSaleRequestAndHouseAccountTransaction(errorRequest, null, null);
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }

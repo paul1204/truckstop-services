@@ -5,6 +5,7 @@ import java.util.List;
 
 public record POSSaleDto(
         Double totalSalesAmount,
-        List<SalesItem> salesItems
+        List<SalesItem> salesItems,
+        String posTerminal
 ) {
 }

@@ -8,6 +8,7 @@ public record FuelSaleHouseAccountResponse(
     double gallonsSold,
     double totalPrice,
     String specialMessage,
+    String terminal,
     HouseAccountTransaction houseAccountTransaction,
     Receipt receipt
 ) {
@@ -20,6 +21,7 @@ public record FuelSaleHouseAccountResponse(
             request.gallonsSold(),
             request.totalPrice(),
             request.specialMessage(),
+            request.terminal(),
             houseAccountTransaction, receipt
         );
     }

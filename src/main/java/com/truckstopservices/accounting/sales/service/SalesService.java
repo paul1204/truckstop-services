@@ -36,10 +36,11 @@ public class SalesService {
         return salesRepository.findSalesByTodayAllShifts();
     }
 
-    public Receipt createFuelSalesReturnReceipt(double amount, SalesType salesType, String fuelType){
+    public Receipt createFuelSalesReturnReceipt(double amount, SalesType salesType, String fuelType, String terminal){
         LocalTime now = LocalTime.now();
         Integer shiftNumber = calculateShiftNumber(now);
         Sales sales = new Sales(LocalDate.now(), now, amount,shiftNumber, new ArrayList<>());
+        sales.setTerminal(terminal != null ? terminal : "N/A Fuel Pump");
         SalesItem item = new SalesItem("Fuel", 1.00, 1.99, salesType, fuelType);
         sales.addSalesItem(item);
         salesRepository.save(sales);
@@ -57,6 +58,7 @@ public class SalesService {
         LocalTime now = LocalTime.now();
         Integer shiftNumber = calculateShiftNumber(now);
         Sales sales = new Sales(LocalDate.now(), now, posSale.totalSalesAmount(), shiftNumber, new ArrayList<>());
+        sales.setTerminal(posSale.posTerminal() != null ? posSale.posTerminal() : "N/A POS");
         List<SalesItem> items = posSale.salesItems();
         if (items != null) {
             for (SalesItem item : items) {

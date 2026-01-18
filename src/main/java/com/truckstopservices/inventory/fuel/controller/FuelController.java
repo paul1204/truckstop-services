@@ -63,7 +63,7 @@ public class FuelController {
     @PutMapping("/update/Diesel/FIFO")
     public ResponseEntity<FuelSaleResponse> updateDieselFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest) {
         try {
-            FuelSaleResponse fuelSold = fuelService.updateDieselInventoryFIFOSales(fuelSaleRequest.gallonsSold());
+            FuelSaleResponse fuelSold = fuelService.updateDieselInventoryFIFOSales(fuelSaleRequest.gallonsSold(), fuelSaleRequest.terminal());
             return new ResponseEntity<>(fuelSold, HttpStatus.OK);
         } catch (FuelSaleException e) {
             // Create a dummy receipt for the error case
@@ -74,7 +74,7 @@ public class FuelController {
     @PutMapping("/update/RegularFuel/FIFO")
     public ResponseEntity<FuelSaleResponse> updateRegularFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest) {
         try {
-            FuelSaleResponse fuelSold = fuelService.updateRegularOctaneInventoryFIFOSales(fuelSaleRequest.gallonsSold());
+            FuelSaleResponse fuelSold = fuelService.updateRegularOctaneInventoryFIFOSales(fuelSaleRequest.gallonsSold(), fuelSaleRequest.terminal());
             return new ResponseEntity<>(fuelSold, HttpStatus.OK);
         } catch (FuelSaleException e) {
             // Create a dummy receipt for the error case
@@ -85,7 +85,7 @@ public class FuelController {
     @PutMapping("/update/PremiumFuel/FIFO")
     public ResponseEntity<FuelSaleResponse> updatePremiumFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest) {
         try {
-            FuelSaleResponse fuelSold = fuelService.updatePremiumOctaneInventoryFIFOSales(fuelSaleRequest.gallonsSold());
+            FuelSaleResponse fuelSold = fuelService.updatePremiumOctaneInventoryFIFOSales(fuelSaleRequest.gallonsSold(), fuelSaleRequest.terminal());
             return new ResponseEntity<>(fuelSold, HttpStatus.OK);
         } catch (FuelSaleException e) {
             // Create a dummy receipt for the error case

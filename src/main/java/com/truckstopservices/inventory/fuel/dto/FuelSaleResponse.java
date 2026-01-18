@@ -7,6 +7,7 @@ public record FuelSaleResponse(
     double gallonsSold,
     double totalPrice,
     String specialMessage,
+    String terminal,
     Receipt receipt
 ) {
     // Constructor to create from FuelSaleRequest and Receipt
@@ -16,6 +17,7 @@ public record FuelSaleResponse(
             request.gallonsSold(),
             request.totalPrice(),
             request.specialMessage(),
+            request.terminal(),
             receipt
         );
     }

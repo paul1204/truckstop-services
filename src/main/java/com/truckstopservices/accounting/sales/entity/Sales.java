@@ -28,6 +28,9 @@ public class Sales {
     @Column(name = "shift_number")
     private Integer shiftNumber;
 
+    @Column(name = "terminal")
+    private String terminal;
+
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SalesItem> salesItems;
 
@@ -39,7 +42,6 @@ public class Sales {
         this.salesDate = salesDate;
         this.salesTime = salesTime;
         this.salesAmount = salesAmount;
-      //  this.salesType = salesType;
         this.shiftNumber = shiftNumber;
         this.salesItems = salesItems;
     }
@@ -76,14 +78,6 @@ public class Sales {
         this.salesAmount = salesAmount;
     }
 
-//    public SalesType getSalesType() {
-//        return salesType;
-//    }
-//
-//    public void setSalesType(SalesType salesType) {
-//        this.salesType = salesType;
-//    }
-
     public Integer getShiftNumber() {
         return shiftNumber;
     }
@@ -91,7 +85,15 @@ public class Sales {
     public void setShiftNumber(Integer shiftNumber) {
         this.shiftNumber = shiftNumber;
     }
-
+    
+    public String getTerminal() {
+        return terminal;
+    }
+    
+    public void setTerminal(String terminal) {
+        this.terminal = terminal;
+    }
+    
     public List<SalesItem> getSalesItems() {return salesItems;}
 
     public void setSalesItems(List<SalesItem> salesItems) {this.salesItems = salesItems;}

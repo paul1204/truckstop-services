@@ -1,6 +1,8 @@
 package com.truckstopservices.inventory.merchandise.model;
 
 import jakarta.persistence.*;
+import java.util.List;
+import java.util.ArrayList;
 
 @MappedSuperclass
 public abstract class Consumable {
@@ -24,7 +26,12 @@ public abstract class Consumable {
     private String size;
 
     private String merchandiseType;
-
+    
+    @ElementCollection
+    private List<String> deliveryDates = new ArrayList<>();
+    
+    private String lastDeliveryDate;
+    
     public Consumable(){}
     public Consumable(String skuCode, String name, double costOfGoods, String brand, double qty, String size) {
         this.skuCode = skuCode;
@@ -88,6 +95,30 @@ public abstract class Consumable {
     public void setSize(String size) {this.size = size;}
 
     public void reduceInventory(double qty){setQty(this.qty -= qty);}
-
+    
     public void increaseInventory(double qty){this.qty += qty;}
+    
+    public List<String> getDeliveryDates() {
+        return deliveryDates;
+    }
+    
+    public void setDeliveryDates(List<String> deliveryDates) {
+        this.deliveryDates = deliveryDates;
+    }
+    
+    public String getLastDeliveryDate() {
+        return lastDeliveryDate;
+    }
+    
+    public void setLastDeliveryDate(String lastDeliveryDate) {
+        this.lastDeliveryDate = lastDeliveryDate;
+    }
+    
+    public void addDelivery(String date) {
+        if (deliveryDates == null) {
+            deliveryDates = new ArrayList<>();
+        }
+        deliveryDates.add(date);
+        lastDeliveryDate = date;
+    }
 }

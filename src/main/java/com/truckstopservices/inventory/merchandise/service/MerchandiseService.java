@@ -30,6 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 
 @Service
@@ -101,9 +103,10 @@ public class MerchandiseService {
         //Parse Merchandise Order
         String rawDeliveryOrder = new String(merchandiseInventoryOrder.getBytes(), StandardCharsets.UTF_8);
         String[] lines = rawDeliveryOrder.split("\n");
-
-
-
+        
+        
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+        
         //Totals
         double total = Double.parseDouble(lines[lines.length - 1].split(",")[1]);
         String company = lines[0].split(",")[0];
@@ -115,16 +118,20 @@ public class MerchandiseService {
             if(!currentInventory.containsKey(merchandiseInfo[0].trim())) {
                 // System.out.println(merchandiseInfo[0].trim());
                 if (Objects.equals(merchandiseInfo[merchandiseInfo.length - 1].trim(), "D")) {
-                    bottledBeverageRepository.save(new BottledBeverage(
+                    BottledBeverage newBeverage = new BottledBeverage(
                             merchandiseInfo[0], merchandiseInfo[1], Double.parseDouble(merchandiseInfo[2]), merchandiseInfo[3],
                             Integer.parseInt(merchandiseInfo[4]), merchandiseInfo[5]
-                    ));
+                    );
+                    newBeverage.addDelivery(today);
+                    bottledBeverageRepository.save(newBeverage);
                 }
                 if (Objects.equals(merchandiseInfo[merchandiseInfo.length - 1].trim(), "NR")) {
-                    packagedFoodRepository.save(new PackagedFood(
+                    PackagedFood newFood = new PackagedFood(
                             merchandiseInfo[0], merchandiseInfo[1], Double.parseDouble(merchandiseInfo[2]), merchandiseInfo[3],
                             Integer.parseInt(merchandiseInfo[4]), merchandiseInfo[5]
-                    ));
+                    );
+                    newFood.addDelivery(today);
+                    packagedFoodRepository.save(newFood);
                 }
             }
             //Existing Product, update inventory
@@ -132,15 +139,17 @@ public class MerchandiseService {
                 if(Objects.equals(merchandiseInfo[merchandiseInfo.length - 1].trim(), "D")){
                         BottledBeverage restockBeverage = bottledBeverageRepository.findBySkuCode(merchandiseInfo[0]).orElseThrow(()-> new EntityNotFoundException("Not in Stock" + merchandiseInfo[0] + " - " + merchandiseInfo[1] ));
                         restockBeverage.increaseInventory(Integer.parseInt(merchandiseInfo[4]));
+                        restockBeverage.addDelivery(today);
                 }
                 if(Objects.equals(merchandiseInfo[merchandiseInfo.length - 1].trim(), "NR")){
-                    PackagedFood restockFood = packagedFoodRepository.findBySkuCode(merchandiseInfo[0]).orElseThrow(()-> new EntityNotFoundException("Not in Stock" + merchandiseInfo[0] + " - " + merchandiseInfo[1] ));
-                    restockFood.increaseInventory(Integer.parseInt(merchandiseInfo[4]));
-                }
+                            PackagedFood restockFood = packagedFoodRepository.findBySkuCode(merchandiseInfo[0]).orElseThrow(()-> new EntityNotFoundException("Not in Stock" + merchandiseInfo[0] + " - " + merchandiseInfo[1] ));
+                            restockFood.increaseInventory(Integer.parseInt(merchandiseInfo[4]));
+                            restockFood.addDelivery(today);
+                    }
             }
         }
 
-        return invoiceService.createInvoice(company, "02/09/2025",total);
+        return invoiceService.createInvoice(company, today, total);
     }
 
     private void createInvoiceForMerchant(String company,Double total){

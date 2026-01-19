@@ -70,12 +70,21 @@ public class InventoryManagerController {
         return new ResponseEntity<>(merchandiseService.getAllMerchandise(), HttpStatus.OK);
     }
 
+    @PutMapping("/consumables/{skuCode}/max-capacity")
+    @CrossOrigin(origins = "http://localhost:8000")
+    public ResponseEntity<Double> updateConsumableMaxCapacity(
+            @PathVariable String skuCode,
+            @RequestParam Double maxCapacity) {
+        Double ratio = merchandiseService.updateMaxCapacity(skuCode, maxCapacity);
+        return new ResponseEntity<>(ratio, HttpStatus.OK);
+    }
+
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/delivery/merchandise")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Invoice> orderInventoryReceiveMerchandiseDelivery(@RequestParam MultipartFile merchandiseInventoryOrder) throws IOException {
+    public ResponseEntity<Invoice> orderInventoryReceiveMerchandiseDelivery(@RequestParam MultipartFile merchandiseInventoryOrder, @RequestParam String date) throws IOException {
         Invoice invoice;
         try {
-            invoice = merchandiseService.acceptMerchandiseDelivery(merchandiseInventoryOrder);
+            invoice = merchandiseService.acceptMerchandiseDelivery(merchandiseInventoryOrder, date);
         }
         //Throw better Exception
         catch (Exception e) {

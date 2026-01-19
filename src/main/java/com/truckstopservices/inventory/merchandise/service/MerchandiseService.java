@@ -85,7 +85,7 @@ public class MerchandiseService {
     }
 
     @Transactional
-    public Invoice acceptMerchandiseDelivery(MultipartFile merchandiseInventoryOrder) throws IOException {
+    public Invoice acceptMerchandiseDelivery(MultipartFile merchandiseInventoryOrder, String date) throws IOException {
         Map<String, DeliveryItemDto> currentInventory = new HashMap<>();
         int bottledBeverageCount = (int) bottledBeverageRepository.count();
         int packagedFoodRepositoryCount = (int) packagedFoodRepository.count();
@@ -105,7 +105,8 @@ public class MerchandiseService {
         String[] lines = rawDeliveryOrder.split("\n");
         
         
-        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+        //String today = LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+        String today = date;
         
         //Totals
         double total = Double.parseDouble(lines[lines.length - 1].split(",")[1]);
@@ -122,7 +123,7 @@ public class MerchandiseService {
                             merchandiseInfo[0], merchandiseInfo[1], Double.parseDouble(merchandiseInfo[2]), merchandiseInfo[3],
                             Integer.parseInt(merchandiseInfo[4]), merchandiseInfo[5]
                     );
-                    newBeverage.addDelivery(today);
+                    newBeverage.addDelivery(today, Double.parseDouble(merchandiseInfo[4]), Double.parseDouble(merchandiseInfo[2]));
                     bottledBeverageRepository.save(newBeverage);
                 }
                 if (Objects.equals(merchandiseInfo[merchandiseInfo.length - 1].trim(), "NR")) {
@@ -130,7 +131,7 @@ public class MerchandiseService {
                             merchandiseInfo[0], merchandiseInfo[1], Double.parseDouble(merchandiseInfo[2]), merchandiseInfo[3],
                             Integer.parseInt(merchandiseInfo[4]), merchandiseInfo[5]
                     );
-                    newFood.addDelivery(today);
+                    newFood.addDelivery(today, Double.parseDouble(merchandiseInfo[4]), Double.parseDouble(merchandiseInfo[2]));
                     packagedFoodRepository.save(newFood);
                 }
             }
@@ -139,12 +140,12 @@ public class MerchandiseService {
                 if(Objects.equals(merchandiseInfo[merchandiseInfo.length - 1].trim(), "D")){
                         BottledBeverage restockBeverage = bottledBeverageRepository.findBySkuCode(merchandiseInfo[0]).orElseThrow(()-> new EntityNotFoundException("Not in Stock" + merchandiseInfo[0] + " - " + merchandiseInfo[1] ));
                         restockBeverage.increaseInventory(Integer.parseInt(merchandiseInfo[4]));
-                        restockBeverage.addDelivery(today);
+                        restockBeverage.addDelivery(today, Double.parseDouble(merchandiseInfo[4]), Double.parseDouble(merchandiseInfo[2]));
                 }
                 if(Objects.equals(merchandiseInfo[merchandiseInfo.length - 1].trim(), "NR")){
                             PackagedFood restockFood = packagedFoodRepository.findBySkuCode(merchandiseInfo[0]).orElseThrow(()-> new EntityNotFoundException("Not in Stock" + merchandiseInfo[0] + " - " + merchandiseInfo[1] ));
                             restockFood.increaseInventory(Integer.parseInt(merchandiseInfo[4]));
-                            restockFood.addDelivery(today);
+                            restockFood.addDelivery(today, Double.parseDouble(merchandiseInfo[4]), Double.parseDouble(merchandiseInfo[2]));
                     }
             }
         }
@@ -195,5 +196,41 @@ public class MerchandiseService {
         HotFood hotFood = restaurantRepository.findBySkuCode(product.getSkuCode()).orElseThrow(()-> new EntityNotFoundException("Hot Food with " + product.getSkuCode() + " not found"));
       //  hotFood.reduceInventory(product.getQuantity());
         restaurantRepository.save(hotFood);
+    }
+
+    public Double updateMaxCapacity(String skuCode, Double maxCapacity) {
+        Optional<BottledBeverage> optBb = bottledBeverageRepository.findBySkuCode(skuCode);
+        if (optBb.isPresent()) {
+            BottledBeverage bb = optBb.get();
+            bb.setMaxCapacity(maxCapacity);
+            bottledBeverageRepository.save(bb);
+            double ratio;
+            if (maxCapacity == null) {
+                ratio = 0.0;
+            } else if (maxCapacity.doubleValue() > 0.0) {
+                ratio = bb.getQty() / maxCapacity.doubleValue() * 100.0;
+            } else {
+                ratio = 0.0;
+            }
+            return ratio;
+        }
+
+        Optional<PackagedFood> optPf = packagedFoodRepository.findBySkuCode(skuCode);
+        if (optPf.isPresent()) {
+            PackagedFood pf = optPf.get();
+            pf.setMaxCapacity(maxCapacity);
+            packagedFoodRepository.save(pf);
+            double ratio;
+            if (maxCapacity == null) {
+                ratio = 0.0;
+            } else if (maxCapacity.doubleValue() > 0.0) {
+                ratio = pf.getQty() / maxCapacity.doubleValue() * 100.0;
+            } else {
+                ratio = 0.0;
+            }
+            return ratio;
+        }
+
+        throw new EntityNotFoundException("Consumable not found for skuCode: " + skuCode);
     }
 }

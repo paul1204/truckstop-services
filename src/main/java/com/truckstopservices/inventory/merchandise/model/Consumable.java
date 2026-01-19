@@ -23,12 +23,14 @@ public abstract class Consumable {
 
     private Double qty;
 
+    private Double maxCapacity;
+
     private String size;
 
     private String merchandiseType;
     
     @ElementCollection
-    private List<String> deliveryDates = new ArrayList<>();
+    private List<DeliveryInfo> deliveries = new ArrayList<>();
     
     private String lastDeliveryDate;
     
@@ -91,20 +93,21 @@ public abstract class Consumable {
     }
 
     public String getSize() {return size;}
-
+    
     public void setSize(String size) {this.size = size;}
+    
+    public Double getMaxCapacity() {
+        return maxCapacity;
+    }
+    
+    public void setMaxCapacity(Double maxCapacity) {
+        this.maxCapacity = maxCapacity;
+    }
 
     public void reduceInventory(double qty){setQty(this.qty -= qty);}
     
     public void increaseInventory(double qty){this.qty += qty;}
     
-    public List<String> getDeliveryDates() {
-        return deliveryDates;
-    }
-    
-    public void setDeliveryDates(List<String> deliveryDates) {
-        this.deliveryDates = deliveryDates;
-    }
     
     public String getLastDeliveryDate() {
         return lastDeliveryDate;
@@ -114,11 +117,19 @@ public abstract class Consumable {
         this.lastDeliveryDate = lastDeliveryDate;
     }
     
-    public void addDelivery(String date) {
-        if (deliveryDates == null) {
-            deliveryDates = new ArrayList<>();
+    public List<DeliveryInfo> getDeliveries() {
+        return deliveries;
+    }
+    
+    public void setDeliveries(List<DeliveryInfo> deliveries) {
+        this.deliveries = deliveries;
+    }
+    
+    public void addDelivery(String deliveryDate, double qtyOrdered, double costPerUnit) {
+        if (deliveries == null) {
+            deliveries = new ArrayList<>();
         }
-        deliveryDates.add(date);
-        lastDeliveryDate = date;
+        deliveries.add(new DeliveryInfo(deliveryDate, qtyOrdered, costPerUnit));
+        lastDeliveryDate = deliveryDate;
     }
 }

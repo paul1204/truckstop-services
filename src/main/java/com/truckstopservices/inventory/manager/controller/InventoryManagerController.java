@@ -6,6 +6,7 @@ import com.truckstopservices.inventory.merchandise.dto.BottledBeverageCostByBran
 import com.truckstopservices.inventory.merchandise.dto.BottledBeverageInventoryByBrand;
 import com.truckstopservices.inventory.merchandise.model.Consumable;
 import com.truckstopservices.inventory.merchandise.packagedfood.entity.PackagedFood;
+import com.truckstopservices.inventory.merchandise.dto.AllProductsChartData;
 import com.truckstopservices.inventory.merchandise.service.MerchandiseService;
 import com.truckstopservices.inventory.restaurant.service.RestaurantService;
 import com.truckstopservices.processing.dto.InventoryDto;
@@ -62,6 +63,18 @@ public class InventoryManagerController {
     @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<PackagedFood>> getAllPackagedFood() {
         return new ResponseEntity<>(merchandiseService.getAllPackagedFood(), HttpStatus.OK);
+    }
+
+    @GetMapping("/packagedFood/allProducts/chartData")
+    @CrossOrigin(origins = "http://localhost:8000")
+    public ResponseEntity<AllProductsChartData> getAllPackagedFoodReturnChartData() {
+        return new ResponseEntity<>(merchandiseService.getAllPackagedFoodReturnChartData(), HttpStatus.OK);
+    }
+
+    @GetMapping("/bottledBeverage/allProducts/chartData")
+    @CrossOrigin(origins = "http://localhost:8000")
+    public ResponseEntity<AllProductsChartData> getAllBottledBeverageReturnChartData() {
+        return new ResponseEntity<>(merchandiseService.getAllBottledBeverageReturnChartData(), HttpStatus.OK);
     }
 
     @GetMapping("/allMerchandise")

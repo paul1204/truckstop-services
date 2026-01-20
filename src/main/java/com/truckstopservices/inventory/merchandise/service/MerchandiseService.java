@@ -9,6 +9,8 @@ import com.truckstopservices.common.types.SalesType;
 import com.truckstopservices.inventory.merchandise.beverages.entity.BottledBeverage;
 import com.truckstopservices.inventory.merchandise.dto.BottledBeverageCostByBrand;
 import com.truckstopservices.inventory.merchandise.dto.BottledBeverageInventoryByBrand;
+import com.truckstopservices.inventory.merchandise.dto.AllProductsChartData;
+import com.truckstopservices.inventory.merchandise.dto.ChartEntry;
 import com.truckstopservices.inventory.merchandise.model.DeliveryItemDto;
 import com.truckstopservices.inventory.merchandise.model.DeliveryItemInfo;
 //import com.truckstopservices.inventory.merchandise.model.DeliveryItemType;
@@ -52,13 +54,18 @@ public class MerchandiseService {
     @Autowired
     private SalesService salesService;
 
+    @Autowired
+    private MerchandiseChartService merchandiseChartService;
+
     public MerchandiseService(BottledBeverageRepository bottledBeverageRepository, PackagedFoodRepository packagedFoodRepository,
-                              RestaurantRepository restaurantRepository, InvoiceServiceImpl invoiceService, SalesService salesService) {
+                              RestaurantRepository restaurantRepository, InvoiceServiceImpl invoiceService, SalesService salesService,
+                              MerchandiseChartService merchandiseChartService) {
         this.bottledBeverageRepository = bottledBeverageRepository;
         this.packagedFoodRepository = packagedFoodRepository;
         this.restaurantRepository = restaurantRepository;
         this.invoiceService = invoiceService;
         this.salesService = salesService;
+        this.merchandiseChartService = merchandiseChartService;
     }
 
     public List<BottledBeverageInventoryByBrand> getBottledBeverageInventoryByBrandSqlAgg() {
@@ -71,6 +78,18 @@ public class MerchandiseService {
 
     public List<PackagedFood> getAllPackagedFood() {
         return packagedFoodRepository.findAll();
+    }
+
+    public AllProductsChartData getAllPackagedFoodReturnChartData() {
+        List<PackagedFood> foods = packagedFoodRepository.findAll();
+        Map<String, List<ChartEntry>> chartData = merchandiseChartService.getConsumablesChartData(foods);
+        return new AllProductsChartData(foods, chartData);
+    }
+
+    public AllProductsChartData getAllBottledBeverageReturnChartData() {
+        List<BottledBeverage> coldBeverages = bottledBeverageRepository.findAll();
+        Map<String, List<ChartEntry>> chartData = merchandiseChartService.getConsumablesChartData(coldBeverages);
+        return new AllProductsChartData(coldBeverages, chartData);
     }
 
     public List<BottledBeverageCostByBrand> returnInventoryCostByBrandSqlAgg() {
@@ -151,12 +170,6 @@ public class MerchandiseService {
         }
 
         return invoiceService.createInvoice(company, today, total);
-    }
-
-    private void createInvoiceForMerchant(String company,Double total){
-        //Create Invoice, Make payable to company
-        //invoiceService.createInvoice(company, "02/09/2025",total);
-        //Process Payment
     }
 
     public Receipt reduceInventoryV2(POSSaleDto posSaleDto){

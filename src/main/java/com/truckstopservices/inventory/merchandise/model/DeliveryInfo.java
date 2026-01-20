@@ -7,13 +7,16 @@ public class DeliveryInfo {
     private String deliveryDate;
     private Double qtyOrdered;
     private Double costPerUnit;
+    private Double retailPrice = 0.0;
+
 
     public DeliveryInfo() {}
 
-    public DeliveryInfo(String deliveryDate, Double qtyOrdered, Double costPerUnit) {
+    public DeliveryInfo(String deliveryDate, Double qtyOrdered, Double costPerUnit, Double retailPrice) {
         this.deliveryDate = deliveryDate;
         this.qtyOrdered = qtyOrdered;
         this.costPerUnit = costPerUnit;
+        this.retailPrice = retailPrice;
     }
 
     public String getDeliveryDate() {
@@ -38,5 +41,13 @@ public class DeliveryInfo {
 
     public void setCostPerUnit(Double costPerUnit) {
         this.costPerUnit = costPerUnit;
+    }
+
+    public Double getRetailPrice() {
+        return retailPrice;
+    }
+
+    public void setRetailPrice(Double retailPrice) {
+        this.retailPrice = retailPrice;
     }
 }

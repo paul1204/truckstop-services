@@ -129,7 +129,7 @@ public abstract class Consumable {
         if (deliveries == null) {
             deliveries = new ArrayList<>();
         }
-        deliveries.add(new DeliveryInfo(deliveryDate, qtyOrdered, costPerUnit));
+        deliveries.add(new DeliveryInfo(deliveryDate, qtyOrdered, costPerUnit, 0.0));
         lastDeliveryDate = deliveryDate;
     }
 }

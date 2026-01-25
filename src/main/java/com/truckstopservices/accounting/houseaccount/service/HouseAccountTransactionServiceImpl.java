@@ -19,7 +19,6 @@ public class HouseAccountTransactionServiceImpl implements HouseAccountTransacti
     
     private final HouseAccountTransactionRepository transactionRepository;
     
-    @Autowired
     public HouseAccountTransactionServiceImpl(HouseAccountTransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
     }

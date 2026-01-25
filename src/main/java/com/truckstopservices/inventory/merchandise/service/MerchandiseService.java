@@ -39,26 +39,18 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class MerchandiseService {
 
-    @Autowired
-    private BottledBeverageRepository bottledBeverageRepository;
+    private final BottledBeverageRepository bottledBeverageRepository;
+    private final PackagedFoodRepository packagedFoodRepository;
+    private final RestaurantRepository restaurantRepository;
+    private final InvoiceServiceImpl invoiceService;
+    private final SalesService salesService;
+    private final MerchandiseChartService merchandiseChartService;
 
-    @Autowired
-    private PackagedFoodRepository packagedFoodRepository;
-
-    @Autowired
-    private RestaurantRepository restaurantRepository;
-
-    @Autowired
-    private InvoiceServiceImpl invoiceService;
-
-    @Autowired
-    private SalesService salesService;
-
-    @Autowired
-    private MerchandiseChartService merchandiseChartService;
-
-    public MerchandiseService(BottledBeverageRepository bottledBeverageRepository, PackagedFoodRepository packagedFoodRepository,
-                              RestaurantRepository restaurantRepository, InvoiceServiceImpl invoiceService, SalesService salesService,
+    public MerchandiseService(BottledBeverageRepository bottledBeverageRepository,
+                              PackagedFoodRepository packagedFoodRepository,
+                              RestaurantRepository restaurantRepository,
+                              InvoiceServiceImpl invoiceService,
+                              SalesService salesService,
                               MerchandiseChartService merchandiseChartService) {
         this.bottledBeverageRepository = bottledBeverageRepository;
         this.packagedFoodRepository = packagedFoodRepository;

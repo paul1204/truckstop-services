@@ -29,7 +29,6 @@ public class ShowerService {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private static final int CLEANING_MINUTES = 10;
 
-    @Autowired
     public ShowerService(ShowerRepository showerRepository, ShowerRateRepository showerRateRepository) {
         this.showerRepository = showerRepository;
         this.showerRateRepository = showerRateRepository;

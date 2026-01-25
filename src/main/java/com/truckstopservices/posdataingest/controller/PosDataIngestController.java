@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/pos-ingest")
 public class PosDataIngestController {
 
-    @Autowired
     private final MerchandiseService merchandiseService;
 
     public PosDataIngestController(MerchandiseService merchandiseService) {
@@ -27,6 +26,6 @@ public class PosDataIngestController {
 
     @PostMapping("/sales")
     public ResponseEntity<Receipt> ingestData(@RequestBody POSSaleDto posSaleDto) {
-        return new ResponseEntity<Receipt>(merchandiseService.reduceInventoryV2(posSaleDto), HttpStatus.ACCEPTED);
+        return ResponseEntity.accepted().body(merchandiseService.reduceInventoryV2(posSaleDto));
     }
 }

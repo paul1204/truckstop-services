@@ -14,8 +14,7 @@ import java.util.UUID;
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
 
-    @Autowired
-    private InvoiceRepository invoiceRepository;
+    private final InvoiceRepository invoiceRepository;
 
     public InvoiceServiceImpl(InvoiceRepository invoiceRepository) {
         this.invoiceRepository = invoiceRepository;

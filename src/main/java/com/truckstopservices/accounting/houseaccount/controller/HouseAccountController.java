@@ -22,7 +22,6 @@ public class HouseAccountController {
     
     private final HouseAccountService houseAccountService;
     
-    @Autowired
     public HouseAccountController(HouseAccountService houseAccountService) {
         this.houseAccountService = houseAccountService;
     }
@@ -35,12 +34,8 @@ public class HouseAccountController {
      */
     @PostMapping
     public ResponseEntity<HouseAccountResponse> createHouseAccount(@RequestBody HouseAccountRequest request) {
-        try {
-            HouseAccountResponse response = houseAccountService.createHouseAccount(request);
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (HouseAccountException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        HouseAccountResponse response = houseAccountService.createHouseAccount(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
     /**
@@ -51,12 +46,8 @@ public class HouseAccountController {
      */
     @GetMapping("/{houseAccountId}")
     public ResponseEntity<HouseAccountResponse> getHouseAccount(@PathVariable String houseAccountId) {
-        try {
-            HouseAccountResponse response = houseAccountService.getHouseAccount(houseAccountId);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (HouseAccountException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        HouseAccountResponse response = houseAccountService.getHouseAccount(houseAccountId);
+        return ResponseEntity.ok(response);
     }
     
     /**
@@ -67,7 +58,7 @@ public class HouseAccountController {
     @GetMapping
     public ResponseEntity<List<HouseAccountResponse>> getAllHouseAccounts() {
         List<HouseAccountResponse> responses = houseAccountService.getAllHouseAccounts();
-        return new ResponseEntity<>(responses, HttpStatus.OK);
+        return ResponseEntity.ok(responses);
     }
 
     /**
@@ -78,12 +69,8 @@ public class HouseAccountController {
      */
     @DeleteMapping("/{houseAccountId}")
     public ResponseEntity<Void> deleteHouseAccount(@PathVariable String houseAccountId) {
-        try {
-            houseAccountService.deleteHouseAccount(houseAccountId);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (HouseAccountException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        houseAccountService.deleteHouseAccount(houseAccountId);
+        return ResponseEntity.noContent().build();
     }
     
     /**
@@ -97,15 +84,9 @@ public class HouseAccountController {
     public ResponseEntity<HouseAccountResponse> updateAccountStanding(
             @PathVariable String customerNumber,
             @RequestBody Map<String, String> body) {
-        try {
-            AccountStanding standing = AccountStanding.valueOf(body.get("standing").toUpperCase());
-            HouseAccountResponse response = houseAccountService.updateAccountStanding(customerNumber, standing);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (HouseAccountException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        AccountStanding standing = AccountStanding.valueOf(body.get("standing").toUpperCase());
+        HouseAccountResponse response = houseAccountService.updateAccountStanding(customerNumber, standing);
+        return ResponseEntity.ok(response);
     }
     
     /**
@@ -119,17 +100,13 @@ public class HouseAccountController {
     public ResponseEntity<HouseAccountResponse> updateCreditLimit(
             @PathVariable String customerNumber,
             @RequestBody Map<String, Double> body) {
-        try {
-            Double creditLimit = body.get("creditLimit");
-            if (creditLimit == null) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-            
-            HouseAccountResponse response = houseAccountService.updateCreditLimit(customerNumber, creditLimit);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (HouseAccountException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Double creditLimit = body.get("creditLimit");
+        if (creditLimit == null) {
+            return ResponseEntity.badRequest().build();
         }
+        
+        HouseAccountResponse response = houseAccountService.updateCreditLimit(customerNumber, creditLimit);
+        return ResponseEntity.ok(response);
     }
     
     /**
@@ -140,13 +117,9 @@ public class HouseAccountController {
      */
     @GetMapping("/standing/{standing}")
     public ResponseEntity<List<HouseAccountResponse>> findByAccountStanding(@PathVariable String standing) {
-        try {
-            AccountStanding accountStanding = AccountStanding.valueOf(standing.toUpperCase());
-            List<HouseAccountResponse> responses = houseAccountService.findByAccountStanding(accountStanding);
-            return new ResponseEntity<>(responses, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        AccountStanding accountStanding = AccountStanding.valueOf(standing.toUpperCase());
+        List<HouseAccountResponse> responses = houseAccountService.findByAccountStanding(accountStanding);
+        return ResponseEntity.ok(responses);
     }
     
     /**
@@ -158,7 +131,7 @@ public class HouseAccountController {
     @GetMapping("/search/{customerNumber}")
     public ResponseEntity<List<HouseAccountResponse>> findByCustomerName(@PathVariable String customerNumber) {
         List<HouseAccountResponse> responses = houseAccountService.findByName(customerNumber);
-        return new ResponseEntity<>(responses, HttpStatus.OK);
+        return ResponseEntity.ok(responses);
     }
     
     /**
@@ -170,6 +143,6 @@ public class HouseAccountController {
     @GetMapping("/phone/{phoneNumber}")
     public ResponseEntity<List<HouseAccountResponse>> findByPhoneNumber(@PathVariable String phoneNumber) {
         List<HouseAccountResponse> responses = houseAccountService.findByPhoneNumber(phoneNumber);
-        return new ResponseEntity<>(responses, HttpStatus.OK);
+        return ResponseEntity.ok(responses);
     }
 }

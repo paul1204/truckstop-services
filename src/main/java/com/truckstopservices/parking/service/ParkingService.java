@@ -26,7 +26,6 @@ public class ParkingService {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    @Autowired
     public ParkingService(ParkingSpotRepository parkingSpotRepository, ParkingRateRepository parkingRateRepository) {
         this.parkingSpotRepository = parkingSpotRepository;
         this.parkingRateRepository = parkingRateRepository;

@@ -31,23 +31,12 @@ import java.util.Optional;
 @Service
 public class TruckDriverFuelService {
 
-    @Autowired
-    private DieselRepository dieselRepository;
-
-    @Autowired
-    private FuelDeliveryRepository fuelDeliveryRepository;
-
-    @Autowired
-    private InvoiceServiceImpl invoiceService;
-    
-    @Autowired
-    private HouseAccountTransactionService houseAccountTransactionService;
-
-    @Autowired
-    private HouseAccountRepository houseAccountRepository;
-
-    @Autowired
-    private SalesService salesService;
+    private final DieselRepository dieselRepository;
+    private final FuelDeliveryRepository fuelDeliveryRepository;
+    private final InvoiceServiceImpl invoiceService;
+    private final HouseAccountTransactionService houseAccountTransactionService;
+    private final HouseAccountRepository houseAccountRepository;
+    private final SalesService salesService;
 
     public TruckDriverFuelService(DieselRepository dieselRepository,
                                   FuelDeliveryRepository fuelDeliveryRepository,

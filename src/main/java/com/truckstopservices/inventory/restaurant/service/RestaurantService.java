@@ -19,11 +19,8 @@ import java.util.Map;
 
 @Service
 public class RestaurantService {
-    @Autowired
-    private RestaurantRepository restaurantRepository;
-
-    @Autowired
-    private InvoiceServiceImpl invoiceService;
+    private final RestaurantRepository restaurantRepository;
+    private final InvoiceServiceImpl invoiceService;
 
     public RestaurantService(RestaurantRepository restaurantRepository, InvoiceServiceImpl invoiceService){
         this.restaurantRepository = restaurantRepository;

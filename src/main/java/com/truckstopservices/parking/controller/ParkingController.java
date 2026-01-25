@@ -18,7 +18,6 @@ public class ParkingController {
 
     private final ParkingService parkingService;
 
-    @Autowired
     public ParkingController(ParkingService parkingService) {
         this.parkingService = parkingService;
     }
@@ -26,47 +25,31 @@ public class ParkingController {
     @GetMapping("/spots")
     public ResponseEntity<List<ParkingResponse>> getAllParkingSpots() {
         List<ParkingResponse> spots = parkingService.getAllParkingSpots();
-        return new ResponseEntity<>(spots, HttpStatus.OK);
+        return ResponseEntity.ok(spots);
     }
 
     @GetMapping("/spots/available")
     public ResponseEntity<List<ParkingResponse>> getAvailableParkingSpots() {
         List<ParkingResponse> spots = parkingService.getAvailableParkingSpots();
-        return new ResponseEntity<>(spots, HttpStatus.OK);
+        return ResponseEntity.ok(spots);
     }
 
     @GetMapping("/spots/{spotNumber}")
     public ResponseEntity<ParkingResponse> getParkingSpotByNumber(@PathVariable String spotNumber) {
-        try {
-            ParkingResponse spot = parkingService.getParkingSpotByNumber(spotNumber);
-            return new ResponseEntity<>(spot, HttpStatus.OK);
-        } catch (ParkingException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        ParkingResponse spot = parkingService.getParkingSpotByNumber(spotNumber);
+        return ResponseEntity.ok(spot);
     }
 
     @PostMapping("/reserve")
     public ResponseEntity<ParkingResponse> createParkingSpotReservation(@RequestBody ParkingRequest request) {
-        try {
-            ParkingResponse response = parkingService.createParkingSpotReservation(request);
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (ParkingException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ParkingResponse response = parkingService.createParkingSpotReservation(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/release/{spotNumber}")
     public ResponseEntity<ParkingResponse> releaseParkingSpot(@PathVariable String spotNumber) {
-        try {
-            ParkingResponse response = parkingService.releaseParkingSpot(spotNumber);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (ParkingException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ParkingResponse response = parkingService.releaseParkingSpot(spotNumber);
+        return ResponseEntity.ok(response);
     }
 
 }

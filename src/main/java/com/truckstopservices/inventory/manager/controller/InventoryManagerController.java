@@ -24,12 +24,9 @@ import java.util.List;
 @RequestMapping("api/inventory")
 public class InventoryManagerController {
 
-    @Autowired
     private final MerchandiseService merchandiseService;
 
-    @Autowired
     private final RestaurantService restaurantService;
-
 
     public InventoryManagerController(MerchandiseService merchandiseService, RestaurantService restaurantService) {
         this.merchandiseService = merchandiseService;
@@ -39,48 +36,48 @@ public class InventoryManagerController {
     @PutMapping
     public ResponseEntity<String> updateMerchandiseInventoryFromSales(@RequestBody List<InventoryDto> inventoryList){
         merchandiseService.reduceInventory(inventoryList);
-        return new ResponseEntity<>("Inventory Updated", HttpStatus.OK);
+        return ResponseEntity.ok("Inventory Updated");
     }
 
     @GetMapping("/bottledbeverageInventoryByBrandSqlAgg")
     @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<BottledBeverageInventoryByBrand>> getBottledBeverageInventoryByBrandSqlAgg() {
-        return new ResponseEntity<>(merchandiseService.getBottledBeverageInventoryByBrandSqlAgg(), HttpStatus.OK);
+        return ResponseEntity.ok(merchandiseService.getBottledBeverageInventoryByBrandSqlAgg());
     }
     @GetMapping("/bottledbeverageInventoryCostByBrandSqlAgg")
     @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<BottledBeverageCostByBrand>> returnInventoryCostByBrandSqlAgg() {
-        return new ResponseEntity<>(merchandiseService.returnInventoryCostByBrandSqlAgg(), HttpStatus.OK);
+        return ResponseEntity.ok(merchandiseService.returnInventoryCostByBrandSqlAgg());
     }
 
     @GetMapping("/bottledBeverages")
     @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<BottledBeverage>> getAllBottledBeverages() {
-        return new ResponseEntity<>(merchandiseService.getAllBottledBeverages(), HttpStatus.OK);
+        return ResponseEntity.ok(merchandiseService.getAllBottledBeverages());
     }
 
     @GetMapping("/packagedFood")
     @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<PackagedFood>> getAllPackagedFood() {
-        return new ResponseEntity<>(merchandiseService.getAllPackagedFood(), HttpStatus.OK);
+        return ResponseEntity.ok(merchandiseService.getAllPackagedFood());
     }
 
     @GetMapping("/packagedFood/allProducts/chartData")
     @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<AllProductsChartData> getAllPackagedFoodReturnChartData() {
-        return new ResponseEntity<>(merchandiseService.getAllPackagedFoodReturnChartData(), HttpStatus.OK);
+        return ResponseEntity.ok(merchandiseService.getAllPackagedFoodReturnChartData());
     }
 
     @GetMapping("/bottledBeverage/allProducts/chartData")
     @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<AllProductsChartData> getAllBottledBeverageReturnChartData() {
-        return new ResponseEntity<>(merchandiseService.getAllBottledBeverageReturnChartData(), HttpStatus.OK);
+        return ResponseEntity.ok(merchandiseService.getAllBottledBeverageReturnChartData());
     }
 
     @GetMapping("/allMerchandise")
     @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<Consumable>> getAllMerchandise() {
-        return new ResponseEntity<>(merchandiseService.getAllMerchandise(), HttpStatus.OK);
+        return ResponseEntity.ok(merchandiseService.getAllMerchandise());
     }
 
     @PutMapping("/consumables/{skuCode}/max-capacity")
@@ -89,34 +86,20 @@ public class InventoryManagerController {
             @PathVariable String skuCode,
             @RequestParam Double maxCapacity) {
         Double ratio = merchandiseService.updateMaxCapacity(skuCode, maxCapacity);
-        return new ResponseEntity<>(ratio, HttpStatus.OK);
+        return ResponseEntity.ok(ratio);
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/delivery/merchandise")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Invoice> orderInventoryReceiveMerchandiseDelivery(@RequestParam MultipartFile merchandiseInventoryOrder, @RequestParam String date) throws IOException {
-        Invoice invoice;
-        try {
-            invoice = merchandiseService.acceptMerchandiseDelivery(merchandiseInventoryOrder, date);
-        }
-        //Throw better Exception
-        catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(invoice, HttpStatus.OK);
+        Invoice invoice = merchandiseService.acceptMerchandiseDelivery(merchandiseInventoryOrder, date);
+        return ResponseEntity.ok(invoice);
     }
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/delivery/restaurant")
     @ResponseStatus(HttpStatus.OK )
     public ResponseEntity<Invoice> orderInventoryReceiveRestaurantDelivery(@RequestParam MultipartFile merchandiseRestaurantOrder) throws IOException {
-        Invoice invoice;
-        try {
-            invoice = restaurantService.acceptRestaurantDelivery(merchandiseRestaurantOrder);
-        }
-        //Throw better Exception
-        catch (Exception e){
-            return new ResponseEntity<>( null, HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(invoice, HttpStatus.OK);
+        Invoice invoice = restaurantService.acceptRestaurantDelivery(merchandiseRestaurantOrder);
+        return ResponseEntity.ok(invoice);
     }
 
 }

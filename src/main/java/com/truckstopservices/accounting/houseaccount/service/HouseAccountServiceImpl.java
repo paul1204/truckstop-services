@@ -22,7 +22,6 @@ public class HouseAccountServiceImpl implements HouseAccountService {
     
     private final HouseAccountRepository houseAccountRepository;
     
-    @Autowired
     public HouseAccountServiceImpl(HouseAccountRepository houseAccountRepository) {
         this.houseAccountRepository = houseAccountRepository;
     }

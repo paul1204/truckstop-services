@@ -22,11 +22,7 @@ public class SalesService {
 
     private static final Logger log = LoggerFactory.getLogger(SalesService.class);
 
-    @Autowired
-    private SalesRepository salesRepository;
-
-    public SalesService() {
-    }
+    private final SalesRepository salesRepository;
 
     public SalesService(SalesRepository salesRepository) {
         this.salesRepository = salesRepository;

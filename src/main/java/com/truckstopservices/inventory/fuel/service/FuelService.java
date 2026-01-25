@@ -32,40 +32,31 @@ public class FuelService {
 
     private static final Logger log = LoggerFactory.getLogger(FuelService.class);
 
-    @Autowired
-    private DieselRepository dieselRepository;
+    private final DieselRepository dieselRepository;
+    private final RegularFuelRepository regularFuelRepository;
+    private final MidGradeFuelRepository midGradeFuelRepository;
+    private final PremimumFuelRepository premimumFuelRepository;
+    private final FuelDeliveryRepository fuelDeliveryRepository;
+    private final InvoiceServiceImpl invoiceService;
+    private final SalesRepository salesRepository;
+    private final SalesService salesService;
 
-    @Autowired
-    private RegularFuelRepository regularFuelRepository;
-
-    @Autowired
-    private MidGradeFuelRepository midGradeFuelRepository;
-
-    @Autowired
-    private PremimumFuelRepository premimumFuelRepository;
-
-    @Autowired
-    private FuelDeliveryRepository fuelDeliveryRepository;
-
-    @Autowired
-    private InvoiceServiceImpl invoiceService;
-
-    @Autowired
-    private SalesRepository salesRepository;
-    
-    @Autowired
-    private SalesService salesService;
-
-    public FuelService(DieselRepository dieselRepository, RegularFuelRepository regularFuelRepository,
-                       MidGradeFuelRepository midGradeFuelRepository, PremimumFuelRepository premimumFuelRepository,
+    public FuelService(DieselRepository dieselRepository,
+                       RegularFuelRepository regularFuelRepository,
+                       MidGradeFuelRepository midGradeFuelRepository,
+                       PremimumFuelRepository premimumFuelRepository,
+                       FuelDeliveryRepository fuelDeliveryRepository,
                        InvoiceServiceImpl invoiceService,
-                       SalesRepository salesRepository) {
+                       SalesRepository salesRepository,
+                       SalesService salesService) {
         this.dieselRepository = dieselRepository;
         this.regularFuelRepository = regularFuelRepository;
         this.midGradeFuelRepository = midGradeFuelRepository;
         this.premimumFuelRepository = premimumFuelRepository;
+        this.fuelDeliveryRepository = fuelDeliveryRepository;
         this.invoiceService = invoiceService;
         this.salesRepository = salesRepository;
+        this.salesService = salesService;
     }
 
     public List<FuelInventoryResponse> getAllFuelInventory() {

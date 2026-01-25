@@ -19,22 +19,20 @@ import java.util.*;
 
 @Service
 public class ProcessingService {
-    @Autowired
-    private ShiftReportRepository shiftReportRepository;
-
-    @Autowired
-    private FuelService fuelService;
-
-    @Autowired
-    private MerchandiseService merchandiseService;
-
-    @Autowired
-    private BottledBeverageRepository bottledBeverageRepository;
-
-    @Autowired
+    private final ShiftReportRepository shiftReportRepository;
+    private final FuelService fuelService;
+    private final MerchandiseService merchandiseService;
+    private final BottledBeverageRepository bottledBeverageRepository;
     private final MerchandiseManager merchandiseManagerClient;
 
-    public ProcessingService(BottledBeverageRepository bottledBeverageRepository, MerchandiseManager merchandiseManagerClient) {
+    public ProcessingService(ShiftReportRepository shiftReportRepository,
+                             FuelService fuelService,
+                             MerchandiseService merchandiseService,
+                             BottledBeverageRepository bottledBeverageRepository,
+                             MerchandiseManager merchandiseManagerClient) {
+        this.shiftReportRepository = shiftReportRepository;
+        this.fuelService = fuelService;
+        this.merchandiseService = merchandiseService;
         this.bottledBeverageRepository = bottledBeverageRepository;
         this.merchandiseManagerClient = merchandiseManagerClient;
     }

@@ -22,7 +22,6 @@ import java.util.List;
 @RequestMapping("fuel")
 public class FuelController {
 
-    @Autowired
     private final FuelService fuelService;
 
     public FuelController(FuelService fuelService) {
@@ -33,63 +32,42 @@ public class FuelController {
     @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<FuelInventoryResponse>> viewInventory() {
         List<FuelInventoryResponse> response = fuelService.getAllFuelInventory();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/viewInventoryChartData")
     @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<FuelChartDataResponse>> viewInventoryChartData() {
         List<FuelChartDataResponse> chartData = fuelService.getFuelInventoryChartData();
-        return new ResponseEntity<>(chartData, HttpStatus.OK);
+        return ResponseEntity.ok(chartData);
     }
 
     @PostMapping("/update/FuelInventory/reduceGallons")
     public ResponseEntity<String> updateFuelInventoryReduceGallons(@RequestBody Double[] fuelSales) {
         fuelService.updateFuelInventoryDeductAvailableGallonsFromSales(fuelSales);
-        return new ResponseEntity<>("Fuel Updated", HttpStatus.OK);
+        return ResponseEntity.ok("Fuel Updated");
     }
 
     @PutMapping("/update/FuelInventory/FuelDelivery")
-    public ResponseEntity<FuelDeliveryResponse<FuelDelivery>> fuelDeliveryUpdateRepo(@RequestBody FuelDelivery fuelDelivery) {
-        try {
-            return new ResponseEntity<>(fuelService.updateFuelDeliveryRepo(fuelDelivery), HttpStatus.OK);
-        } catch (DataAccessException e) {
-            throw new DataAccessResourceFailureException("Failed to update fuel delivery: " + e.getMessage(), e);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new FuelDeliveryResponse<>(false, e.getMessage(), null, null), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<FuelDeliveryResponse<FuelDelivery>> fuelDeliveryUpdateRepo(@RequestBody FuelDelivery fuelDelivery) throws Exception {
+        return ResponseEntity.ok(fuelService.updateFuelDeliveryRepo(fuelDelivery));
     }
 
     @PutMapping("/update/Diesel/FIFO")
     public ResponseEntity<FuelSaleResponse> updateDieselFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest) {
-        try {
-            FuelSaleResponse fuelSold = fuelService.updateDieselInventoryFIFOSales(fuelSaleRequest.gallonsSold(), fuelSaleRequest.terminal());
-            return new ResponseEntity<>(fuelSold, HttpStatus.OK);
-        } catch (FuelSaleException e) {
-            // Create a dummy receipt for the error case
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        FuelSaleResponse fuelSold = fuelService.updateDieselInventoryFIFOSales(fuelSaleRequest.gallonsSold(), fuelSaleRequest.terminal());
+        return ResponseEntity.ok(fuelSold);
     }
 
     @PutMapping("/update/RegularFuel/FIFO")
     public ResponseEntity<FuelSaleResponse> updateRegularFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest) {
-        try {
-            FuelSaleResponse fuelSold = fuelService.updateRegularOctaneInventoryFIFOSales(fuelSaleRequest.gallonsSold(), fuelSaleRequest.terminal());
-            return new ResponseEntity<>(fuelSold, HttpStatus.OK);
-        } catch (FuelSaleException e) {
-            // Create a dummy receipt for the error case
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        FuelSaleResponse fuelSold = fuelService.updateRegularOctaneInventoryFIFOSales(fuelSaleRequest.gallonsSold(), fuelSaleRequest.terminal());
+        return ResponseEntity.ok(fuelSold);
     }
 
     @PutMapping("/update/PremiumFuel/FIFO")
     public ResponseEntity<FuelSaleResponse> updatePremiumFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest) {
-        try {
-            FuelSaleResponse fuelSold = fuelService.updatePremiumOctaneInventoryFIFOSales(fuelSaleRequest.gallonsSold(), fuelSaleRequest.terminal());
-            return new ResponseEntity<>(fuelSold, HttpStatus.OK);
-        } catch (FuelSaleException e) {
-            // Create a dummy receipt for the error case
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        FuelSaleResponse fuelSold = fuelService.updatePremiumOctaneInventoryFIFOSales(fuelSaleRequest.gallonsSold(), fuelSaleRequest.terminal());
+        return ResponseEntity.ok(fuelSold);
     }
 }

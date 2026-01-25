@@ -13,9 +13,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/sales")
 public class SalesController {
+    
+    private final SalesService salesService;
 
-    @Autowired
-    private SalesService salesService;
+    public SalesController(SalesService salesService) {
+        this.salesService = salesService;
+    }
 
     @GetMapping("/by-shift")
     @CrossOrigin(origins = "http://localhost:8000")

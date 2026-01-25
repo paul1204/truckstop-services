@@ -23,7 +23,6 @@ import java.util.Map;
 @RequestMapping("api/shiftProcessing")
 public class ProcessingController {
 
-    @Autowired
     private final ProcessingService processingService;
 
     public ProcessingController(ProcessingService processingService) {
@@ -32,53 +31,48 @@ public class ProcessingController {
 
     @GetMapping("/postShift")
     public ResponseEntity<String> process() {
-        return new ResponseEntity<>("Hello! Please use HTTP POST to upload files from path reports/shift/shift1.txt", HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Hello! Please use HTTP POST to upload files from path reports/shift/shift1.txt");
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/postShift")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<Map<String, Object>> processShift(@RequestParam("shift_report") MultipartFile rawShiftReport, @RequestParam("inventory_report") MultipartFile rawInventoryReport) {
+    public ResponseEntity<Map<String, Object>> processShift(@RequestParam("shift_report") MultipartFile rawShiftReport, @RequestParam("inventory_report") MultipartFile rawInventoryReport) throws InterruptedException {
         long startTime = System.currentTimeMillis();
-        try {
-            if (rawShiftReport.isEmpty() || rawInventoryReport.isEmpty() ) {
-                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-            }
 
-            final ShiftReportDto[] shiftReportDto = new ShiftReportDto[1];
-            @SuppressWarnings("unchecked")
-            final List<List<InventoryDto>>[] inventoryList = new List[1];
-            Thread parseShiftThread = new Thread(()-> {
-                String rawShiftString = null;
-                try {
-                    rawShiftString = new String(rawShiftReport.getBytes(), StandardCharsets.UTF_8);
-                    shiftReportDto[0] = processingService.parsePOSShiftFile(rawShiftString);
-                    processingService.parseShiftDataAndSaveToRepo(shiftReportDto[0]);
-             //       processingService.updateFuelInventory(shiftReportDto[0]);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            Thread parseInventoryThread = new Thread(()->{
-                try {
-                    inventoryList[0] = processingService.parsePOSInventoryFile(rawInventoryReport);
-                    processingService.updateInventory(inventoryList[0]);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            parseShiftThread.start();
-            parseInventoryThread.start();
-
-            parseShiftThread.join();
-            parseInventoryThread.join();
-
-            long endTime = System.currentTimeMillis();
-            System.out.println("Execution Time: " + (endTime - startTime) + " milliseconds");
-            return new ResponseEntity<>(Map.of("ShiftReport",shiftReportDto[0], "Inventory Report",inventoryList[0]), HttpStatus.CREATED);
-        } catch (Exception e) {
-            Thread.currentThread().interrupt();
-            return new ResponseEntity<>( null, HttpStatus.BAD_REQUEST);
+        if (rawShiftReport.isEmpty() || rawInventoryReport.isEmpty()) {
+            return ResponseEntity.badRequest().build();
         }
 
+        final ShiftReportDto[] shiftReportDto = new ShiftReportDto[1];
+        @SuppressWarnings("unchecked")
+        final List<List<InventoryDto>>[] inventoryList = new List[1];
+        Thread parseShiftThread = new Thread(() -> {
+            String rawShiftString = null;
+            try {
+                rawShiftString = new String(rawShiftReport.getBytes(), StandardCharsets.UTF_8);
+                shiftReportDto[0] = processingService.parsePOSShiftFile(rawShiftString);
+                processingService.parseShiftDataAndSaveToRepo(shiftReportDto[0]);
+                //       processingService.updateFuelInventory(shiftReportDto[0]);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        Thread parseInventoryThread = new Thread(() -> {
+            try {
+                inventoryList[0] = processingService.parsePOSInventoryFile(rawInventoryReport);
+                processingService.updateInventory(inventoryList[0]);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        parseShiftThread.start();
+        parseInventoryThread.start();
+
+        parseShiftThread.join();
+        parseInventoryThread.join();
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("Execution Time: " + (endTime - startTime) + " milliseconds");
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("ShiftReport", shiftReportDto[0], "Inventory Report", inventoryList[0]));
     }
 }

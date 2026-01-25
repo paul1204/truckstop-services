@@ -21,7 +21,6 @@ import java.util.List;
 @RequestMapping("truck-driver/fuel")
 public class TruckDriverFuelController {
 
-    @Autowired
     private final TruckDriverFuelService truckDriverFuelService;
 
     public TruckDriverFuelController(TruckDriverFuelService truckDriverFuelService) {
@@ -32,47 +31,29 @@ public class TruckDriverFuelController {
     @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<FuelChartDataResponse>> viewInventoryChartData() {
         List<FuelChartDataResponse> chartData = truckDriverFuelService.getDieselInventoryChartData();
-        return new ResponseEntity<>(chartData, HttpStatus.OK);
+        return ResponseEntity.ok(chartData);
     }
 
     @PutMapping("/update/FuelInventory/FuelDelivery")
-    public ResponseEntity<FuelDeliveryResponse<FuelDelivery>> fuelDeliveryUpdateRepo(@RequestBody FuelDelivery fuelDelivery) {
-        try {
-            return new ResponseEntity<>(truckDriverFuelService.updateDieselDeliveryRepo(fuelDelivery), HttpStatus.OK);
-        } catch (DataAccessException e) {
-            throw new DataAccessResourceFailureException("Failed to update fuel delivery: " + e.getMessage(), e);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new FuelDeliveryResponse<>(false, e.getMessage(), null, null), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<FuelDeliveryResponse<FuelDelivery>> fuelDeliveryUpdateRepo(@RequestBody FuelDelivery fuelDelivery) throws Exception {
+        return ResponseEntity.ok(truckDriverFuelService.updateDieselDeliveryRepo(fuelDelivery));
     }
 
     @PutMapping("/update/Diesel/FIFO")
     public ResponseEntity<FuelSaleResponse> updateDieselFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest) {
-        try {
-            FuelSaleResponse fuelSold = truckDriverFuelService.updateDieselInventoryFIFOSales(fuelSaleRequest.gallonsSold(), fuelSaleRequest.terminal());
-            return new ResponseEntity<>(fuelSold, HttpStatus.OK);
-        } catch (FuelSaleException e) {
-            FuelSaleRequest errorRequest = new FuelSaleRequest(0, 0.0, 0.0, e.getMessage(), fuelSaleRequest.terminal());
-            FuelSaleResponse errorResponse = FuelSaleResponse.fromFuelSaleRequestAndReceipt(errorRequest, null);
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        }
+        FuelSaleResponse fuelSold = truckDriverFuelService.updateDieselInventoryFIFOSales(fuelSaleRequest.gallonsSold(), fuelSaleRequest.terminal());
+        return ResponseEntity.ok(fuelSold);
     }
 
     @PutMapping("/update/Diesel/FIFO/HouseAccount/{houseAccountId}")
     public ResponseEntity<FuelSaleHouseAccountResponse> updateDieselFuelFIFOHouseAccount(
             @RequestBody FuelSaleRequest fuelSaleRequest,
             @PathVariable String houseAccountId) {
-        try {
-            FuelSaleHouseAccountResponse fuelSold = truckDriverFuelService.updateDieselInventoryFIFOSalesHouseAccount(
-                    fuelSaleRequest.gallonsSold(), 
-                    houseAccountId,
-                    fuelSaleRequest.terminal());
-            return new ResponseEntity<>(fuelSold, HttpStatus.OK);
-        } catch (FuelSaleException e) {
-            FuelSaleRequest errorRequest = new FuelSaleRequest(0, 0.0, 0.0, e.getMessage(), fuelSaleRequest.terminal());
-            FuelSaleHouseAccountResponse errorResponse = FuelSaleHouseAccountResponse.fromFuelSaleRequestAndHouseAccountTransaction(errorRequest, null, null);
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        }
+        FuelSaleHouseAccountResponse fuelSold = truckDriverFuelService.updateDieselInventoryFIFOSalesHouseAccount(
+                fuelSaleRequest.gallonsSold(), 
+                houseAccountId,
+                fuelSaleRequest.terminal());
+        return ResponseEntity.ok(fuelSold);
     }
 
 }

@@ -159,7 +159,7 @@ public class TruckDriverFuelService {
                         "Due to Transaction Failure, a rollback occurred. " + originalFifoGallonState + " needs to be also accounted for.");
             }
         }
-        FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No diesel fuel was sold, inventory unchanged.", null);
+        FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0.0, 0.0, "No diesel fuel was sold, inventory unchanged.", null);
         return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(0.00, com.truckstopservices.common.types.SalesType.FUEL, "Diesel", terminal));
 
     }

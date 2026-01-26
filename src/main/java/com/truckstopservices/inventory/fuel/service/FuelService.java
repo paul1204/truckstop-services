@@ -6,11 +6,13 @@ import com.truckstopservices.accounting.sales.repository.SalesRepository;
 import com.truckstopservices.accounting.sales.service.SalesService;
 import com.truckstopservices.common.types.SalesType;
 import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
+import com.truckstopservices.inventory.fuel.dto.FuelDeliveryDto;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleResponse;
 import com.truckstopservices.inventory.fuel.entity.*;
+import com.truckstopservices.inventory.fuel.model.Fuel;
 import com.truckstopservices.inventory.fuel.repository.*;
 //import com.truckstopservices.inventory.fuel.repository.FuelRepository;
 import com.truckstopservices.inventory.fuel.exception.FuelSaleException;
@@ -111,7 +113,36 @@ public class FuelService {
     }
 
     @Transactional
-    public FuelDeliveryResponse<FuelDelivery> updateFuelDeliveryRepo(FuelDelivery fuelDelivery) throws Exception {
+    public FuelDeliveryResponse updateFuelDeliveryRepo(FuelDeliveryDto fuelDeliveryDto) throws Exception {
+        FuelDelivery fuelDelivery = new FuelDelivery();
+        fuelDelivery.setCompanyName(fuelDeliveryDto.companyName());
+        fuelDelivery.setFuelDelivery_ID(fuelDeliveryDto.fuelDeliveryId());
+        fuelDelivery.setDeliveryDate(fuelDeliveryDto.deliveryDate());
+
+        List<Fuel> fuels = new ArrayList<>();
+
+        if (fuelDeliveryDto.dieselOrder() != null) {
+            Diesel diesel = new Diesel(fuelDeliveryDto.deliveryDate(), 40,
+                fuelDeliveryDto.dieselOrder().pricePerGallon() != null ? fuelDeliveryDto.dieselOrder().pricePerGallon() : 0.0,
+                fuelDeliveryDto.dieselOrder().totalGallons() != null ? fuelDeliveryDto.dieselOrder().totalGallons() : 0.0);
+            fuelDelivery.setDieselOrder(diesel);
+            fuels.add(diesel);
+        }
+        if (fuelDeliveryDto.regularOctaneOrder() != null) {
+            RegularOctane regular = new RegularOctane(fuelDeliveryDto.deliveryDate(), 87,
+                fuelDeliveryDto.regularOctaneOrder().pricePerGallon() != null ? fuelDeliveryDto.regularOctaneOrder().pricePerGallon() : 0.0,
+                fuelDeliveryDto.regularOctaneOrder().totalGallons() != null ? fuelDeliveryDto.regularOctaneOrder().totalGallons() : 0.0);
+            fuelDelivery.setRegularOctaneOrder(regular);
+            fuels.add(regular);
+        }
+        if (fuelDeliveryDto.premiumOctaneOrder() != null) {
+            PremiumOctane premium = new PremiumOctane(fuelDeliveryDto.deliveryDate(), 91,
+                fuelDeliveryDto.premiumOctaneOrder().pricePerGallon() != null ? fuelDeliveryDto.premiumOctaneOrder().pricePerGallon() : 0.0,
+                fuelDeliveryDto.premiumOctaneOrder().totalGallons() != null ? fuelDeliveryDto.premiumOctaneOrder().totalGallons() : 0.0);
+            fuelDelivery.setPremiumOctaneOrder(premium);
+            fuels.add(premium);
+        }
+
         try {
             FuelDelivery savedDelivery = fuelDeliveryRepository.save(fuelDelivery);
             try {
@@ -148,7 +179,7 @@ public class FuelService {
                 totalAmount
             );
 
-            return new FuelDeliveryResponse<>(true, "Fuel Successfully Delivered!", new FuelDelivery[0], vendorInvoice);
+            return new FuelDeliveryResponse<>(true, "Fuel Successfully Delivered!", fuels.toArray(new Fuel[0]), vendorInvoice);
         } catch (DataAccessException e) {
             throw new DataAccessResourceFailureException("Failed to update fuel delivery: " + e.getMessage(), e);
         }
@@ -182,9 +213,15 @@ public class FuelService {
     private void updateFuelInventoryFromDelivery(FuelDelivery fuelDelivery) throws Exception {
         //updateDieselFuelDelivery(fuelDelivery.getDieselOrder().getDelivery_id(),fuelDelivery.getDieselOrder().getTotalGallons());
         String deliveryDate = fuelDelivery.getDeliveryDate();
-        updateDieselFuelDelivery(fuelDelivery.getDieselOrder(), deliveryDate);
-        updateRegularOctaneFuelDelivery(fuelDelivery.getRegularOctaneOrder(), deliveryDate);
-        updatePremiumOctaneFuelDelivery(fuelDelivery.getPremiumOctaneOrder(), deliveryDate);
+        if (fuelDelivery.getDieselOrder() != null) {
+            updateDieselFuelDelivery(fuelDelivery.getDieselOrder(), deliveryDate);
+        }
+        if (fuelDelivery.getRegularOctaneOrder() != null) {
+            updateRegularOctaneFuelDelivery(fuelDelivery.getRegularOctaneOrder(), deliveryDate);
+        }
+        if (fuelDelivery.getPremiumOctaneOrder() != null) {
+            updatePremiumOctaneFuelDelivery(fuelDelivery.getPremiumOctaneOrder(), deliveryDate);
+        }
     }
 
     private Diesel updateDieselFuelDelivery(Diesel newDieselOrder, String deliveryDate) throws Exception {
@@ -278,7 +315,7 @@ public class FuelService {
             }
         }
 
-        FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.", null);
+        FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0.0, 0.0, "No fuel was sold, inventory unchanged.", null);
         //No sales should be generated - Fix this
         return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(0.00, SalesType.FUEL, "Diesel", terminal));
     }
@@ -334,10 +371,9 @@ public class FuelService {
             }
         }
 
-        FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.", null);
+        FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0.0, 0.0, "No fuel was sold, inventory unchanged.", null);
 
         return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(0.00, SalesType.FUEL, "87", terminal));
-
     }
 
     @Transactional
@@ -393,10 +429,9 @@ public class FuelService {
             }
         }
 
-        FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0, 0, "No fuel was sold, inventory unchanged.", null);
+        FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0.0, 0.0, "No fuel was sold, inventory unchanged.", null);
 
         return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(0.00, SalesType.FUEL, "93", terminal));
-
     }
     public List<FuelChartDataResponse> getFuelInventoryChartData() {
         List<FuelInventoryResponse> fuelInventory = getAllFuelInventory();

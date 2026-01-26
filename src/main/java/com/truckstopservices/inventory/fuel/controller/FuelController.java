@@ -1,6 +1,7 @@
 package com.truckstopservices.inventory.fuel.controller;
 
 import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
+import com.truckstopservices.inventory.fuel.dto.FuelDeliveryDto;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleResponse;
@@ -49,8 +50,8 @@ public class FuelController {
     }
 
     @PutMapping("/update/FuelInventory/FuelDelivery")
-    public ResponseEntity<FuelDeliveryResponse<FuelDelivery>> fuelDeliveryUpdateRepo(@RequestBody FuelDelivery fuelDelivery) throws Exception {
-        return ResponseEntity.ok(fuelService.updateFuelDeliveryRepo(fuelDelivery));
+    public ResponseEntity<FuelDeliveryResponse> fuelDeliveryUpdateRepo(@RequestBody FuelDeliveryDto fuelDeliveryDto) throws Exception {
+        return ResponseEntity.ok(fuelService.updateFuelDeliveryRepo(fuelDeliveryDto));
     }
 
     @PutMapping("/update/Diesel/FIFO")

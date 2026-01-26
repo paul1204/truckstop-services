@@ -10,10 +10,10 @@ public abstract class Fuel {
     private Long delivery_id;
     private int octane;
     String deliveryDate;
-    private double costPerGallon;
-    private double retailPrice;
-    private double totalGallons;
-    private double availableGallons;
+    private double costPerGallon = 0.00;
+    private double retailPrice = 0.00;
+    private double totalGallons = 0.00;
+    private double availableGallons = 0.00;
 
    // private double averagePrice;
 

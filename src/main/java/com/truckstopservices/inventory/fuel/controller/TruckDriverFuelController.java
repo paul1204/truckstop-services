@@ -34,17 +34,6 @@ public class TruckDriverFuelController {
         return ResponseEntity.ok(chartData);
     }
 
-    @PutMapping("/update/FuelInventory/FuelDelivery")
-    public ResponseEntity<FuelDeliveryResponse<FuelDelivery>> fuelDeliveryUpdateRepo(@RequestBody FuelDelivery fuelDelivery) throws Exception {
-        return ResponseEntity.ok(truckDriverFuelService.updateDieselDeliveryRepo(fuelDelivery));
-    }
-
-    @PutMapping("/update/Diesel/FIFO")
-    public ResponseEntity<FuelSaleResponse> updateDieselFuelFIFO(@RequestBody FuelSaleRequest fuelSaleRequest) {
-        FuelSaleResponse fuelSold = truckDriverFuelService.updateDieselInventoryFIFOSales(fuelSaleRequest.gallonsSold(), fuelSaleRequest.terminal());
-        return ResponseEntity.ok(fuelSold);
-    }
-
     @PutMapping("/update/Diesel/FIFO/HouseAccount/{houseAccountId}")
     public ResponseEntity<FuelSaleHouseAccountResponse> updateDieselFuelFIFOHouseAccount(
             @RequestBody FuelSaleRequest fuelSaleRequest,

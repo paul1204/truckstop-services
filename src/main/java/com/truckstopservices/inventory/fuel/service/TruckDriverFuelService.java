@@ -32,21 +32,15 @@ import java.util.Optional;
 public class TruckDriverFuelService {
 
     private final DieselRepository dieselRepository;
-    private final FuelDeliveryRepository fuelDeliveryRepository;
-    private final InvoiceServiceImpl invoiceService;
     private final HouseAccountTransactionService houseAccountTransactionService;
     private final HouseAccountRepository houseAccountRepository;
     private final SalesService salesService;
 
     public TruckDriverFuelService(DieselRepository dieselRepository,
-                                  FuelDeliveryRepository fuelDeliveryRepository,
-                                  InvoiceServiceImpl invoiceService,
                                   HouseAccountTransactionService houseAccountTransactionService,
                                   HouseAccountRepository houseAccountRepository,
                                   SalesService salesService) {
         this.dieselRepository = dieselRepository;
-        this.fuelDeliveryRepository = fuelDeliveryRepository;
-        this.invoiceService = invoiceService;
         this.houseAccountTransactionService = houseAccountTransactionService;
         this.houseAccountRepository = houseAccountRepository;
         this.salesService = salesService;
@@ -67,60 +61,15 @@ public class TruckDriverFuelService {
     }
 
     @Transactional
-    public FuelDeliveryResponse<FuelDelivery> updateDieselDeliveryRepo(FuelDelivery fuelDelivery) throws Exception {
-        try {
-            if (fuelDelivery.getDieselOrder() == null) {
-                throw new Exception("Diesel order is required for truck driver fuel delivery");
-            }
-            
-            FuelDelivery savedDelivery = fuelDeliveryRepository.save(fuelDelivery);
-            updateDieselFuelDelivery(savedDelivery.getDieselOrder(), savedDelivery.getDeliveryDate());
-            double totalAmount = fuelDelivery.getDieselOrder().getCostPerGallon() *
-                                fuelDelivery.getDieselOrder().getTotalGallons();
-            Invoice vendorInvoice = invoiceService.createInvoice(
-                fuelDelivery.getCompanyName(),
-                fuelDelivery.getDeliveryDate(),
-                totalAmount
-            );
-            
-            return new FuelDeliveryResponse<>(true, "Diesel Successfully Delivered!", new FuelDelivery[0], vendorInvoice);
-        } catch (DataAccessException e) {
-            throw new DataAccessResourceFailureException("Failed to update diesel delivery: " + e.getMessage(), e);
-        }
-    }
-    
-    private Diesel updateDieselFuelDelivery(Diesel newDieselOrder, String deliveryDate) throws Exception {
-        // Always call findById to satisfy the test verification
-        // If delivery_id is null, use any() matcher in test
-        if (newDieselOrder.getDelivery_id() == null) {
-            // First try to find an existing record (this will satisfy the test verification)
-            Optional<Diesel> existingDiesel = dieselRepository.findById(0L); // Using 0L as a placeholder
-            
-            // Then save the new diesel order
-            newDieselOrder.setDeliveryDate(deliveryDate);
-            return dieselRepository.save(newDieselOrder);
-        }
-        
-        // Otherwise, find the existing diesel order and update it
-        return dieselRepository.findById(newDieselOrder.getDelivery_id())
-                .map(diesel -> {
-                    diesel.updateGallonsAddInventory(newDieselOrder.getTotalGallons());
-                    diesel.setDeliveryDate(deliveryDate);
-                    return dieselRepository.save(diesel);
-                })
-                .orElseThrow(() -> new Exception("Error, could not accept Diesel Delivery "));
-    }
-    
-    @Transactional
     public FuelSaleResponse updateDieselInventoryFIFOSales(double gallonsSold, String terminal) throws FuelSaleException {
         Optional<Diesel> dieselFirstRecord = dieselRepository.findFIFOAvailableGallons();
         if (!dieselFirstRecord.isPresent()) {
             throw new FuelSaleException("No available diesel to consume. There are " + gallonsSold + " gallons unaccounted for");
         }
-        
+
         Diesel fifoDiesel = dieselFirstRecord.get();
         double originalFifoGallonState;
-        
+
         if (fifoDiesel.getAvailableGallons() > gallonsSold) {
             fifoDiesel.updateGallonsReduceInventorySales(gallonsSold);
             dieselRepository.save(fifoDiesel);
@@ -128,14 +77,14 @@ public class TruckDriverFuelService {
             FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(fifoDiesel.getOctane(), gallonsSold, totalPrice, "Truck Driver Diesel Fuel Updated", terminal);
             return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(totalPrice, SalesType.FUEL, "Diesel", terminal));
         }
-        
+
         if (fifoDiesel.getAvailableGallons() <= gallonsSold) {
             Optional<Diesel> dieselSecondRecord = dieselRepository.findNextFifoNextAvailableGallons();
             double negativeCarryOver = fifoDiesel.getAvailableGallons() - gallonsSold;
 
             originalFifoGallonState = fifoDiesel.getAvailableGallons();
             fifoDiesel.setAvailableGallons(fifoDiesel.getAvailableGallons() - fifoDiesel.getAvailableGallons());
-            
+
             if (dieselSecondRecord.isPresent()) {
                 Diesel newFifoDieselBatch = dieselSecondRecord.get();
                 newFifoDieselBatch.setAvailableGallons(newFifoDieselBatch.getAvailableGallons() + negativeCarryOver);
@@ -143,10 +92,10 @@ public class TruckDriverFuelService {
                 fifoDiesel.setFlagInactive();
                 double totalPrice = gallonsSold * 1.99; // Using fixed price for simplicity
                 FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(
-                    fifoDiesel.getOctane(), 
-                    gallonsSold, 
-                    totalPrice, 
-                    "Truck Driver Diesel Fuel Updated. New Batch of Fuel being used. Delivery ID: " + 
+                    fifoDiesel.getOctane(),
+                    gallonsSold,
+                    totalPrice,
+                    "Truck Driver Diesel Fuel Updated. New Batch of Fuel being used. Delivery ID: " +
                     (newFifoDieselBatch.getDelivery_id() != null ? newFifoDieselBatch.getDelivery_id().toString() : "N/A"),
                     terminal
                 );
@@ -162,10 +111,6 @@ public class TruckDriverFuelService {
         FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(0, 0.0, 0.0, "No diesel fuel was sold, inventory unchanged.", null);
         return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(0.00, com.truckstopservices.common.types.SalesType.FUEL, "Diesel", terminal));
 
-    }
-    
-    public HouseAccountTransactionService getHouseAccountTransactionService() {
-        return houseAccountTransactionService;
     }
     
     @Transactional

@@ -89,7 +89,7 @@ public class FuelService {
                 .map(entry -> new FuelInventoryResponse(entry.getKey(), entry.getValue()))
                 .toList();
     }
-    
+
 
 
     public void updateFuelInventoryDeductAvailableGallonsFromSales(Double[] fuelSales) {
@@ -123,22 +123,22 @@ public class FuelService {
 
         if (fuelDeliveryDto.dieselOrder() != null) {
             Diesel diesel = new Diesel(fuelDeliveryDto.deliveryDate(), 40,
-                fuelDeliveryDto.dieselOrder().pricePerGallon() != null ? fuelDeliveryDto.dieselOrder().pricePerGallon() : 0.0,
-                fuelDeliveryDto.dieselOrder().totalGallons() != null ? fuelDeliveryDto.dieselOrder().totalGallons() : 0.0);
+                    fuelDeliveryDto.dieselOrder().pricePerGallon() != null ? fuelDeliveryDto.dieselOrder().pricePerGallon() : 0.0,
+                    fuelDeliveryDto.dieselOrder().totalGallons() != null ? fuelDeliveryDto.dieselOrder().totalGallons() : 0.0);
             fuelDelivery.setDieselOrder(diesel);
             fuels.add(diesel);
         }
         if (fuelDeliveryDto.regularOctaneOrder() != null) {
             RegularOctane regular = new RegularOctane(fuelDeliveryDto.deliveryDate(), 87,
-                fuelDeliveryDto.regularOctaneOrder().pricePerGallon() != null ? fuelDeliveryDto.regularOctaneOrder().pricePerGallon() : 0.0,
-                fuelDeliveryDto.regularOctaneOrder().totalGallons() != null ? fuelDeliveryDto.regularOctaneOrder().totalGallons() : 0.0);
+                    fuelDeliveryDto.regularOctaneOrder().pricePerGallon() != null ? fuelDeliveryDto.regularOctaneOrder().pricePerGallon() : 0.0,
+                    fuelDeliveryDto.regularOctaneOrder().totalGallons() != null ? fuelDeliveryDto.regularOctaneOrder().totalGallons() : 0.0);
             fuelDelivery.setRegularOctaneOrder(regular);
             fuels.add(regular);
         }
         if (fuelDeliveryDto.premiumOctaneOrder() != null) {
             PremiumOctane premium = new PremiumOctane(fuelDeliveryDto.deliveryDate(), 91,
-                fuelDeliveryDto.premiumOctaneOrder().pricePerGallon() != null ? fuelDeliveryDto.premiumOctaneOrder().pricePerGallon() : 0.0,
-                fuelDeliveryDto.premiumOctaneOrder().totalGallons() != null ? fuelDeliveryDto.premiumOctaneOrder().totalGallons() : 0.0);
+                    fuelDeliveryDto.premiumOctaneOrder().pricePerGallon() != null ? fuelDeliveryDto.premiumOctaneOrder().pricePerGallon() : 0.0,
+                    fuelDeliveryDto.premiumOctaneOrder().totalGallons() != null ? fuelDeliveryDto.premiumOctaneOrder().totalGallons() : 0.0);
             fuelDelivery.setPremiumOctaneOrder(premium);
             fuels.add(premium);
         }
@@ -166,17 +166,15 @@ public class FuelService {
             } catch (Exception e) {
                 log.warn("fuel_delivery_saved logging_error message={}", e.getMessage());
             }
-            //Need to update additional fields past initial save to repo
-            updateFuelInventoryFromDelivery(savedDelivery);
 
             // Calculate total amount for the invoice
             double totalAmount = calculateTotalAmount(fuelDelivery);
 
             // Create and save the invoice
             Invoice vendorInvoice = invoiceService.createInvoice(
-                fuelDelivery.getCompanyName(),
-                fuelDelivery.getDeliveryDate(),
-                totalAmount
+                    fuelDelivery.getCompanyName(),
+                    fuelDelivery.getDeliveryDate(),
+                    totalAmount
             );
 
             return new FuelDeliveryResponse<>(true, "Fuel Successfully Delivered!", fuels.toArray(new Fuel[0]), vendorInvoice);
@@ -208,54 +206,6 @@ public class FuelService {
         }
 
         return dieselAmount + regularAmount + premiumAmount;
-    }
-
-    private void updateFuelInventoryFromDelivery(FuelDelivery fuelDelivery) throws Exception {
-        //updateDieselFuelDelivery(fuelDelivery.getDieselOrder().getDelivery_id(),fuelDelivery.getDieselOrder().getTotalGallons());
-        String deliveryDate = fuelDelivery.getDeliveryDate();
-        if (fuelDelivery.getDieselOrder() != null) {
-            updateDieselFuelDelivery(fuelDelivery.getDieselOrder(), deliveryDate);
-        }
-        if (fuelDelivery.getRegularOctaneOrder() != null) {
-            updateRegularOctaneFuelDelivery(fuelDelivery.getRegularOctaneOrder(), deliveryDate);
-        }
-        if (fuelDelivery.getPremiumOctaneOrder() != null) {
-            updatePremiumOctaneFuelDelivery(fuelDelivery.getPremiumOctaneOrder(), deliveryDate);
-        }
-    }
-
-    private Diesel updateDieselFuelDelivery(Diesel newDieselOrder, String deliveryDate) throws Exception {
-        return dieselRepository.findById(newDieselOrder.getDelivery_id())
-                .map(diesel -> {
-                    diesel.updateGallonsAddInventory(newDieselOrder.getTotalGallons());
-                    diesel.setDeliveryDate(deliveryDate);
-                    // diesel.setNextDelivery_id(newDieselOrder.getDelivery_id() + 1 );
-                    return dieselRepository.save(diesel);
-                })
-                //Throw Better Error!!
-                .orElseThrow(() -> new Exception("Error, could not accept Fuel Delivery "));
-    }
-
-    private RegularOctane updateRegularOctaneFuelDelivery(RegularOctane newRegularOrder, String deliveryDate) throws Exception {
-        return regularFuelRepository.findById(newRegularOrder.getDelivery_id())
-                .map(regularOctane -> {
-                    regularOctane.updateGallonsAddInventory(newRegularOrder.getTotalGallons());
-                    regularOctane.setDeliveryDate(deliveryDate);
-                    return regularFuelRepository.save(regularOctane);
-                })
-                //Throw Better Error!!
-                .orElseThrow(() -> new Exception("Error, could not accept Fuel Delivery "));
-    }
-
-    private PremiumOctane updatePremiumOctaneFuelDelivery(PremiumOctane newPremiumOrder, String deliveryDate) throws Exception {
-        return premimumFuelRepository.findById(newPremiumOrder.getDelivery_id())
-                .map(premiumOctane -> {
-                    premiumOctane.updateGallonsAddInventory(newPremiumOrder.getTotalGallons());
-                    premiumOctane.setDeliveryDate(deliveryDate);
-                    return premimumFuelRepository.save(premiumOctane);
-                })
-                //Throw Better Error!!
-                .orElseThrow(() -> new Exception("Error, could not accept Fuel Delivery "));
     }
 
     @Transactional
@@ -300,11 +250,11 @@ public class FuelService {
 
                 double totalPrice = gallonsSold * 1.99;
                 FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(
-                    fifoDiesel.getOctane(), 
-                    gallonsSold, 
-                    totalPrice, 
-                    "Diesel Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoDieselBatch.getDelivery_id().toString(),
-                    terminal
+                        fifoDiesel.getOctane(),
+                        gallonsSold,
+                        totalPrice,
+                        "Diesel Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoDieselBatch.getDelivery_id().toString(),
+                        terminal
                 );
                 return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(totalPrice, SalesType.FUEL, "Diesel", terminal));
 
@@ -355,11 +305,11 @@ public class FuelService {
 
                 double totalPrice = gallonsSold * 1.99;
                 FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(
-                    fifoRegularOctane.getOctane(), 
-                    gallonsSold, 
-                    totalPrice, 
-                    "Regular Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoRegularBatch.getDelivery_id().toString(),
-                    terminal
+                        fifoRegularOctane.getOctane(),
+                        gallonsSold,
+                        totalPrice,
+                        "Regular Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoRegularBatch.getDelivery_id().toString(),
+                        terminal
                 );
 
                 return FuelSaleResponse.fromFuelSaleRequestAndReceipt(fuelSaleRequest,  salesService.createFuelSalesReturnReceipt(totalPrice, SalesType.FUEL, "87", terminal));
@@ -412,11 +362,11 @@ public class FuelService {
 
                 double totalPrice = gallonsSold * 1.99;
                 FuelSaleRequest fuelSaleRequest = new FuelSaleRequest(
-                    fifoPremiumOctane.getOctane(), 
-                    gallonsSold, 
-                    totalPrice, 
-                    "Premium Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoPremiumBatch.getDelivery_id().toString(),
-                    terminal
+                        fifoPremiumOctane.getOctane(),
+                        gallonsSold,
+                        totalPrice,
+                        "Premium Fuel Updated. New Batch of Fuel being used. Delivery ID: " + newFifoPremiumBatch.getDelivery_id().toString(),
+                        terminal
                 );
 
 

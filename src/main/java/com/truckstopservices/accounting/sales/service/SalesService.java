@@ -28,8 +28,8 @@ public class SalesService {
         this.salesRepository = salesRepository;
     }
 
-    public List<SalesByShift> findSalesByTodayAllShifts() {
-        return salesRepository.findSalesByTodayAllShifts();
+    public List<SalesByShift> findSalesByDate(LocalDate date) {
+        return salesRepository.findSalesByDate(date);
     }
 
     public Receipt createFuelSalesReturnReceipt(double amount, SalesType salesType, String fuelType, String terminal){

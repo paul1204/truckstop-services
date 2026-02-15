@@ -3,11 +3,10 @@ package com.truckstopservices.accounting.sales.controller;
 import com.truckstopservices.accounting.sales.dto.SalesByShift;
 import com.truckstopservices.accounting.sales.service.SalesService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -20,9 +19,9 @@ public class SalesController {
         this.salesService = salesService;
     }
 
-    @GetMapping("/by-shift")
+    @GetMapping("/by-shift/{date}")
     @CrossOrigin(origins = "http://localhost:8000")
-    public List<SalesByShift> findSalesByTodayAllShifts() {
-        return salesService.findSalesByTodayAllShifts();
+    public List<SalesByShift> findSalesByShift(@PathVariable("date") @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate date) {
+        return salesService.findSalesByDate(date);
     }
 }

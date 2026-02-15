@@ -6,11 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
 public interface SalesRepository extends JpaRepository<Sales, String> {
 
-    @Query(value = "SELECT ROUND(SUM(sales_amount),2) AS salesAmount, shift_number AS shiftNumber FROM sales GROUP BY shift_number ORDER BY shift_number ASC", nativeQuery = true)
-    List<SalesByShift> findSalesByTodayAllShifts();
+    @Query(value = "SELECT ROUND(SUM(sales_amount),2) AS salesAmount, shift_number AS shiftNumber FROM sales WHERE sales_date = :date GROUP BY shift_number ORDER BY shift_number ASC", nativeQuery = true)
+    List<SalesByShift> findSalesByDate(LocalDate date);
+
 }

@@ -3,8 +3,10 @@ package com.truckstopservices.inventory.fuel.controller;
 import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryDto;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
+import com.truckstopservices.inventory.fuel.dto.FuelDeliveryRetailPricePatchRequest;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleResponse;
+import com.truckstopservices.inventory.fuel.dto.RecentFuelDeliveryResponse;
 import com.truckstopservices.inventory.fuel.entity.FuelDelivery;
 import com.truckstopservices.inventory.fuel.service.FuelService;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryResponse;
@@ -21,6 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("fuel")
+@CrossOrigin(origins = "http://localhost:8000")
 public class FuelController {
 
     private final FuelService fuelService;
@@ -42,6 +45,20 @@ public class FuelController {
         List<FuelChartDataResponse> chartData = fuelService.getFuelInventoryChartData();
         return ResponseEntity.ok(chartData);
     }
+
+    @GetMapping("/viewRecentFuelDeliveries")
+    @CrossOrigin(origins = "http://localhost:8000")
+    public ResponseEntity<List<RecentFuelDeliveryResponse>> viewRecentFuelDeliveries(@RequestParam int count) {
+        List<RecentFuelDeliveryResponse> deliveries = fuelService.getRecentFuelDeliveries(count);
+        return ResponseEntity.ok(deliveries);
+    }
+
+    @PatchMapping("/update/FuelDelivery/retailPrices")
+    public ResponseEntity<Void> updateFuelDeliveryRetailPrices(@RequestBody List<FuelDeliveryRetailPricePatchRequest> fuelDeliveries) {
+        fuelService.patchFuelDeliveryRetailPrices(fuelDeliveries);
+        return ResponseEntity.noContent().build();
+    }
+
 
     @PostMapping("/update/FuelInventory/reduceGallons")
     public ResponseEntity<String> updateFuelInventoryReduceGallons(@RequestBody Double[] fuelSales) {

@@ -2,18 +2,23 @@ package com.truckstopservices.inventory.fuel.controller;
 
 import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryResponse;
+import com.truckstopservices.inventory.fuel.dto.FuelDeliveryRetailPricePatchRequest;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
+import com.truckstopservices.inventory.fuel.dto.RecentFuelDeliveryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleResponse;
+import com.truckstopservices.inventory.fuel.entity.Diesel;
 import com.truckstopservices.inventory.fuel.service.FuelService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import java.util.Collections;
@@ -21,9 +26,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -51,6 +58,8 @@ class FuelControllerTest {
     @Test
     void viewInventory_returns200() {
         prepopulateInventory();
+        Diesel diesel = new Diesel();
+        HttpEntity<Diesel> request = new HttpEntity<>(diesel);
 
         var response = client.get()
                 .uri("/fuel/viewInventory")
@@ -76,6 +85,54 @@ class FuelControllerTest {
         assertNotNull(response.getBody());
         assertTrue(response.getBody().contains("Diesel"));
         assertTrue(response.getBody().contains("5000.0"));
+    }
+
+    @Test
+    void viewRecentFuelDeliveries_returns200() {
+        List<RecentFuelDeliveryResponse> recentDeliveries = List.of(
+                new RecentFuelDeliveryResponse(5L, "FuelCo", "DEL-005", "2026-04-30", 8000.0, 3.99, 7000.0, 3.49, 6000.0, 4.29)
+        );
+        when(fuelService.getRecentFuelDeliveries(5)).thenReturn(recentDeliveries);
+
+        var response = client.get()
+                .uri("/fuel/viewRecentFuelDeliveries?count=5")
+                .retrieve()
+                .toEntity(String.class);
+
+        assertEquals(200, response.getStatusCode().value());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().contains("DEL-005"));
+        assertTrue(response.getBody().contains("FuelCo"));
+        assertTrue(response.getBody().contains("3.99"));
+    }
+
+    @Test
+    void viewRecentFuelDeliveries_withInvalidCount_returns400() {
+        when(fuelService.getRecentFuelDeliveries(0))
+                .thenThrow(new IllegalArgumentException("count must be greater than 0"));
+
+        HttpClientErrorException.BadRequest ex = assertThrows(HttpClientErrorException.BadRequest.class,
+                () -> client.get()
+                        .uri("/fuel/viewRecentFuelDeliveries?count=0")
+                        .retrieve()
+                        .toEntity(String.class));
+
+        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+        assertTrue(ex.getResponseBodyAsString().contains("count must be greater than 0"));
+    }
+
+    @Test
+    void updateFuelDeliveryRetailPrices_returns200() {
+        doNothing().when(fuelService).patchFuelDeliveryRetailPrices(anyList());
+
+        var response = client.patch()
+                .uri("/fuel/update/FuelDelivery/retailPrices")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(List.of(new FuelDeliveryRetailPricePatchRequest(5L, 4.19, 3.69, 4.49)))
+                .retrieve()
+                .toEntity(String.class);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test

@@ -7,8 +7,10 @@ import com.truckstopservices.accounting.sales.service.SalesService;
 import com.truckstopservices.common.types.SalesType;
 import com.truckstopservices.inventory.fuel.dto.FuelChartDataResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryDto;
+import com.truckstopservices.inventory.fuel.dto.FuelDeliveryRetailPricePatchRequest;
 import com.truckstopservices.inventory.fuel.dto.FuelDeliveryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelInventoryResponse;
+import com.truckstopservices.inventory.fuel.dto.RecentFuelDeliveryResponse;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleRequest;
 import com.truckstopservices.inventory.fuel.dto.FuelSaleResponse;
 import com.truckstopservices.inventory.fuel.entity.*;
@@ -18,6 +20,7 @@ import com.truckstopservices.inventory.fuel.repository.*;
 import com.truckstopservices.inventory.fuel.exception.FuelSaleException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.stereotype.Service;
@@ -398,5 +401,63 @@ public class FuelService {
         }
 
         return chartData;
+    }
+
+    public List<RecentFuelDeliveryResponse> getRecentFuelDeliveries(int limit) {
+        if (limit <= 0) {
+            throw new IllegalArgumentException("count must be greater than 0");
+        }
+
+        return fuelDeliveryRepository.findAllByOrderByIdDesc(PageRequest.of(0, limit)).stream()
+                .map(delivery -> new RecentFuelDeliveryResponse(
+                        delivery.getId(),
+                        delivery.getCompanyName(),
+                        delivery.getFuelDelivery_ID(),
+                        delivery.getDeliveryDate(),
+                        delivery.getDieselOrder() != null ? delivery.getDieselOrder().getTotalGallons() : null,
+                        delivery.getDieselOrder() != null ? delivery.getDieselOrder().getRetailPrice() : null,
+                        delivery.getRegularOctaneOrder() != null ? delivery.getRegularOctaneOrder().getTotalGallons() : null,
+                        delivery.getRegularOctaneOrder() != null ? delivery.getRegularOctaneOrder().getRetailPrice() : null,
+                        delivery.getPremiumOctaneOrder() != null ? delivery.getPremiumOctaneOrder().getTotalGallons() : null,
+                        delivery.getPremiumOctaneOrder() != null ? delivery.getPremiumOctaneOrder().getRetailPrice() : null
+                ))
+                .toList();
+    }
+
+    @Transactional
+    public void patchFuelDeliveryRetailPrices(List<FuelDeliveryRetailPricePatchRequest> fuelDeliveries) {
+        if (fuelDeliveries == null || fuelDeliveries.isEmpty()) {
+            throw new IllegalArgumentException("fuelDeliveries must not be empty");
+        }
+
+        fuelDeliveries.forEach(request -> {
+            log.info("patch_retail_price delivery_id={} diesel={} regular={} premium={}",
+                    request.id(),
+                    request.dieselRetailPrice(),
+                    request.regularRetailPrice(),
+                    request.premiumRetailPrice());
+            patchFuelDeliveryRetailPrice(request);
+        });
+    }
+
+    private void patchFuelDeliveryRetailPrice(FuelDeliveryRetailPricePatchRequest request) {
+        if (request.id() == null) {
+            throw new IllegalArgumentException("delivery id is required");
+        }
+
+        FuelDelivery delivery = fuelDeliveryRepository.findById(request.id())
+                .orElseThrow(() -> new EntityNotFoundException("Fuel delivery not found: " + request.id()));
+
+        if (request.dieselRetailPrice() != null && delivery.getDieselOrder() != null) {
+            delivery.getDieselOrder().setRetailPrice(request.dieselRetailPrice());
+        }
+        if (request.regularRetailPrice() != null && delivery.getRegularOctaneOrder() != null) {
+            delivery.getRegularOctaneOrder().setRetailPrice(request.regularRetailPrice());
+        }
+        if (request.premiumRetailPrice() != null && delivery.getPremiumOctaneOrder() != null) {
+            delivery.getPremiumOctaneOrder().setRetailPrice(request.premiumRetailPrice());
+        }
+
+        fuelDeliveryRepository.save(delivery);
     }
 }

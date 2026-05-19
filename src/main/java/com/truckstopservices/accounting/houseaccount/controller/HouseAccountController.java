@@ -2,6 +2,7 @@ package com.truckstopservices.accounting.houseaccount.controller;
 
 import com.truckstopservices.accounting.houseaccount.dto.HouseAccountRequest;
 import com.truckstopservices.accounting.houseaccount.dto.HouseAccountResponse;
+import com.truckstopservices.accounting.houseaccount.entity.HouseAccount;
 import com.truckstopservices.accounting.houseaccount.entity.HouseAccount.AccountStanding;
 import com.truckstopservices.accounting.houseaccount.exception.HouseAccountException;
 import com.truckstopservices.accounting.houseaccount.service.HouseAccountService;
@@ -18,6 +19,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("accounting/house-accounts")
+@CrossOrigin(origins = "http://localhost:8000")
 public class HouseAccountController {
     
     private final HouseAccountService houseAccountService;
@@ -56,6 +58,7 @@ public class HouseAccountController {
      * @return A list of all house account responses
      */
     @GetMapping
+    //@CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<HouseAccountResponse>> getAllHouseAccounts() {
         List<HouseAccountResponse> responses = houseAccountService.getAllHouseAccounts();
         return ResponseEntity.ok(responses);

@@ -1,136 +1,41 @@
 package com.truckstopservices.accounting.houseaccount.dto;
 
 import com.truckstopservices.accounting.houseaccount.entity.HouseAccount;
-import com.truckstopservices.accounting.houseaccount.entity.HouseAccount.AccountStanding;
 
 import java.time.LocalDateTime;
 
 /**
  * DTO for house account responses.
  */
-public class HouseAccountResponse {
-    private String houseAccountId; // Auto-generated UID
-    private String companyName; // Business identifier
-    private String phoneNumber;
-    private String address;
-    private Double creditLimit;
-    private AccountStanding accountStanding;
-    private Integer goodStandingDuration;
-    private Integer accountAge;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    
-    // Default constructor
-    public HouseAccountResponse() {
-    }
-    
-    /**
-     * Constructor to create a response from an entity.
-     * 
-     * @param houseAccount The house account entity
-     */
-    public HouseAccountResponse(HouseAccount houseAccount) {
-        this.houseAccountId = houseAccount.getHouseAccountId();
-        this.companyName = houseAccount.getCompanyName();
-        this.phoneNumber = houseAccount.getPhoneNumber();
-        this.address = houseAccount.getAddress();
-        this.creditLimit = houseAccount.getCreditLimit();
-        this.accountStanding = houseAccount.getAccountStanding();
-        this.goodStandingDuration = houseAccount.getGoodStandingDuration();
-        this.accountAge = houseAccount.getAccountAge();
-        this.createdAt = houseAccount.getCreatedAt();
-        this.updatedAt = houseAccount.getUpdatedAt();
-    }
-    
-    // Getters and setters
-    public String getHouseAccountId() {
-        return houseAccountId;
-    }
-    
-    public void setHouseAccountId(String houseAccountId) {
-        this.houseAccountId = houseAccountId;
-    }
-    
-    public String getCompanyName() {
-        return companyName;
-    }
-    
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-    
-    
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-    
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-    
-    public String getAddress() {
-        return address;
-    }
-    
-    public void setAddress(String address) {
-        this.address = address;
-    }
-    
-    public Double getCreditLimit() {
-        return creditLimit;
-    }
-    
-    public void setCreditLimit(Double creditLimit) {
-        this.creditLimit = creditLimit;
-    }
-    
-    public AccountStanding getAccountStanding() {
-        return accountStanding;
-    }
-    
-    public void setAccountStanding(AccountStanding accountStanding) {
-        this.accountStanding = accountStanding;
-    }
-    
-    public Integer getGoodStandingDuration() {
-        return goodStandingDuration;
-    }
-    
-    public void setGoodStandingDuration(Integer goodStandingDuration) {
-        this.goodStandingDuration = goodStandingDuration;
-    }
-    
-    public Integer getAccountAge() {
-        return accountAge;
-    }
-    
-    public void setAccountAge(Integer accountAge) {
-        this.accountAge = accountAge;
-    }
-    
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-    
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-    
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-    
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-    
-    /**
-     * Static factory method to create a response from an entity.
-     * 
-     * @param houseAccount The house account entity
-     * @return A new HouseAccountResponse
-     */
+public record HouseAccountResponse(
+        String houseAccountId, // Auto-generated UID
+        String companyName,     // Business identifier
+        String phoneNumber,
+        String address,
+        Double creditLimit,
+        HouseAccount.AccountStanding accountStanding,
+        Integer goodStandingDuration,
+        Integer accountAge,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
+        Double amountDue,
+        Double gallonsDue
+) {
+
     public static HouseAccountResponse fromEntity(HouseAccount houseAccount) {
-        return new HouseAccountResponse(houseAccount);
+        return new HouseAccountResponse(
+                houseAccount.getHouseAccountId(),
+                houseAccount.getCompanyName(),
+                houseAccount.getPhoneNumber(),
+                houseAccount.getAddress(),
+                houseAccount.getCreditLimit(),
+                houseAccount.getAccountStanding(),
+                houseAccount.getGoodStandingDuration(),
+                houseAccount.getAccountAge(),
+                houseAccount.getCreatedAt(),
+                houseAccount.getUpdatedAt(),
+                houseAccount.getAmountDue(),
+                houseAccount.getGallonsDue()
+        );
     }
 }

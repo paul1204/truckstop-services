@@ -36,7 +36,7 @@ public class HouseAccountServiceTest {
         HouseAccountResponse response = houseAccountService.createHouseAccount(request);
 
         assertNotNull(response);
-        assertEquals("ID1", response.getHouseAccountId());
+        assertEquals("ID1", response.houseAccountId());
     }
 
     @Test
@@ -48,6 +48,6 @@ public class HouseAccountServiceTest {
         HouseAccountResponse response = houseAccountService.getHouseAccount("ID1");
 
         assertNotNull(response);
-        assertEquals("ID1", response.getHouseAccountId());
+        assertEquals("ID1", response.houseAccountId());
     }
 }

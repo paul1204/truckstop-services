@@ -2,6 +2,7 @@ package com.truckstopservices.accounting.houseaccount.controller;
 
 import com.truckstopservices.accounting.houseaccount.dto.HouseAccountRequest;
 import com.truckstopservices.accounting.houseaccount.dto.HouseAccountResponse;
+import com.truckstopservices.accounting.houseaccount.dto.HouseAccountStatusDto;
 import com.truckstopservices.accounting.houseaccount.entity.HouseAccount;
 import com.truckstopservices.accounting.houseaccount.entity.HouseAccount.AccountStanding;
 import com.truckstopservices.accounting.houseaccount.exception.HouseAccountException;
@@ -50,6 +51,18 @@ public class HouseAccountController {
     public ResponseEntity<HouseAccountResponse> getHouseAccount(@PathVariable String houseAccountId) {
         HouseAccountResponse response = houseAccountService.getHouseAccount(houseAccountId);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Get the status of a house account including available gallons.
+     *
+     * @param houseAccountId The house account ID
+     * @return The house account status response
+     */
+    @GetMapping("/{houseAccountId}/status")
+    public ResponseEntity<HouseAccountStatusDto> getHouseAccountStatus(@PathVariable String houseAccountId) {
+        HouseAccountStatusDto status = houseAccountService.getHouseAccountStatus(houseAccountId);
+        return ResponseEntity.ok(status);
     }
     
     /**

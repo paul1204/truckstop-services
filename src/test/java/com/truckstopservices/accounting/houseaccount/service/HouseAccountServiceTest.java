@@ -2,6 +2,7 @@ package com.truckstopservices.accounting.houseaccount.service;
 
 import com.truckstopservices.accounting.houseaccount.dto.HouseAccountRequest;
 import com.truckstopservices.accounting.houseaccount.dto.HouseAccountResponse;
+import com.truckstopservices.accounting.houseaccount.dto.HouseAccountStatusDto;
 import com.truckstopservices.accounting.houseaccount.entity.HouseAccount;
 import com.truckstopservices.accounting.houseaccount.repository.HouseAccountRepository;
 import org.junit.jupiter.api.Test;
@@ -49,5 +50,22 @@ public class HouseAccountServiceTest {
 
         assertNotNull(response);
         assertEquals("ID1", response.houseAccountId());
+    }
+
+    @Test
+    void getHouseAccountStatus_CalculatesAvailableGallons() {
+        HouseAccount account = new HouseAccount("Test Co", "123", "Addr");
+        account.setHouseAccountId("ID1");
+        account.setCreditLimit(1000.0);
+        account.setGallonsDue(250.0);
+        when(houseAccountRepository.findById("ID1")).thenReturn(Optional.of(account));
+
+        HouseAccountStatusDto status = houseAccountService.getHouseAccountStatus("ID1");
+
+        assertNotNull(status);
+        assertEquals("ID1", status.houseAccountId());
+        assertEquals(1000.0, status.creditLimit());
+        assertEquals(250.0, status.gallonsDue());
+        assertEquals(750.0, status.availableGallons());
     }
 }

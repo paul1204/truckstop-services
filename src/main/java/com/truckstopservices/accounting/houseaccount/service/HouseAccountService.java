@@ -2,6 +2,7 @@ package com.truckstopservices.accounting.houseaccount.service;
 
 import com.truckstopservices.accounting.houseaccount.dto.HouseAccountRequest;
 import com.truckstopservices.accounting.houseaccount.dto.HouseAccountResponse;
+import com.truckstopservices.accounting.houseaccount.dto.HouseAccountStatusDto;
 import com.truckstopservices.accounting.houseaccount.entity.HouseAccount;
 import com.truckstopservices.accounting.houseaccount.entity.HouseAccount.AccountStanding;
 import com.truckstopservices.accounting.houseaccount.exception.HouseAccountException;
@@ -237,6 +238,24 @@ public class HouseAccountService {
         
         HouseAccount updatedAccount = houseAccountRepository.save(houseAccount);
         return HouseAccountResponse.fromEntity(updatedAccount);
+    }
+
+    /**
+     * Get the status of a house account including available gallons.
+     *
+     * @param id The account ID
+     * @return The house account status DTO
+     */
+    @Transactional(readOnly = true)
+    public HouseAccountStatusDto getHouseAccountStatus(String id) {
+        HouseAccount account = findAccountById(id);
+        double availableGallons = account.getCreditLimit() - account.getGallonsDue();
+        return new HouseAccountStatusDto(
+                account.getHouseAccountId(),
+                account.getCreditLimit(),
+                account.getGallonsDue(),
+                availableGallons
+        );
     }
     
     /**

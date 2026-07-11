@@ -19,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("truck-driver/fuel")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8000"})
 public class TruckDriverFuelController {
 
     private final TruckDriverFuelService truckDriverFuelService;
@@ -34,7 +35,7 @@ public class TruckDriverFuelController {
         return ResponseEntity.ok(chartData);
     }
 
-    @PutMapping("/update/Diesel/FIFO/HouseAccount/{houseAccountId}")
+    @PatchMapping("/update/Diesel/FIFO/HouseAccount/{houseAccountId}")
     public ResponseEntity<FuelSaleHouseAccountResponse> updateDieselFuelFIFOHouseAccount(
             @RequestBody FuelSaleRequest fuelSaleRequest,
             @PathVariable String houseAccountId) {

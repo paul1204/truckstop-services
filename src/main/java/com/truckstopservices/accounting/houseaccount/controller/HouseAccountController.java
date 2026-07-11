@@ -19,7 +19,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("accounting/house-accounts")
-@CrossOrigin(origins = "http://localhost:8000")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8000"})
 public class HouseAccountController {
     
     private final HouseAccountService houseAccountService;

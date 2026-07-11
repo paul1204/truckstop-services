@@ -39,12 +39,12 @@ public class HouseAccountException extends RuntimeException {
      * Creates an exception for when a credit limit is exceeded.
      * 
      * @param customerNumber The customer number
-     * @param currentLimit The current credit limit
+     * @param remainingCredit The remaining credit before this attempt
      * @return A new HouseAccountException
      */
-    public static HouseAccountException creditLimitExceeded(String customerNumber, Double currentLimit) {
+    public static HouseAccountException creditLimitExceeded(String customerNumber, Double remainingCredit) {
         return new HouseAccountException("Credit limit exceeded for customer number: " + customerNumber + 
-                                        ". Current limit: $" + currentLimit);
+                                        ". Remaining credit: $" + remainingCredit);
     }
     
     /**

@@ -147,6 +147,42 @@ public class HouseAccountService {
     }
     
     /**
+     * Adjust the balance of a house account with credit limit check.
+     * 
+     * @param id The account ID
+     * @param amountToCharge The amount to charge to the account
+     * @param gallonsToCharge The gallons to charge to the account
+     * @return The updated house account response
+     */
+    @Transactional
+    public HouseAccountResponse adjustBalance(String id, Double amountToCharge, Double gallonsToCharge) {
+        HouseAccount houseAccount = findAccountById(id);
+        
+        validateCreditLimit(houseAccount, amountToCharge);
+        
+        houseAccount.setAmountDue(houseAccount.getAmountDue() + amountToCharge);
+        houseAccount.setGallonsDue(houseAccount.getGallonsDue() + gallonsToCharge);
+        houseAccount.setUpdatedAt(LocalDateTime.now());
+        
+        HouseAccount updatedAccount = houseAccountRepository.save(houseAccount);
+        return HouseAccountResponse.fromEntity(updatedAccount);
+    }
+    
+    /**
+     * Validates that the account has enough credit limit for the attempt amount.
+     * 
+     * @param account The house account
+     * @param attemptAmount The amount being charged
+     * @throws HouseAccountException if credit limit is exceeded
+     */
+    private void validateCreditLimit(HouseAccount account, Double attemptAmount) {
+        if (account.getAmountDue() + attemptAmount > account.getCreditLimit()) {
+            double remainingCredit = Math.round((account.getCreditLimit() - account.getGallonsDue()) * 100.0) / 100.0;
+            throw HouseAccountException.creditLimitExceeded(account.getHouseAccountId(), remainingCredit);
+        }
+    }
+    
+    /**
      * Find house accounts by standing status.
      * 
      * @param standing The standing status

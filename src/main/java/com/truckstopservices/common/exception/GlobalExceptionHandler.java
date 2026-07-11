@@ -17,7 +17,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HouseAccountException.class)
     public ProblemDetail handleHouseAccountException(HouseAccountException ex) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        if (ex.getMessage().contains("not found")) {
+            status = HttpStatus.NOT_FOUND;
+        }
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, ex.getMessage());
         problemDetail.setTitle("House Account Error");
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;

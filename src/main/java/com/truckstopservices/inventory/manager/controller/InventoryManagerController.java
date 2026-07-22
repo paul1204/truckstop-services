@@ -40,48 +40,40 @@ public class InventoryManagerController {
     }
 
     @GetMapping("/bottledbeverageInventoryByBrandSqlAgg")
-    @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<BottledBeverageInventoryByBrand>> getBottledBeverageInventoryByBrandSqlAgg() {
         return ResponseEntity.ok(merchandiseService.getBottledBeverageInventoryByBrandSqlAgg());
     }
     @GetMapping("/bottledbeverageInventoryCostByBrandSqlAgg")
-    @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<BottledBeverageCostByBrand>> returnInventoryCostByBrandSqlAgg() {
         return ResponseEntity.ok(merchandiseService.returnInventoryCostByBrandSqlAgg());
     }
 
     @GetMapping("/bottledBeverages")
-    @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<BottledBeverage>> getAllBottledBeverages() {
         return ResponseEntity.ok(merchandiseService.getAllBottledBeverages());
     }
 
     @GetMapping("/packagedFood")
-    @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<PackagedFood>> getAllPackagedFood() {
         return ResponseEntity.ok(merchandiseService.getAllPackagedFood());
     }
 
     @GetMapping("/packagedFood/allProducts/chartData")
-    @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<AllProductsChartData> getAllPackagedFoodReturnChartData() {
         return ResponseEntity.ok(merchandiseService.getAllPackagedFoodReturnChartData());
     }
 
     @GetMapping("/bottledBeverage/allProducts/chartData")
-    @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<AllProductsChartData> getAllBottledBeverageReturnChartData() {
         return ResponseEntity.ok(merchandiseService.getAllBottledBeverageReturnChartData());
     }
 
     @GetMapping("/allMerchandise")
-    @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<Consumable>> getAllMerchandise() {
         return ResponseEntity.ok(merchandiseService.getAllMerchandise());
     }
 
     @PutMapping("/consumables/{skuCode}/max-capacity")
-    @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<Double> updateConsumableMaxCapacity(
             @PathVariable String skuCode,
             @RequestParam Double maxCapacity) {

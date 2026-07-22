@@ -23,7 +23,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("fuel")
-@CrossOrigin(origins = "http://localhost:8000")
 public class FuelController {
 
     private final FuelService fuelService;
@@ -33,21 +32,18 @@ public class FuelController {
     }
 
     @GetMapping("/viewInventory")
-    @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<FuelInventoryResponse>> viewInventory() {
         List<FuelInventoryResponse> response = fuelService.getAllFuelInventory();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/viewInventoryChartData")
-    @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<FuelChartDataResponse>> viewInventoryChartData() {
         List<FuelChartDataResponse> chartData = fuelService.getFuelInventoryChartData();
         return ResponseEntity.ok(chartData);
     }
 
     @GetMapping("/viewRecentFuelDeliveries")
-    @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<RecentFuelDeliveryResponse>> viewRecentFuelDeliveries(@RequestParam int count) {
         List<RecentFuelDeliveryResponse> deliveries = fuelService.getRecentFuelDeliveries(count);
         return ResponseEntity.ok(deliveries);

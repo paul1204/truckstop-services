@@ -20,7 +20,6 @@ public class SalesController {
     }
 
     @GetMapping("/by-shift/{date}")
-    @CrossOrigin(origins = "http://localhost:8000")
     public List<SalesByShift> findSalesByShift(@PathVariable("date") @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate date) {
         return salesService.findSalesByDate(date);
     }

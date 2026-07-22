@@ -19,7 +19,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("truck-driver/fuel")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8000"})
 public class TruckDriverFuelController {
 
     private final TruckDriverFuelService truckDriverFuelService;
@@ -29,7 +28,6 @@ public class TruckDriverFuelController {
     }
 
     @GetMapping("/viewInventoryChartData")
-    @CrossOrigin(origins = "http://localhost:8000")
     public ResponseEntity<List<FuelChartDataResponse>> viewInventoryChartData() {
         List<FuelChartDataResponse> chartData = truckDriverFuelService.getDieselInventoryChartData();
         return ResponseEntity.ok(chartData);

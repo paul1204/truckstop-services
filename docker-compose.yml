@@ -1,4 +1,14 @@
 services:
+#  app:
+#    image: mcr.microsoft.com/devcontainers/java:1-21-bullseye
+#    volumes:
+#      - .:/workspaces/truckstop-services:cached
+#    command: /bin/sh -c "while sleep 1000; do :; done"
+#    ports:
+#      - "9000:9000"
+#    depends_on:
+#      - mysql
+
   mysql:
     image: mysql:8.3.0
     container_name: truckstop-mysql

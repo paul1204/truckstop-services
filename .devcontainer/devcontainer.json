@@ -1,0 +1,26 @@
+{
+	"name": "Truck Stop Services Dev Container",
+	"dockerComposeFile": [
+		"docker-compose.yml"
+	],
+	"service": "app",
+	"workspaceFolder": "/workspaces/truckstop-services",
+	"features": {
+		"ghcr.io/devcontainers/features/java:1": {
+			"version": "21",
+			"installMaven": "true"
+		}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"vscjava.vscode-java-pack",
+				"vmware.vscode-spring-boot-dashboard",
+				"vscjava.vscode-spring-boot-extensionpack",
+				"vscjava.vscode-spring-initializr"
+			]
+		}
+	},
+	"forwardPorts": [9000, 3308],
+	"updateContentCommand": "mvn clean install -DskipTests"
+}

@@ -13,7 +13,7 @@ public class RestClientConfig {
     @Bean
     public MerchandiseManager inventoryClient(){
         RestClient restClient = RestClient.builder()
-                .baseUrl("http://localhost:8080")
+                .baseUrl("http://localhost:9000")
                 .build();
         var restClientAdapter = RestClientAdapter.create(restClient);
         var httpServiceProxyFactory = HttpServiceProxyFactory.builderFor(restClientAdapter).build();

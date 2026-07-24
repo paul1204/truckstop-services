@@ -66,11 +66,11 @@ Run the application locally using the Maven wrapper:
 ```bash
 ./mvnw spring-boot:run
 ```
-The server will start on port `8080`.
+The server will start on port `9000`.
 
 ### 3. API Documentation
 Once the application is running, you can explore and test the endpoints via the Swagger UI interface:
-👉 [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+👉 [http://localhost:9000/swagger-ui.html](http://localhost:9000/swagger-ui.html)
 
 ---
 

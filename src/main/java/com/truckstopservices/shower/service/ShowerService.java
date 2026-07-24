@@ -85,7 +85,7 @@ public class ShowerService {
         // Get the shower rate
         ShowerRate rate = showerRateRepository.findAll().stream()
                 .findFirst()
-                .orElseThrow(() -> new ShowerException("Shower rate not found"));
+                .orElseThrow(() -> new ShowerException("Shower reservation failed: No shower rates are configured in the system. Please contact an administrator to set up the default shower rate."));
 
         // Check if reservation exceeds max hours
         long hours = ChronoUnit.HOURS.between(startTime, endTime);

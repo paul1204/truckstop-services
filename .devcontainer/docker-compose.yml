@@ -1,0 +1,31 @@
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/java:1-21-bullseye
+    volumes:
+      - ..:/workspaces/truckstop-services:cached
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    ports:
+      - "9000:9000"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=truckstop_services
+      - DB_USER=root
+      - DB_PASSWORD=password
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.3.0
+    container_name: truckstop-mysql-dev
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: truckstop_services
+    ports:
+      - "3308:3306"
+    volumes:
+      - ../docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db-data:/var/lib/mysql
+volumes:
+  db-data:

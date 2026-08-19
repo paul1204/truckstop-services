@@ -24,47 +24,62 @@ public class DailySalesEtlService {
     }
 
     /**
-     * Scheduled job that runs daily at 1:00 AM.
-     * Extracts and loads yesterday's sales data.
+     * Scheduled job that runs daily at 1:00 AM using the database-to-database SQL implementation.
      */
     @Scheduled(cron = "0 0 1 * * ?")
     @Transactional
     public void runDailySalesEtl() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
-        runDailySalesEtlForDate(yesterday);
+        runDailySalesEtlSqlForDate(yesterday);
     }
 
     /**
-     * Copies the logic of runDailySalesEtl but runs it for today
-     * and has no scheduler annotation.
+     * Option A: EL pipeline pulling data into Java Memory.
      */
     @Transactional
-    public void runDailySalesEtlForToday() {
-        LocalDate today = LocalDate.now();
-        runDailySalesEtlForDate(today);
-    }
-
-    /**
-     * Runs the EL pipeline for a specific date.
-     * Idempotent: deletes existing records for the date first before loading.
-     */
-    @Transactional
-    public void runDailySalesEtlForDate(LocalDate date) {
-        // Step 0: Ensure historical database tables exist
+    public void runDailySalesEtlJavaForDate(LocalDate date) {
         ensureHistoricalTablesExist();
-
         String dateString = date.toString();
 
-        // Step 1: EXTRACT raw data from the primary database
-        List<RawSale> sales = extractSales(dateString);
-        List<RawSalesItem> items = extractSalesItems(dateString);
+        // 1. EXTRACT raw data from the primary database into Java lists
+        List<RawSale> sales = extractSalesFromPrimary(dateString);
+        List<RawSalesItem> items = extractSalesItemsFromPrimary(dateString);
 
-        // Step 2: CLEAN (Delete existing records in historical database for idempotency)
+        // 2. CLEAN (Delete existing records in historical database for idempotency)
         cleanHistoricalDataForDate(dateString);
 
-        // Step 3: LOAD data into the historical database
-        loadSales(sales);
-        loadSalesItems(items);
+        // 3. LOAD data into the historical database from memory
+        loadSalesFromMemory(sales);
+        loadSalesItemsFromMemory(items);
+    }
+
+    /**
+     * Option B: EL pipeline running entirely database-to-database.
+     */
+    @Transactional
+    public void runDailySalesEtlSqlForDate(LocalDate date) {
+        ensureHistoricalTablesExist();
+        String dateString = date.toString();
+
+        // 1. CLEAN (Delete existing records in historical database for idempotency)
+        cleanHistoricalDataForDate(dateString);
+
+        // 2. LOAD (Direct cross-database copy)
+        historicalJdbcTemplate.getJdbcOperations().update("""
+            INSERT INTO sales (sales_id, sales_date, sales_time, sales_amount, shift_number, terminal)
+            SELECT sales_id, sales_date, sales_time, sales_amount, shift_number, terminal
+            FROM truckstop_services.sales
+            WHERE sales_date = ?
+        """, dateString);
+
+        historicalJdbcTemplate.getJdbcOperations().update("""
+            INSERT INTO sales_items (id, sku_code, item_name, quantity, unit_price, sales_type, sales_id)
+            SELECT id, sku_code, item_name, quantity, unit_price, sales_type, sales_id
+            FROM truckstop_services.sales_items
+            WHERE sales_id IN (
+                SELECT sales_id FROM truckstop_services.sales WHERE sales_date = ?
+            )
+        """, dateString);
     }
 
     private void ensureHistoricalTablesExist() {
@@ -96,7 +111,7 @@ public class DailySalesEtlService {
         historicalJdbcTemplate.getJdbcOperations().execute(createSalesItemsTableSql);
     }
 
-    private List<RawSale> extractSales(String dateString) {
+    private List<RawSale> extractSalesFromPrimary(String dateString) {
         String query = """
             SELECT sales_id, sales_date, sales_time, sales_amount, shift_number, terminal
             FROM sales
@@ -113,7 +128,7 @@ public class DailySalesEtlService {
         ), dateString);
     }
 
-    private List<RawSalesItem> extractSalesItems(String dateString) {
+    private List<RawSalesItem> extractSalesItemsFromPrimary(String dateString) {
         String query = """
             SELECT si.id, si.sku_code, si.item_name, si.quantity, si.unit_price, si.sales_type, si.sales_id
             FROM sales_items si
@@ -149,7 +164,7 @@ public class DailySalesEtlService {
         historicalJdbcTemplate.getJdbcOperations().update(deleteSalesSql, dateString);
     }
 
-    private void loadSales(List<RawSale> sales) {
+    private void loadSalesFromMemory(List<RawSale> sales) {
         String insertSql = """
             INSERT INTO sales (sales_id, sales_date, sales_time, sales_amount, shift_number, terminal)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -168,7 +183,7 @@ public class DailySalesEtlService {
         }
     }
 
-    private void loadSalesItems(List<RawSalesItem> items) {
+    private void loadSalesItemsFromMemory(List<RawSalesItem> items) {
         String insertSql = """
             INSERT INTO sales_items (id, sku_code, item_name, quantity, unit_price, sales_type, sales_id)
             VALUES (?, ?, ?, ?, ?, ?, ?)

@@ -1,0 +1,69 @@
+name: Build & Package Spring Backend
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # Step 1: Check out repository source code
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Java 21 using the Microsoft Build of OpenJDK
+      - name: Set up Microsoft OpenJDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'microsoft'
+          cache: 'maven'
+
+      # Step 3: Ensure Maven wrapper is executable
+      - name: Grant execute permission for mvnw
+        run: chmod +x mvnw
+
+      # Step 4: Compile and package the Spring Boot JAR
+      - name: Build JAR with Maven
+        run: ./mvnw clean package -DskipTests
+
+      # Step 5: Save the .jar as a downloadable GitHub Artifact
+      - name: Upload JAR as GitHub Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: truckstop-services-jar
+          path: target/*.jar
+
+      # Step 6: Log in to GitHub Container Registry (GHCR)
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 7: Generate Docker image tags (automatically handles lowercase repo name)
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest
+            type=sha,format=short
+
+      # Step 8: Build the Docker image and push to GHCR
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

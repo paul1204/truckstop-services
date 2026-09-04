@@ -1,0 +1,13 @@
+${AnsiColor.BRIGHT_YELLOW}
+  /\============================================================/\
+  ||  [>>] TRUCK STOP ERP LITE  ──  FLEET & LOGISTICS PLATFORM  ||
+  \/============================================================\/
+${AnsiColor.BRIGHT_BLUE}
+    _______ ____  _   _  ____ _  __   ____ _____ ___  ____  
+   /__  __/  _  \| | | |/ ___| |/ /  / ___|_   _/ _ \|  _ \ 
+     / /  | |_) ) |_| | |___ | . \   \___ \ | || (_) | |_) )
+    /_/   |_| \_\\___/ \____/|_|\_\  |____/ |_| \___/|  __/ 
+                                                     |_|    
+${AnsiColor.BRIGHT_GREEN}
+  >> Application: v${application.version:0.0.1-SNAPSHOT}  |  Spring Boot: ${spring-boot.version}  |  Port: 9000
+${AnsiColor.DEFAULT}

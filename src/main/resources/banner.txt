@@ -1,0 +1,16 @@
+${AnsiColor.BRIGHT_CYAN}
+       .--------.       .----------------------------------------.
+      /|         \======|                                        |
+     / | ERP LITE |     |   T R U C K   S T O P                  |
+    /==|    ()    |     |   >> FLEET & DISPATCH <<               |
+   '------(O)-----'     '---(O)(O)------------------------(O)(O)-'
+${AnsiColor.BRIGHT_YELLOW}
+   _____ ____  _   _  ____ _  __   ____ _____ ___  ____  
+  |_   _|  _ \| | | |/ ___| |/ /  / ___|_   _/ _ \|  _ \ 
+    | | | |_) | | | | |   | ' /   \___ \ | || | | | |_) |
+    | | |  _ <| |_| | |___| . \    ___) || || |_| |  __/ 
+    |_| |_| \_\\___/ \____|_|\_\  |____/ |_| \___/|_|    
+${AnsiColor.BRIGHT_GREEN}
+  :: Truck Stop ERP Lite ::              (v${application.version:0.0.1-SNAPSHOT})
+  :: Powered by Spring Boot v${spring-boot.version} ::     Port: 9000
+${AnsiColor.DEFAULT}
